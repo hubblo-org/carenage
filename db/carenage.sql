@@ -124,5 +124,5 @@ CREATE TABLE events (
   PE_use_value_component FLOAT,
   PE_use_max_component FLOAT,
   PE_use_min_component FLOAT,
-  CONSTRAINT primary_keys PRIMARY KEY (process_id, task_id, job_id, run_id, pipeline_id, workflow_id, repository_id, project_id, machine_id)
+  CONSTRAINT primary_keys PRIMARY KEY (task_id, job_id, run_id, pipeline_id, workflow_id, repository_id, project_id, machine_id)
 );
