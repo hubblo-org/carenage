@@ -97,6 +97,7 @@ CREATE TABLE events (
   project_id uuid  REFERENCES projects(project_id),
   machine_id uuid  REFERENCES devices(device_id),
   type VARCHAR(255),
+  user_label TEXT,
   CPU_time_percent FLOAT,
   RAM_virt_bytes INTEGER,
   RAM_phy_bytes INTEGER,
@@ -123,5 +124,5 @@ CREATE TABLE events (
   PE_use_value_component FLOAT,
   PE_use_max_component FLOAT,
   PE_use_min_component FLOAT,
-  CONSTRAINT primary_keys PRIMARY KEY (process_id, task_id, job_id, pipeline_id, workflow_id, repository_id, project_id, machine_id)
+  CONSTRAINT primary_keys PRIMARY KEY (process_id, task_id, job_id, run_id, pipeline_id, workflow_id, repository_id, project_id, machine_id)
 );
