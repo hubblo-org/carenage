@@ -85,6 +85,8 @@ CREATE TABLE component_characteristic (
   value VARCHAR(255)
 );
 
+CREATE TYPE event_type AS ENUM ('regular', 'custom', 'start', 'stop');
+
 CREATE TABLE events (
   timestamp TIMESTAMP,
   process_id uuid REFERENCES processes(process_id),
@@ -96,7 +98,7 @@ CREATE TABLE events (
   repository_id uuid REFERENCES repositories(repository_id),
   project_id uuid REFERENCES projects(project_id),
   machine_id uuid REFERENCES devices(device_id),
-  type VARCHAR(255),
+  event_type event_type,
   user_label TEXT,
   CPU_time_percent FLOAT,
   RAM_virt_bytes INTEGER,
