@@ -138,5 +138,17 @@ CREATE TABLE events (
   PE_use_value_component FLOAT,
   PE_use_max_component FLOAT,
   PE_use_min_component FLOAT,
+  GWP_total_operational_emissions FLOAT,
+  GWP_total_embedded_emissions FLOAT,
+  GWP_total FLOAT,
+  ADP_total_operational_emissions FLOAT,
+  ADP_total_embedded_emissions FLOAT,
+  ADP_total FLOAT,
+  PE_total_operational_emissions FLOAT,
+  PE_total_embedded_emissions FLOAT,
+  PE_total FLOAT,
+  total_time INTEGER,
+  avg_power FLOAT,
+  electric_carbon_intensity FLOAT,
   CONSTRAINT primary_keys PRIMARY KEY (task_id, job_id, run_id, pipeline_id, workflow_id, repository_id, project_id, machine_id)
 );
