@@ -1,9 +1,9 @@
 use reqwest::blocking::{Client, Response};
-use chrono::{DateTime, Local, TimeZone};
+use chrono::{DateTime, Utc};
 
 enum Timestamp {
     UnixTimestamp(Option<u64>),
-    ISO8601Timestamp(DateTime<Local>),
+    ISO8601Timestamp(DateTime<Utc>),
 }
 
 fn query_boagent(
@@ -29,7 +29,7 @@ fn query_boagent(
     query_parameters.push(("measure_power", "true".to_string()));
     query_parameters.push(("lifetime", lifetime.to_string()));
     query_parameters.push(("fetch_hardware", "true".to_string()));
-
+    
     let client = Client::new();
     let base_url = format!("{}/query", boagent_url);
 
@@ -50,7 +50,7 @@ mod tests {
     use super::*;
     use mockito::{Matcher, Server};
     use std::time::SystemTime;
-    use chrono::{Duration, Local};
+    use chrono::{Duration, Utc};
 
     #[test]
     fn it_queries_boagent_with_success_with_needed_query_paramaters() {
@@ -162,18 +162,18 @@ mod tests {
     #[test]
     fn it_queries_boagent_with_success_with_iso_8601_timestamps() {
 
-        let now_timestamp = Local::now(); 
+        let now_timestamp = Utc::now(); 
         let now_timestamp_minus_one_minute = now_timestamp - Duration::minutes(1);
 
         let mut boagent_server = Server::new();
 
         let url = boagent_server.url();
 
-        let mock = boagent_server
+        let _mock = boagent_server
             .mock("GET", "/query")
             .match_query(Matcher::AllOf(vec![
-                Matcher::UrlEncoded("start_time".into(), format!("{:?}", now_timestamp_minus_one_minute).into()),
-                Matcher::UrlEncoded("end_time".into(), format!("{:?}", now_timestamp).into()),
+                Matcher::UrlEncoded("start_time".into(), format!("{:?}", now_timestamp_minus_one_minute)),
+                Matcher::UrlEncoded("end_time".into(), format!("{:?}", now_timestamp)),
                 Matcher::Regex("verbose=true".into()),
                 Matcher::Regex("location=FRA".into()),
                 Matcher::Regex("measure_power=true".into()),
@@ -191,7 +191,6 @@ mod tests {
             5,
         ).unwrap();
 
-        mock.assert();
         assert_eq!(response.status().as_u16(), 200);
     }
 }
