@@ -1,5 +1,9 @@
 use reqwest::blocking::{Client, Response};
 use chrono::{DateTime, Utc};
+use std::fs::File;
+use std::io::BufReader;
+use serde_json::{Value, Error};
+
 
 enum Timestamp {
     UnixTimestamp(Option<u64>),
@@ -45,11 +49,22 @@ fn query_boagent(
     }
 }
 
+
+fn deserialize_boagent_json(boagent_response_json: File) -> Result<Value, Error> {
+    
+    let boagent_json_reader = BufReader::new(boagent_response_json);
+    let deserialized_boagent_json = serde_json::from_reader(boagent_json_reader)?;
+
+    Ok(deserialized_boagent_json)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use mockito::{Matcher, Server};
     use std::time::SystemTime;
+    use std::fs::File;
+    use std::env::current_dir;
     use chrono::{Duration, Utc};
 
     #[test]
@@ -98,6 +113,8 @@ mod tests {
             .as_secs();
         let now_timestamp_minus_one_minute = now_timestamp - 60;
 
+        let error_message = "Error from Boagent.";
+
         let mut boagent_server = Server::new();
 
         let url = boagent_server.url();
@@ -125,6 +142,7 @@ mod tests {
         );
 
         assert_eq!(response.is_err(), true);
+        assert_eq!(response.unwrap_err(), error_message);
     }
     
     #[test]
@@ -192,5 +210,21 @@ mod tests {
         ).unwrap();
 
         assert_eq!(response.status().as_u16(), 200);
+    }
+
+    #[test]
+    fn it_deserializes_json_from_boagent_response_as_a_saved_json_file() {
+        
+        let mut boagent_json_fp = current_dir().unwrap();
+
+        boagent_json_fp.push("mocks");
+        boagent_json_fp.push("boagent_response");
+        boagent_json_fp.set_extension("json");
+
+        let boagent_response_json = File::open(boagent_json_fp).unwrap(); 
+
+        let deserialized_json = deserialize_boagent_json(boagent_response_json);
+
+        assert_eq!(deserialized_json.is_ok(), true);
     }
 }
