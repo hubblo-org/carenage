@@ -65,8 +65,9 @@ fn deserialize_boagent_json(boagent_response_json: File) -> Result<Value, Error>
     Ok(deserialized_boagent_json)
 }
 
-async fn insert_project_metadata(
+async fn insert_dimension_table_metadata(
     database_connection: PoolConnection<Postgres>,
+    table: &str,
     project_data: Value,
 ) -> Result<PgQueryResult, sqlx::Error> {
     let project_name = project_data.get("name").unwrap();
@@ -79,13 +80,17 @@ async fn insert_project_metadata(
         NaiveDateTime::parse_from_str(project_stop_date, "%Y-%m-%d %H:%M:%S").unwrap();
 
     let mut connection = database_connection.detach();
-    let insert_data_query =
-        sqlx::query("INSERT INTO projects (name, start_date, stop_date) VALUES ($1, $2, $3)")
-            .bind(project_name)
-            .bind(start_date_timestamp)
-            .bind(stop_date_timestamp)
-            .execute(&mut connection)
-            .await;
+
+    let insert_query = format!(
+        "INSERT INTO {} (name, start_date, stop_date) VALUES ($1, $2, $3)",
+        table
+    );
+    let insert_data_query = sqlx::query(&insert_query)
+        .bind(project_name)
+        .bind(start_date_timestamp)
+        .bind(stop_date_timestamp)
+        .execute(&mut connection)
+        .await;
 
     insert_data_query
 }
@@ -279,9 +284,43 @@ mod tests {
 
         let db_connection = pool.acquire().await?;
 
-        let insert_query = insert_project_metadata(db_connection, project_metadata);
+        let insert_query =
+            insert_dimension_table_metadata(db_connection, "projects", project_metadata);
 
         assert_eq!(insert_query.await.is_ok(), true);
+        Ok(())
+    }
+
+    #[sqlx::test(migrations = "../db/")]
+    async fn it_inserts_valid_data_for_several_dimension_tables_in_the_carenage_database(
+        pool: PgPool,
+    ) -> sqlx::Result<()> {
+        let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
+        let later_timestamp = (Utc::now() + Duration::weeks(4)).format("%Y-%m-%d %H:%M:%S");
+
+        let dimension_tables = vec![
+            "projects",
+            "repositories",
+            "workflows",
+            "pipelines",
+            "runs",
+            "jobs",
+            "tasks",
+            "containers",
+        ];
+
+        let dimension_table_metadata = json!({
+            "name": "dimension_table_metadata",
+            "start_date": now_timestamp.to_string(),
+            "stop_date": later_timestamp.to_string(),
+        });
+
+        for table in dimension_tables {
+            let db_connection = pool.acquire().await?;
+            let insert_query = insert_dimension_table_metadata(db_connection, table, dimension_table_metadata.clone());
+            assert_eq!(insert_query.await.is_ok(), true);
+        }
+
         Ok(())
     }
 }
