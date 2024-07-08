@@ -128,6 +128,27 @@ async fn insert_process_metadata(
 
     insert_data_query
 }
+
+async fn insert_device_metadata(
+    database_connection: PoolConnection<Postgres>,
+    device_data: Value,
+) -> std::result::Result<PgQueryResult, sqlx::Error> {
+    let device_name = device_data.get("device_name");
+    let device_lifetime = device_data.get("device_lifetime");
+    let device_location = device_data.get("device_location");
+
+    let mut connection = database_connection.detach();
+
+    let insert_query = "INSERT INTO devices (name, lifetime, location) VALUES ($1, $2, $3)";
+    let insert_data_query = sqlx::query(&insert_query)
+        .bind(device_name)
+        .bind(device_lifetime)
+        .bind(device_location)
+        .execute(&mut connection)
+        .await;
+
+    insert_data_query
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -383,6 +404,55 @@ mod tests {
 
         let insert_query =
             insert_process_metadata(db_connection, "processes", process_metadata).await;
+
+        assert_eq!(insert_query.is_ok(), true);
+        assert_eq!(insert_query.unwrap().rows_affected(), 1);
+        Ok(())
+    }
+
+    #[sqlx::test(migrations = "../db/")]
+    async fn it_inserts_valid_data_for_the_devices_components_and_components_characteristics_dimensions_tables_in_the_carenage_database(
+        pool: PgPool,
+    ) -> sqlx::Result<()> {
+        let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
+        let later_timestamp = (Utc::now() + Duration::weeks(4)).format("%Y-%m-%d %H:%M:%S");
+        let device_metadata = json!({
+          "device_name": "/snap/firefox/4336/usr/lib/firefox/firefox",
+          "device_lifetime": 5,
+          "device_location": "FRA",
+          "components": {
+            "cpu": {
+                    "name":"Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
+                    "manufacturer":"Inter Corp.",
+                    "characteristics": {
+                      "units": 1,
+                      "core_units": 4
+                    }
+            },
+            "ram": {
+              "name": "ram",
+              "manufacturer":"Inter Corp.",
+              "characteristics": {
+                "units": 2,
+                "capacity": 8
+              }
+            },
+            "storage": {
+              "name": "/dev/nvme0n1",
+              "manufacturer": "toshiba",
+              "characteristics": {
+                "type": "ssd",
+                "capacity": 238
+              }
+            }
+          }
+        });
+
+        let db_connection = pool.acquire().await?;
+
+        // let tables = vec!["devices", "components", "component_characteristic"];
+
+        let insert_query = insert_device_metadata(db_connection, device_metadata).await;
 
         assert_eq!(insert_query.is_ok(), true);
         assert_eq!(insert_query.unwrap().rows_affected(), 1);
