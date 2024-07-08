@@ -95,6 +95,39 @@ async fn insert_dimension_table_metadata(
     insert_data_query
 }
 
+async fn insert_process_metadata(
+    database_connection: PoolConnection<Postgres>,
+    table: &str,
+    process_data: Value,
+) -> std::result::Result<PgQueryResult, sqlx::Error> {
+    let process_exe = process_data.get("exe").unwrap();
+    let process_cmdline = process_data.get("cmdline").unwrap();
+    let process_state = process_data.get("state").unwrap();
+    let process_start_date = process_data.get("start_date").unwrap().as_str().unwrap();
+    let process_stop_date = process_data.get("stop_date").unwrap().as_str().unwrap();
+
+    let start_date_timestamp =
+        NaiveDateTime::parse_from_str(process_start_date, "%Y-%m-%d %H:%M:%S").unwrap();
+    let stop_date_timestamp =
+        NaiveDateTime::parse_from_str(process_stop_date, "%Y-%m-%d %H:%M:%S").unwrap();
+
+    let mut connection = database_connection.detach();
+
+    let insert_query = format!(
+        "INSERT INTO {} (exe, cmdline, state, start_date, stop_date) VALUES ($1, $2, $3, $4, $5)",
+        table
+    );
+    let insert_data_query = sqlx::query(&insert_query)
+        .bind(process_exe)
+        .bind(process_cmdline)
+        .bind(process_state)
+        .bind(start_date_timestamp)
+        .bind(stop_date_timestamp)
+        .execute(&mut connection)
+        .await;
+
+    insert_data_query
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -285,9 +318,10 @@ mod tests {
         let db_connection = pool.acquire().await?;
 
         let insert_query =
-            insert_dimension_table_metadata(db_connection, "projects", project_metadata);
+            insert_dimension_table_metadata(db_connection, "projects", project_metadata).await;
 
-        assert_eq!(insert_query.await.is_ok(), true);
+        assert_eq!(insert_query.is_ok(), true);
+        assert_eq!(insert_query.unwrap().rows_affected(), 1);
         Ok(())
     }
 
@@ -317,10 +351,41 @@ mod tests {
 
         for table in dimension_tables {
             let db_connection = pool.acquire().await?;
-            let insert_query = insert_dimension_table_metadata(db_connection, table, dimension_table_metadata.clone());
-            assert_eq!(insert_query.await.is_ok(), true);
+            let insert_query = insert_dimension_table_metadata(
+                db_connection,
+                table,
+                dimension_table_metadata.clone(),
+            )
+            .await;
+            assert_eq!(insert_query.is_ok(), true);
+            assert_eq!(insert_query.unwrap().rows_affected(), 1);
         }
 
+        Ok(())
+    }
+    #[sqlx::test(migrations = "../db/")]
+    async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage_database(
+        pool: PgPool,
+    ) -> sqlx::Result<()> {
+        let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
+        let later_timestamp = (Utc::now() + Duration::weeks(4)).format("%Y-%m-%d %H:%M:%S");
+
+        let process_metadata = json!({
+            "exe": "/snap/firefox/4336/usr/lib/firefox/firefox",
+            "cmdline": "/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/
+        usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab",
+            "state": "running",
+            "start_date": now_timestamp.to_string(),
+            "stop_date": later_timestamp.to_string(),
+        });
+
+        let db_connection = pool.acquire().await?;
+
+        let insert_query =
+            insert_process_metadata(db_connection, "processes", process_metadata).await;
+
+        assert_eq!(insert_query.is_ok(), true);
+        assert_eq!(insert_query.unwrap().rows_affected(), 1);
         Ok(())
     }
 }
