@@ -70,7 +70,7 @@ async fn insert_dimension_table_metadata(
     table: &str,
     project_data: Value,
 ) -> Result<PgQueryResult, sqlx::Error> {
-    let project_name = project_data.get("name").unwrap();
+    let project_name = project_data["name"].as_str();
     let project_start_date = project_data.get("start_date").unwrap().as_str().unwrap();
     let project_stop_date = project_data.get("stop_date").unwrap().as_str().unwrap();
 
@@ -100,9 +100,9 @@ async fn insert_process_metadata(
     table: &str,
     process_data: Value,
 ) -> std::result::Result<PgQueryResult, sqlx::Error> {
-    let process_exe = process_data.get("exe").unwrap();
-    let process_cmdline = process_data.get("cmdline").unwrap();
-    let process_state = process_data.get("state").unwrap();
+    let process_exe = process_data["exe"].as_str();
+    let process_cmdline = process_data["cmdline"].as_str();
+    let process_state = process_data["state"].as_str();
     let process_start_date = process_data.get("start_date").unwrap().as_str().unwrap();
     let process_stop_date = process_data.get("stop_date").unwrap().as_str().unwrap();
 
@@ -133,22 +133,66 @@ async fn insert_device_metadata(
     database_connection: PoolConnection<Postgres>,
     device_data: Value,
 ) -> std::result::Result<PgQueryResult, sqlx::Error> {
-    let device_name = device_data.get("device_name");
-    let device_lifetime = device_data.get("device_lifetime");
-    let device_location = device_data.get("device_location");
+    let device_name = device_data["device"]["name"].as_str();
+    let device_lifetime = device_data["device"]["lifetime"].as_i64();
+    let device_location = device_data["device"]["location"].as_str();
+    let components_keys = device_data["components"].as_object().unwrap().keys();
 
+    /*
+          "device": {
+            "name":"dell r740",
+            "lifetime": 5,
+            "location": "FRA"
+        },
+          "components": {
+            "cpu": {
+                    "model":"Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
+                    "manufacturer":"Inter Corp.",
+                    "characteristics": {
+                      "units": 1,
+                      "core_units": 4
+                    }
+            },
+            "ram": {
+              "manufacturer":"Inter Corp.",
+              "characteristics": {
+                "units": 2,
+                "capacity": 8
+              }
+            },
+            "storage": {
+              "manufacturer": "toshiba",
+              "characteristics": {
+                "type": "ssd",
+                "capacity": 238
+              }
+            }
+          }
+        });
+    */
     let mut connection = database_connection.detach();
 
-    let insert_query = "INSERT INTO devices (name, lifetime, location) VALUES ($1, $2, $3)";
-    let insert_data_query = sqlx::query(&insert_query)
+    let insert_devices_query = "INSERT INTO devices (name, lifetime, location) VALUES ($1, $2, $3) RETURNING device_id INTO device_id";
+    let insert_data_query = sqlx::query(&insert_devices_query)
         .bind(device_name)
         .bind(device_lifetime)
         .bind(device_location)
         .execute(&mut connection)
         .await;
 
+    let insert_components_query = "INSERT INTO components (device_id, name, model, manufacturer) VALUES ($device_id, $1, $2, $3) RETURNING component_id INTO component_id";
+    for component in components_keys {
+        let insert_data_query = sqlx::query(&insert_components_query)
+            .bind(component)
+            .bind(device_data[component]["model"].as_str())
+            .bind(device_data[component]["manufacturer"].as_str())
+            .execute(&mut connection)
+            .await;
+    }
+
     insert_data_query
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -417,12 +461,14 @@ mod tests {
         let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
         let later_timestamp = (Utc::now() + Duration::weeks(4)).format("%Y-%m-%d %H:%M:%S");
         let device_metadata = json!({
-          "device_name": "/snap/firefox/4336/usr/lib/firefox/firefox",
-          "device_lifetime": 5,
-          "device_location": "FRA",
+          "device": {
+            "name":"dell r740",
+            "lifetime": 5,
+            "location": "FRA"
+        },
           "components": {
             "cpu": {
-                    "name":"Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
+                    "model":"Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
                     "manufacturer":"Inter Corp.",
                     "characteristics": {
                       "units": 1,
@@ -430,7 +476,6 @@ mod tests {
                     }
             },
             "ram": {
-              "name": "ram",
               "manufacturer":"Inter Corp.",
               "characteristics": {
                 "units": 2,
@@ -438,7 +483,6 @@ mod tests {
               }
             },
             "storage": {
-              "name": "/dev/nvme0n1",
               "manufacturer": "toshiba",
               "characteristics": {
                 "type": "ssd",
@@ -450,12 +494,10 @@ mod tests {
 
         let db_connection = pool.acquire().await?;
 
-        // let tables = vec!["devices", "components", "component_characteristic"];
-
         let insert_query = insert_device_metadata(db_connection, device_metadata).await;
 
         assert_eq!(insert_query.is_ok(), true);
-        assert_eq!(insert_query.unwrap().rows_affected(), 1);
+        assert_eq!(insert_query.unwrap().rows_affected(), 10);
         Ok(())
     }
 }
