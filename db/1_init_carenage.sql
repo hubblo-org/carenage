@@ -73,7 +73,7 @@ CREATE TABLE devices (
 
 CREATE TABLE components (
   component_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  machine_id uuid REFERENCES devices(device_id),
+  device_id uuid REFERENCES devices(device_id),
   name VARCHAR(255),
   model VARCHAR(255),
   manufacturer VARCHAR(255)
