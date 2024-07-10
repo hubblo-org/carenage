@@ -458,25 +458,23 @@ mod tests {
     async fn it_inserts_valid_data_for_the_devices_components_and_components_characteristics_dimensions_tables_in_the_carenage_database(
         pool: PgPool,
     ) -> sqlx::Result<()> {
-        let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
-        let later_timestamp = (Utc::now() + Duration::weeks(4)).format("%Y-%m-%d %H:%M:%S");
         let device_metadata = json!({
           "device": {
-            "name":"dell r740",
+            "name": "dell r740",
             "lifetime": 5,
             "location": "FRA"
         },
           "components": {
             "cpu": {
-                    "model":"Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
-                    "manufacturer":"Inter Corp.",
+                    "model": "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
+                    "manufacturer": "Inter Corp.",
                     "characteristics": {
                       "units": 1,
                       "core_units": 4
                     }
             },
             "ram": {
-              "manufacturer":"Inter Corp.",
+              "manufacturer": "Inter Corp.",
               "characteristics": {
                 "units": 2,
                 "capacity": 8
