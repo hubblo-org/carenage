@@ -97,7 +97,7 @@ CREATE TABLE events (
   workflow_id uuid REFERENCES workflows(workflow_id),
   repository_id uuid REFERENCES repositories(repository_id),
   project_id uuid REFERENCES projects(project_id),
-  machine_id uuid REFERENCES devices(device_id),
+  device_id uuid REFERENCES devices(device_id),
   event_type event_type,
   user_label TEXT,
   CPU_time_percent FLOAT,
@@ -152,5 +152,5 @@ CREATE TABLE events (
   total_time INTEGER,
   avg_power FLOAT,
   electric_carbon_intensity FLOAT,
-  CONSTRAINT primary_keys PRIMARY KEY (task_id, job_id, run_id, pipeline_id, workflow_id, repository_id, project_id, machine_id)
+  CONSTRAINT primary_keys PRIMARY KEY (task_id, job_id, run_id, pipeline_id, workflow_id, repository_id, project_id, device_id)
 );
