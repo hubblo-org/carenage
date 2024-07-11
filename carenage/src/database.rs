@@ -3,7 +3,9 @@ use reqwest::blocking::{Client, Response};
 use serde_json::{Error, Value};
 use sqlx::pool::PoolConnection;
 use sqlx::postgres::PgQueryResult;
+use sqlx::types::uuid;
 use sqlx::Postgres;
+use sqlx::Row;
 use std::fs::File;
 use std::io::BufReader;
 
@@ -132,65 +134,51 @@ async fn insert_process_metadata(
 async fn insert_device_metadata(
     database_connection: PoolConnection<Postgres>,
     device_data: Value,
-) -> std::result::Result<PgQueryResult, sqlx::Error> {
+) -> std::result::Result<(), sqlx::Error> {
     let device_name = device_data["device"]["name"].as_str();
     let device_lifetime = device_data["device"]["lifetime"].as_i64();
     let device_location = device_data["device"]["location"].as_str();
     let components_keys = device_data["components"].as_object().unwrap().keys();
 
-    /*
-          "device": {
-            "name":"dell r740",
-            "lifetime": 5,
-            "location": "FRA"
-        },
-          "components": {
-            "cpu": {
-                    "model":"Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
-                    "manufacturer":"Inter Corp.",
-                    "characteristics": {
-                      "units": 1,
-                      "core_units": 4
-                    }
-            },
-            "ram": {
-              "manufacturer":"Inter Corp.",
-              "characteristics": {
-                "units": 2,
-                "capacity": 8
-              }
-            },
-            "storage": {
-              "manufacturer": "toshiba",
-              "characteristics": {
-                "type": "ssd",
-                "capacity": 238
-              }
-            }
-          }
-        });
-    */
     let mut connection = database_connection.detach();
 
-    let insert_devices_query = "INSERT INTO devices (name, lifetime, location) VALUES ($1, $2, $3) RETURNING device_id INTO device_id";
-    let insert_data_query = sqlx::query(&insert_devices_query)
+    let formatted_query =
+        "INSERT INTO devices (name, lifetime, location) VALUES ($1, $2, $3) RETURNING device_id";
+    let insert_device_data_query = sqlx::query(&formatted_query)
         .bind(device_name)
         .bind(device_lifetime)
         .bind(device_location)
-        .execute(&mut connection)
-        .await;
+        .fetch_one(&mut connection)
+        .await?;
 
-    let insert_components_query = "INSERT INTO components (device_id, name, model, manufacturer) VALUES ($device_id, $1, $2, $3) RETURNING component_id INTO component_id";
+    let device_id: uuid::Uuid = insert_device_data_query.get("device_id");
+    let formatted_query = "INSERT INTO components (device_id, name, model, manufacturer) VALUES ($1, $2, $3, $4) RETURNING component_id";
     for component in components_keys {
-        let insert_data_query = sqlx::query(&insert_components_query)
+        let insert_component_data_query = sqlx::query(&formatted_query)
+            .bind(device_id)
             .bind(component)
             .bind(device_data[component]["model"].as_str())
             .bind(device_data[component]["manufacturer"].as_str())
-            .execute(&mut connection)
-            .await;
+            .fetch_one(&mut connection)
+            .await?;
+
+        let component_id: uuid::Uuid = insert_component_data_query.get("component_id");
+        let component_characteristics = device_data["components"][component]["characteristics"]
+            .as_object()
+            .unwrap()
+            .keys();
+        for component_characteristic in component_characteristics {
+            let formatted_query = "INSERT INTO component_characteristic (component_id, name, value) VALUES ($1, $2, $3)";
+            let insert_component_characteristic_data_query = sqlx::query(&formatted_query)
+                .bind(component_id)
+                .bind(device_data[component][component_characteristic]["name"].as_str())
+                .bind(device_data[component][component_characteristic]["value"].as_str())
+                .execute(&mut connection)
+                .await?;
+        }
     }
 
-    insert_data_query
+    Ok(())
 }
 
 #[cfg(test)]
@@ -495,7 +483,6 @@ mod tests {
         let insert_query = insert_device_metadata(db_connection, device_metadata).await;
 
         assert_eq!(insert_query.is_ok(), true);
-        assert_eq!(insert_query.unwrap().rows_affected(), 10);
         Ok(())
     }
 }
