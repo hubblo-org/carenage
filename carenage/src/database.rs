@@ -52,7 +52,7 @@ fn query_boagent(
         .get(base_url)
         .query(&query_parameters)
         .send()
-        .unwrap();
+        .expect("Failed to send request.");
 
     match response.status().as_u16() {
         200 => Ok(response),
@@ -73,13 +73,22 @@ async fn insert_dimension_table_metadata(
     project_data: Value,
 ) -> Result<PgQueryResult, sqlx::Error> {
     let project_name = project_data["name"].as_str();
-    let project_start_date = project_data.get("start_date").unwrap().as_str().unwrap();
-    let project_stop_date = project_data.get("stop_date").unwrap().as_str().unwrap();
+    let project_start_date = project_data
+        .get("start_date")
+        .expect("Unable to read timestamp.")
+        .as_str()
+        .expect("Unable to read string");
+    let project_stop_date = project_data
+        .get("stop_date")
+        .expect("Unable to read timestamp.")
+        .as_str()
+        .expect("Unable to read string");
 
     let start_date_timestamp =
-        NaiveDateTime::parse_from_str(project_start_date, "%Y-%m-%d %H:%M:%S").unwrap();
-    let stop_date_timestamp =
-        NaiveDateTime::parse_from_str(project_stop_date, "%Y-%m-%d %H:%M:%S").unwrap();
+        NaiveDateTime::parse_from_str(project_start_date, "%Y-%m-%d %H:%M:%S")
+            .expect("Unable to convert to Postgres timestamp type.");
+    let stop_date_timestamp = NaiveDateTime::parse_from_str(project_stop_date, "%Y-%m-%d %H:%M:%S")
+        .expect("Unable to convert to Postgres timestamp type.");
 
     let mut connection = database_connection.detach();
 
@@ -105,13 +114,22 @@ async fn insert_process_metadata(
     let process_exe = process_data["exe"].as_str();
     let process_cmdline = process_data["cmdline"].as_str();
     let process_state = process_data["state"].as_str();
-    let process_start_date = process_data.get("start_date").unwrap().as_str().unwrap();
-    let process_stop_date = process_data.get("stop_date").unwrap().as_str().unwrap();
+    let process_start_date = process_data
+        .get("start_date")
+        .expect("Unable to read timestamp.")
+        .as_str()
+        .expect("Unable to read string");
+    let process_stop_date = process_data
+        .get("stop_date")
+        .expect("Unable to read timestamp.")
+        .as_str()
+        .expect("Unable to read string");
 
     let start_date_timestamp =
-        NaiveDateTime::parse_from_str(process_start_date, "%Y-%m-%d %H:%M:%S").unwrap();
-    let stop_date_timestamp =
-        NaiveDateTime::parse_from_str(process_stop_date, "%Y-%m-%d %H:%M:%S").unwrap();
+        NaiveDateTime::parse_from_str(process_start_date, "%Y-%m-%d %H:%M:%S")
+            .expect("Unable to convert to Postgres timestamp type.");
+    let stop_date_timestamp = NaiveDateTime::parse_from_str(process_stop_date, "%Y-%m-%d %H:%M:%S")
+        .expect("Unable to convert to Postgres timestamp type.");
 
     let mut connection = database_connection.detach();
 
@@ -138,7 +156,10 @@ async fn insert_device_metadata(
     let device_name = device_data["device"]["name"].as_str();
     let device_lifetime = device_data["device"]["lifetime"].as_i64();
     let device_location = device_data["device"]["location"].as_str();
-    let components_keys = device_data["components"].as_object().unwrap().keys();
+    let components_keys = device_data["components"]
+        .as_object()
+        .expect("Unable to read JSON Object.")
+        .keys();
 
     let mut connection = database_connection.detach();
 
@@ -165,7 +186,7 @@ async fn insert_device_metadata(
         let component_id: uuid::Uuid = insert_component_data_query.get("component_id");
         let component_characteristics = device_data["components"][component]["characteristics"]
             .as_object()
-            .unwrap()
+            .expect("Unable to read JSON Object.")
             .keys();
         for component_characteristic in component_characteristics {
             let formatted_query = "INSERT INTO component_characteristic (component_id, name, value) VALUES ($1, $2, $3)";
