@@ -1,5 +1,6 @@
 use chrono::Utc;
 use clap::Parser;
+use dotenv::var;
 use std::time::SystemTime;
 use crate::database::{Timestamp, query_boagent};
 
@@ -11,7 +12,8 @@ fn main() -> Result<(), ()> {
 
     let start_timestamp: Timestamp;
     let stop_timestamp: Timestamp;
-    let boagent_url = "http://127.0.0.1:3000".to_string();
+    let boagent_url = var("BOAGENT_URL").expect("BOAGENT_URL environment variable is absent");
+    let printable_boagent_url = boagent_url.clone();
 
     match cli.unix {
         true => {
@@ -58,7 +60,7 @@ fn main() -> Result<(), ()> {
     );
 
     match boagent_query {
-        Ok(response) => Ok(println!("Queried Boagent: {:?}", response)),
+        Ok(response) => Ok(println!("Queried Boagent at {:?} : {:?}", printable_boagent_url, response)),
         Err(err) => {
             println!("Failed to query Boagent: {:?}", err);
             Ok(())
