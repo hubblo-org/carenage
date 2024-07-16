@@ -2,7 +2,7 @@ use assert_cmd::prelude::*;
 use std::{process::Command, time::SystemTime};
 use chrono::Utc;
 use predicates::str::contains;
-use mockito::{Matcher, Server};
+use mockito::Matcher;
 
 // carenage start
 #[test]
@@ -56,7 +56,7 @@ fn it_prints_start_timestamp_in_iso_8601_format() -> Result<(), Box<dyn std::err
     // Test will probably have to be rewritten as printing the start timestamp will depend on how
     // GitHub, GitLab and other print their first timestamp in pipelines
 
-    let start_timestamp = Utc::now().format("%Y-%m-%dT%H:%M:%S").to_string();
+    let start_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S").to_string();
     let mut cmd = Command::cargo_bin("carenage")?;
     
     cmd.arg("start");
@@ -84,6 +84,7 @@ fn it_prints_start_timestamp_in_unix_epoch_format_in_seconds_with_given_argument
 #[test]
 fn it_queries_boagent_when_calling_start_command() -> Result<(), Box<dyn std::error::Error>> {
     let mut cmd = Command::cargo_bin("carenage")?;
+
 
     let opts = mockito::ServerOpts {
         host: "127.0.0.1",
@@ -137,7 +138,7 @@ fn it_accepts_stop_as_a_command() -> Result<(), Box<dyn std::error::Error>> {
 #[test]
 fn it_prints_stop_timestamp_in_iso_8601_format() -> Result<(), Box<dyn std::error::Error>> {
 
-    let stop_timestamp = Utc::now().format("%Y-%m-%dT%H:%M:%S").to_string();
+    let stop_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S").to_string();
     let mut cmd = Command::cargo_bin("carenage")?;
     
     cmd.arg("stop");
