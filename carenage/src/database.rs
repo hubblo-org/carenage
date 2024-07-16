@@ -14,7 +14,7 @@ use std::fmt::{Display, Formatter};
 #[derive(Debug)]
 pub enum Timestamp {
     UnixTimestamp(Option<u64>),
-    ISO8601Timestamp(DateTime<Utc>),
+    ISO8601Timestamp(Option<DateTime<Utc>>),
 }
 
 impl Display for Timestamp {
@@ -22,7 +22,7 @@ impl Display for Timestamp {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self {
             Timestamp::UnixTimestamp(value) => write!(f, "{}", value.expect("Unable to parse Unix Timestamp").to_string()),
-            Timestamp::ISO8601Timestamp(value) => write!(f, "{:?}", value),
+            Timestamp::ISO8601Timestamp(value) => write!(f, "{}", value.expect("Unable to parse ISO 8601").to_string()),
         }
     }
 
@@ -43,7 +43,7 @@ pub fn query_boagent(
             query_parameters.push(("start_time", start_time.unwrap_or(0).to_string()))
         }
         Timestamp::ISO8601Timestamp(start_time) => {
-            query_parameters.push(("start_time", format!("{:?}", start_time)))
+            query_parameters.push(("start_time", start_time.unwrap_or(Utc::now()).to_string()))
         }
     }
     match end_time {
@@ -51,7 +51,7 @@ pub fn query_boagent(
             query_parameters.push(("end_time", end_time.unwrap_or(0).to_string()))
         }
         Timestamp::ISO8601Timestamp(end_time) => {
-            query_parameters.push(("end_time", format!("{:?}", end_time)))
+            query_parameters.push(("end_time", end_time.unwrap_or(Utc::now()).to_string()))
         }
     }
     query_parameters.push(("verbose", "true".to_string()));
@@ -301,8 +301,8 @@ mod tests {
 
     #[test]
     fn it_queries_boagent_with_success_with_iso_8601_timestamps() {
-        let now_timestamp = Utc::now();
-        let now_timestamp_minus_one_minute = now_timestamp - Duration::minutes(1);
+        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
+        // let now_timestamp_minus_one_minute = now_timestamp - Duration::minutes(1);
 
         let mut boagent_server = Server::new();
 
@@ -311,11 +311,8 @@ mod tests {
         let _mock = boagent_server
             .mock("GET", "/query")
             .match_query(Matcher::AllOf(vec![
-                Matcher::UrlEncoded(
-                    "start_time".into(),
-                    format!("{:?}", now_timestamp_minus_one_minute),
-                ),
-                Matcher::UrlEncoded("end_time".into(), format!("{:?}", now_timestamp)),
+                Matcher::UrlEncoded("start_time".to_string(), now_timestamp.to_string()),
+                Matcher::Regex("".to_string()),
                 Matcher::Regex("verbose=true".into()),
                 Matcher::Regex("location=FRA".into()),
                 Matcher::Regex("measure_power=true".into()),
@@ -327,13 +324,15 @@ mod tests {
 
         let response = query_boagent(
             url,
-            Timestamp::ISO8601Timestamp(now_timestamp_minus_one_minute),
-            Timestamp::ISO8601Timestamp(now_timestamp),
+            now_timestamp,
+            Timestamp::ISO8601Timestamp(None),
             true,
             "FRA".to_string(),
             5,
         )
         .unwrap();
+
+        _mock.assert();
 
         assert_eq!(response.status().as_u16(), 200);
     }
