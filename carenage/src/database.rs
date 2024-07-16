@@ -6,18 +6,33 @@ use sqlx::postgres::PgQueryResult;
 use sqlx::types::uuid;
 use sqlx::Postgres;
 use sqlx::Row;
+use core::fmt;
 use std::fs::File;
 use std::io::BufReader;
+use std::fmt::{Display, Formatter};
 
-enum Timestamp {
+#[derive(Debug)]
+pub enum Timestamp {
     UnixTimestamp(Option<u64>),
     ISO8601Timestamp(DateTime<Utc>),
 }
 
-fn query_boagent(
+impl Display for Timestamp {
+    
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            Timestamp::UnixTimestamp(value) => write!(f, "{}", value.expect("Unable to parse Unix Timestamp").to_string()),
+            Timestamp::ISO8601Timestamp(value) => write!(f, "{:?}", value),
+        }
+    }
+
+} 
+
+pub fn query_boagent(
     boagent_url: String,
     start_time: Timestamp,
     end_time: Timestamp,
+    fetch_hardware: bool,
     location: String,
     lifetime: u8,
 ) -> Result<Response, String> {
@@ -43,7 +58,7 @@ fn query_boagent(
     query_parameters.push(("location", location));
     query_parameters.push(("measure_power", "true".to_string()));
     query_parameters.push(("lifetime", lifetime.to_string()));
-    query_parameters.push(("fetch_hardware", "true".to_string()));
+    query_parameters.push(("fetch_hardware", fetch_hardware.to_string()));
 
     let client = Client::new();
     let base_url = format!("{}/query", boagent_url);
@@ -51,12 +66,11 @@ fn query_boagent(
     let response = client
         .get(base_url)
         .query(&query_parameters)
-        .send()
-        .expect("Failed to send request.");
+        .send();
 
-    match response.status().as_u16() {
-        200 => Ok(response),
-        _ => Err("Error from Boagent.".to_string()),
+    match response {
+        Ok(response) => Ok(response),
+        _ => Err("Failed to send request.".to_string()),
     }
 }
 
@@ -110,7 +124,7 @@ async fn insert_process_metadata(
     database_connection: PoolConnection<Postgres>,
     table: &str,
     process_data: Value,
-) -> std::result::Result<PgQueryResult, sqlx::Error> {
+) -> Result<PgQueryResult, sqlx::Error> {
     let process_exe = process_data["exe"].as_str();
     let process_cmdline = process_data["cmdline"].as_str();
     let process_state = process_data["state"].as_str();
@@ -152,7 +166,7 @@ async fn insert_process_metadata(
 async fn insert_device_metadata(
     database_connection: PoolConnection<Postgres>,
     device_data: Value,
-) -> std::result::Result<(), sqlx::Error> {
+) -> Result<(), sqlx::Error> {
     let device_name = device_data["device"]["name"].as_str();
     let device_lifetime = device_data["device"]["lifetime"].as_i64();
     let device_location = device_data["device"]["location"].as_str();
@@ -243,52 +257,13 @@ mod tests {
             url,
             Timestamp::UnixTimestamp(Some(now_timestamp_minus_one_minute)),
             Timestamp::UnixTimestamp(Some(now_timestamp)),
+            true,
             "FRA".to_string(),
             5,
         )
         .unwrap();
 
         assert_eq!(response.status().as_u16(), 200);
-    }
-
-    #[test]
-    fn it_queries_boagent_with_error_if_500_http_code_received_from_boagent() {
-        let now_timestamp = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-        let now_timestamp_minus_one_minute = now_timestamp - 60;
-
-        let error_message = "Error from Boagent.";
-
-        let mut boagent_server = Server::new();
-
-        let url = boagent_server.url();
-
-        let _mock = boagent_server
-            .mock("GET", "/query")
-            .match_query(Matcher::AllOf(vec![
-                Matcher::Regex(format!("start_time={:?}", now_timestamp_minus_one_minute).into()),
-                Matcher::Regex(format!("end_time={:?}", now_timestamp).into()),
-                Matcher::Regex("verbose=true".into()),
-                Matcher::Regex("location=FRA".into()),
-                Matcher::Regex("measure_power=true".into()),
-                Matcher::Regex("lifetime=5".into()),
-                Matcher::Regex("fetch_hardware=true".into()),
-            ]))
-            .with_status(500)
-            .create();
-
-        let response = query_boagent(
-            url,
-            Timestamp::UnixTimestamp(Some(now_timestamp_minus_one_minute)),
-            Timestamp::UnixTimestamp(Some(now_timestamp)),
-            "FRA".to_string(),
-            5,
-        );
-
-        assert_eq!(response.is_err(), true);
-        assert_eq!(response.unwrap_err(), error_message);
     }
 
     #[test]
@@ -315,6 +290,7 @@ mod tests {
             url,
             Timestamp::UnixTimestamp(None),
             Timestamp::UnixTimestamp(None),
+            true,
             "FRA".to_string(),
             5,
         )
@@ -353,6 +329,7 @@ mod tests {
             url,
             Timestamp::ISO8601Timestamp(now_timestamp_minus_one_minute),
             Timestamp::ISO8601Timestamp(now_timestamp),
+            true,
             "FRA".to_string(),
             5,
         )
