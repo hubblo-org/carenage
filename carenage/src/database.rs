@@ -242,8 +242,8 @@ mod tests {
         let _mock = boagent_server
             .mock("GET", "/query")
             .match_query(Matcher::AllOf(vec![
-                Matcher::Regex(format!("start_time={:?}", now_timestamp_minus_one_minute).into()),
-                Matcher::Regex(format!("end_time={:?}", now_timestamp).into()),
+                Matcher::Regex(format!("start_time={}", now_timestamp_minus_one_minute).into()),
+                Matcher::Regex(format!("end_time={}", now_timestamp).into()),
                 Matcher::Regex("verbose=true".into()),
                 Matcher::Regex("location=FRA".into()),
                 Matcher::Regex("measure_power=true".into()),
@@ -302,7 +302,7 @@ mod tests {
     #[test]
     fn it_queries_boagent_with_success_with_iso_8601_timestamps() {
         let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
-        // let now_timestamp_minus_one_minute = now_timestamp - Duration::minutes(1);
+        let now_timestamp_minus_one_minute = Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
 
         let mut boagent_server = Server::new();
 
@@ -311,21 +311,21 @@ mod tests {
         let _mock = boagent_server
             .mock("GET", "/query")
             .match_query(Matcher::AllOf(vec![
-                Matcher::UrlEncoded("start_time".to_string(), now_timestamp.to_string()),
-                Matcher::Regex("".to_string()),
-                Matcher::Regex("verbose=true".into()),
-                Matcher::Regex("location=FRA".into()),
-                Matcher::Regex("measure_power=true".into()),
-                Matcher::Regex("lifetime=5".into()),
-                Matcher::Regex("fetch_hardware=true".into()),
+                Matcher::UrlEncoded("start_time".to_string(), now_timestamp_minus_one_minute.to_string()),
+                Matcher::UrlEncoded("end_time".to_string(), now_timestamp.to_string()),
+                Matcher::UrlEncoded("verbose".to_string(), "true".to_string()),
+                Matcher::UrlEncoded("location".to_string(),"FRA".to_string()),
+                Matcher::UrlEncoded("measure_power".to_string(), "true".to_string()),
+                Matcher::UrlEncoded("lifetime".to_string(), "5".to_string()),
+                Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
             ]))
             .with_status(200)
             .create();
 
         let response = query_boagent(
             url,
+            now_timestamp_minus_one_minute,
             now_timestamp,
-            Timestamp::ISO8601Timestamp(None),
             true,
             "FRA".to_string(),
             5,
