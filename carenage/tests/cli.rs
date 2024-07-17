@@ -146,3 +146,14 @@ fn it_prints_stop_timestamp_in_iso_8601_format() -> Result<(), Box<dyn std::erro
 
     Ok(())
 }
+
+#[test]
+fn it_queries_boagent_when_calling_stop_command_with_start_and_stop_timestamps() -> Result<(), Box<dyn std::error::Error>> {
+
+    let mut cmd = Command::cargo_bin("carenage")?;
+    
+    cmd.arg("stop");
+    cmd.assert().success().stdout(contains("Queried Boagent")).stdout(contains("Carenage worked between")).stdout(contains("timestamps"));
+
+    Ok(())
+}
