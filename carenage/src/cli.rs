@@ -1,7 +1,4 @@
-use crate::database::Timestamp;
-use chrono::Utc;
 use clap::{Parser, Subcommand};
-use std::time::SystemTime;
 
 #[derive(Parser)]
 pub struct Cli {
@@ -27,16 +24,4 @@ pub enum Events {
 
     /// Stop carenage, final event
     Stop,
-}
-
-pub fn create_timestamp(unix: bool) -> Timestamp {
-    match unix {
-        true => Timestamp::UnixTimestamp(Some(
-            SystemTime::now()
-                .duration_since(SystemTime::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
-        )),
-        false => Timestamp::ISO8601Timestamp(Some(Utc::now())),
-    }
 }

@@ -1,4 +1,5 @@
 use chrono::{DateTime, NaiveDateTime, Utc};
+use core::fmt;
 use reqwest::blocking::{Client, Response};
 use serde_json::{Error, Value};
 use sqlx::pool::PoolConnection;
@@ -6,10 +7,10 @@ use sqlx::postgres::PgQueryResult;
 use sqlx::types::uuid;
 use sqlx::Postgres;
 use sqlx::Row;
-use core::fmt;
+use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io::BufReader;
-use std::fmt::{Display, Formatter};
+use std::time::SystemTime;
 
 #[derive(Debug)]
 pub enum Timestamp {
@@ -18,15 +19,35 @@ pub enum Timestamp {
 }
 
 impl Display for Timestamp {
-    
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self {
-            Timestamp::UnixTimestamp(value) => write!(f, "{}", value.expect("Unable to parse Unix Timestamp").to_string()),
-            Timestamp::ISO8601Timestamp(value) => write!(f, "{}", value.expect("Unable to parse ISO 8601").to_string()),
+            Timestamp::UnixTimestamp(value) => write!(
+                f,
+                "{}",
+                value.expect("Unable to parse Unix Timestamp").to_string()
+            ),
+            Timestamp::ISO8601Timestamp(value) => write!(
+                f,
+                "{}",
+                value.expect("Unable to parse ISO 8601").to_string()
+            ),
         }
     }
+}
 
-} 
+impl Timestamp {
+    pub fn new(unix: bool) -> Timestamp {
+        match unix {
+            true => Timestamp::UnixTimestamp(Some(
+                SystemTime::now()
+                    .duration_since(SystemTime::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs(),
+            )),
+            false => Timestamp::ISO8601Timestamp(Some(Utc::now())),
+        }
+    }
+}
 
 pub fn query_boagent(
     boagent_url: String,
@@ -63,10 +84,7 @@ pub fn query_boagent(
     let client = Client::new();
     let base_url = format!("{}/query", boagent_url);
 
-    let response = client
-        .get(base_url)
-        .query(&query_parameters)
-        .send();
+    let response = client.get(base_url).query(&query_parameters).send();
 
     match response {
         Ok(response) => Ok(response),
@@ -302,7 +320,8 @@ mod tests {
     #[test]
     fn it_queries_boagent_with_success_with_iso_8601_timestamps() {
         let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
-        let now_timestamp_minus_one_minute = Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
+        let now_timestamp_minus_one_minute =
+            Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
 
         let mut boagent_server = Server::new();
 
@@ -311,10 +330,13 @@ mod tests {
         let _mock = boagent_server
             .mock("GET", "/query")
             .match_query(Matcher::AllOf(vec![
-                Matcher::UrlEncoded("start_time".to_string(), now_timestamp_minus_one_minute.to_string()),
+                Matcher::UrlEncoded(
+                    "start_time".to_string(),
+                    now_timestamp_minus_one_minute.to_string(),
+                ),
                 Matcher::UrlEncoded("end_time".to_string(), now_timestamp.to_string()),
                 Matcher::UrlEncoded("verbose".to_string(), "true".to_string()),
-                Matcher::UrlEncoded("location".to_string(),"FRA".to_string()),
+                Matcher::UrlEncoded("location".to_string(), "FRA".to_string()),
                 Matcher::UrlEncoded("measure_power".to_string(), "true".to_string()),
                 Matcher::UrlEncoded("lifetime".to_string(), "5".to_string()),
                 Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
