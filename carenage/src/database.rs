@@ -56,7 +56,7 @@ pub fn query_boagent(
     fetch_hardware: bool,
     location: String,
     lifetime: u8,
-) -> Result<Response, String> {
+) -> Result<Response, reqwest::Error> {
     let mut query_parameters = vec![];
 
     match start_time {
@@ -86,10 +86,7 @@ pub fn query_boagent(
 
     let response = client.get(base_url).query(&query_parameters).send();
 
-    match response {
-        Ok(response) => Ok(response),
-        _ => Err("Failed to send request.".to_string()),
-    }
+    response
 }
 
 fn deserialize_boagent_json(boagent_response_json: File) -> Result<Value, Error> {
@@ -357,6 +354,23 @@ mod tests {
         _mock.assert();
 
         assert_eq!(response.status().as_u16(), 200);
+    }
+
+    #[test]
+    fn it_sends_an_error_when_it_fails_to_send_a_request_to_boagent() {
+        
+        let url = "http://url.will.fail".to_string();
+
+        let response = query_boagent(
+            url,
+            Timestamp::ISO8601Timestamp(None),
+            Timestamp::ISO8601Timestamp(None),
+            true,
+            "FRA".to_string(),
+            5,
+        );
+
+        assert_eq!(response.is_err(), true);
     }
 
     #[test]
