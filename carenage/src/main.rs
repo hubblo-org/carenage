@@ -1,10 +1,11 @@
 use crate::database::query_boagent;
-use crate::database::Timestamp;
+use crate::timestamp::Timestamp;
 use clap::Parser;
 use dotenv::var;
 
 pub mod cli;
 pub mod database;
+pub mod timestamp;
 
 fn main() {
     let cli = cli::Cli::parse();

@@ -1,53 +1,14 @@
-use chrono::{DateTime, NaiveDateTime, Utc};
-use core::fmt;
+use chrono::{NaiveDateTime, Utc};
 use reqwest::blocking::{Client, Response};
 use serde_json::{Error, Value};
+use crate::timestamp::Timestamp;
 use sqlx::pool::PoolConnection;
 use sqlx::postgres::PgQueryResult;
 use sqlx::types::uuid;
 use sqlx::Postgres;
 use sqlx::Row;
-use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io::BufReader;
-use std::time::SystemTime;
-
-#[derive(Debug)]
-pub enum Timestamp {
-    UnixTimestamp(Option<u64>),
-    ISO8601Timestamp(Option<DateTime<Utc>>),
-}
-
-impl Display for Timestamp {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        match self {
-            Timestamp::UnixTimestamp(value) => write!(
-                f,
-                "{}",
-                value.expect("Unable to parse Unix Timestamp").to_string()
-            ),
-            Timestamp::ISO8601Timestamp(value) => write!(
-                f,
-                "{}",
-                value.expect("Unable to parse ISO 8601").to_string()
-            ),
-        }
-    }
-}
-
-impl Timestamp {
-    pub fn new(unix: bool) -> Timestamp {
-        match unix {
-            true => Timestamp::UnixTimestamp(Some(
-                SystemTime::now()
-                    .duration_since(SystemTime::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
-            )),
-            false => Timestamp::ISO8601Timestamp(Some(Utc::now())),
-        }
-    }
-}
 
 pub fn query_boagent(
     boagent_url: String,
