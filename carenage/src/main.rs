@@ -9,7 +9,11 @@ pub mod database;
 fn main() {
     let cli = cli::Cli::parse();
 
-    let boagent_url = var("BOAGENT_URL").expect("BOAGENT_URL environment variable is absent");
+    let boagent_url = var("BOAGENT_URL").expect("BOAGENT_URL environment variable is absent. It is needed to connect to Boagent and query necessary data");
+    let location = var("LOCATION").expect("LOCATION environment variable is absent. It is needed to indicate the energy mix relevant to the evaluated environmental impacts");
+    let lifetime_env = var("LIFETIME").expect("LIFETIME environment variable is absent. It is needed to calculate the environmental impact for the evaluated device.");
+    let lifetime = lifetime_env.parse::<u8>().expect("Unable to parse LIFETIME environment variable. It must be an integer.");
+
     let printable_boagent_url = boagent_url.clone();
 
     let start_timestamp: Timestamp = Timestamp::new(cli.unix);
@@ -25,8 +29,8 @@ fn main() {
                 start_timestamp,
                 stop_timestamp,
                 true,
-                "FRA".to_string(),
-                5,
+                location,
+                lifetime,
             );
             match boagent_query {
                 Ok(response) => println!(
@@ -47,9 +51,9 @@ fn main() {
                 boagent_url,
                 start_timestamp,
                 stop_timestamp,
-                true,
-                "FRA".to_string(),
-                5,
+                false,
+                location,
+                lifetime,
             );
             match boagent_query {
                 Ok(response) => {
