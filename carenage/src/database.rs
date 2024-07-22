@@ -1,7 +1,9 @@
+use crate::timestamp::Timestamp;
 use chrono::{NaiveDateTime, Utc};
 use reqwest::blocking::{Client, Response};
-use serde_json::{Error, Value};
-use crate::timestamp::Timestamp;
+use serde::{Deserialize, Serialize};
+use serde_json::value::Number;
+use serde_json::{json, Error, Value};
 use sqlx::pool::PoolConnection;
 use sqlx::postgres::PgQueryResult;
 use sqlx::types::uuid;
@@ -9,6 +11,33 @@ use sqlx::Postgres;
 use sqlx::Row;
 use std::fs::File;
 use std::io::BufReader;
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub enum CharacteristicValue {
+    StringValue(String),
+    NumericValue(Number),
+}
+
+#[derive(Serialize, Deserialize)]
+struct Device {
+    name: Option<String>,
+    location: String,
+    lifetime: Number,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Component {
+    name: String,
+    model: String,
+    manufacturer: String,
+    characteristics: Vec<ComponentCharacteristic>,
+}
+
+#[derive(Serialize, Deserialize)]
+struct ComponentCharacteristic {
+    name: String,
+    value: CharacteristicValue, 
+}
 
 pub fn query_boagent(
     boagent_url: String,
@@ -55,6 +84,77 @@ fn deserialize_boagent_json(boagent_response_json: File) -> Result<Value, Error>
     let deserialized_boagent_json = serde_json::from_reader(boagent_json_reader)?;
 
     Ok(deserialized_boagent_json)
+}
+
+fn format_hardware_data(
+    deserialized_boagent_response: Value,
+    device_name: Option<String>,
+    location: String,
+    lifetime: i16,
+) -> Result<Value, Error> {
+
+    let hardware_data = &deserialized_boagent_response["raw_data"]["hardware_data"];
+
+    let device = Device {
+        name: device_name,
+        location,
+        lifetime: lifetime.into(),
+    };
+
+    let mut components = vec![];
+
+    let cpus = hardware_data["cpus"].as_array();
+    let rams = hardware_data["rams"].as_array();
+    let disks = hardware_data["disks"].as_array();
+
+    for cpu in cpus.unwrap() {
+        let core_units = ComponentCharacteristic {
+            name: "core_units".to_string(),
+            value: CharacteristicValue::NumericValue(cpu["core_units"].as_number().unwrap().clone()),
+        };
+        let cpu = Component {
+            name: "cpu".to_string(),
+            model: cpu["name"].to_string(),
+            manufacturer: cpu["manufacturer"].to_string(),
+            characteristics: vec!(core_units),
+        };
+        components.push(cpu);
+    };
+
+    for ram in rams.unwrap() {
+        let capacity = ComponentCharacteristic {
+            name: "capacity".to_string(),
+            value: CharacteristicValue::NumericValue(ram["capacity"].as_number().unwrap().clone()),
+        };
+        let ram = Component {
+            name: "ram".to_string(),
+            model: "not implemented".to_string(),
+            manufacturer: ram["manufacturer"].to_string(),
+            characteristics: vec!(capacity),
+        };
+        components.push(ram);
+    }
+
+    for disk in disks.unwrap() {
+        let capacity = ComponentCharacteristic {
+            name: "capacity".to_string(),
+            value: CharacteristicValue::NumericValue(disk["capacity"].as_number().unwrap().clone()),        
+        };
+        let disk_type = ComponentCharacteristic {
+            name: "type".to_string(),
+            value: CharacteristicValue::StringValue(disk["type"].to_string()),
+        };
+        let disk = Component {
+            name: "disk".to_string(),
+            model: "not implemented".to_string(),
+            manufacturer: disk["manufacturer"].to_string(),
+            characteristics: vec!(capacity, disk_type),
+        };
+        components.push(disk);
+    }
+
+    let formatted_hardware_data = json!({"device": device, "components": components});
+    Ok(formatted_hardware_data)
 }
 
 async fn insert_dimension_table_metadata(
@@ -319,7 +419,6 @@ mod tests {
 
     #[test]
     fn it_sends_an_error_when_it_fails_to_send_a_request_to_boagent() {
-        
         let url = "http://url.will.fail".to_string();
 
         let response = query_boagent(
@@ -478,5 +577,54 @@ mod tests {
 
         assert_eq!(insert_query.is_ok(), true);
         Ok(())
+    }
+
+    #[test]
+    fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
+        let mut boagent_json_fp = current_dir().unwrap();
+
+        boagent_json_fp.push("mocks");
+        boagent_json_fp.push("boagent_response");
+        boagent_json_fp.set_extension("json");
+
+        let boagent_response_json = File::open(boagent_json_fp).unwrap();
+
+        let deserialized_boagent_response =
+            deserialize_boagent_json(boagent_response_json).unwrap();
+        let location = "FRA".to_string();
+        let lifetime = 5;
+        let device_name = "dell r740".to_string();
+
+        let hardware_data = format_hardware_data(
+            deserialized_boagent_response,
+            Some(device_name),
+            location,
+            lifetime,
+        )
+        .unwrap();
+
+        println!("{:?}", hardware_data);
+        /* let components: Vec<&String> = hardware_data["components"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .collect(); */
+
+        assert_eq!(hardware_data["device"]["name"], "dell r740");
+        assert_eq!(hardware_data["device"]["location"], "FRA");
+        assert_eq!(hardware_data["device"]["lifetime"], 5);
+        // assert_eq!(components, vec!["cpu", "ram", "disk"]);
+        assert_eq!(
+            hardware_data["components"]["cpu"]["model"],
+            "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz"
+        );
+        assert_eq!(
+            hardware_data["components"]["ram"]["characteristics"]["capacity"],
+            8
+        );
+        assert_eq!(
+            hardware_data["components"]["storage"]["characteristics"]["capacity"],
+            238
+        );
     }
 }
