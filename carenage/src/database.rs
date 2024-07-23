@@ -13,6 +13,7 @@ use std::fs::File;
 use std::io::BufReader;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[serde(untagged)]
 pub enum CharacteristicValue {
     StringValue(String),
     NumericValue(Number),
@@ -36,7 +37,7 @@ struct Component {
 #[derive(Serialize, Deserialize)]
 struct ComponentCharacteristic {
     name: String,
-    value: CharacteristicValue, 
+    value: CharacteristicValue,
 }
 
 pub fn query_boagent(
@@ -92,7 +93,6 @@ fn format_hardware_data(
     location: String,
     lifetime: i16,
 ) -> Result<Value, Error> {
-
     let hardware_data = &deserialized_boagent_response["raw_data"]["hardware_data"];
 
     let device = Device {
@@ -110,16 +110,18 @@ fn format_hardware_data(
     for cpu in cpus.unwrap() {
         let core_units = ComponentCharacteristic {
             name: "core_units".to_string(),
-            value: CharacteristicValue::NumericValue(cpu["core_units"].as_number().unwrap().clone()),
+            value: CharacteristicValue::NumericValue(
+                cpu["core_units"].as_number().unwrap().clone(),
+            ),
         };
         let cpu = Component {
             name: "cpu".to_string(),
             model: cpu["name"].to_string(),
             manufacturer: cpu["manufacturer"].to_string(),
-            characteristics: vec!(core_units),
+            characteristics: vec![core_units],
         };
         components.push(cpu);
-    };
+    }
 
     for ram in rams.unwrap() {
         let capacity = ComponentCharacteristic {
@@ -130,7 +132,7 @@ fn format_hardware_data(
             name: "ram".to_string(),
             model: "not implemented".to_string(),
             manufacturer: ram["manufacturer"].to_string(),
-            characteristics: vec!(capacity),
+            characteristics: vec![capacity],
         };
         components.push(ram);
     }
@@ -138,7 +140,7 @@ fn format_hardware_data(
     for disk in disks.unwrap() {
         let capacity = ComponentCharacteristic {
             name: "capacity".to_string(),
-            value: CharacteristicValue::NumericValue(disk["capacity"].as_number().unwrap().clone()),        
+            value: CharacteristicValue::NumericValue(disk["capacity"].as_number().unwrap().clone()).into(),
         };
         let disk_type = ComponentCharacteristic {
             name: "type".to_string(),
@@ -148,7 +150,7 @@ fn format_hardware_data(
             name: "disk".to_string(),
             model: "not implemented".to_string(),
             manufacturer: disk["manufacturer"].to_string(),
-            characteristics: vec!(capacity, disk_type),
+            characteristics: vec![capacity, disk_type],
         };
         components.push(disk);
     }
@@ -246,10 +248,9 @@ async fn insert_device_metadata(
     let device_name = device_data["device"]["name"].as_str();
     let device_lifetime = device_data["device"]["lifetime"].as_i64();
     let device_location = device_data["device"]["location"].as_str();
-    let components_keys = device_data["components"]
-        .as_object()
-        .expect("Unable to read JSON Object.")
-        .keys();
+    let components = device_data["components"]
+        .as_array()
+        .expect("Unable to read JSON Array.");
 
     let mut connection = database_connection.detach();
 
@@ -264,17 +265,17 @@ async fn insert_device_metadata(
 
     let device_id: uuid::Uuid = insert_device_data_query.get("device_id");
     let formatted_query = "INSERT INTO components (device_id, name, model, manufacturer) VALUES ($1, $2, $3, $4) RETURNING component_id";
-    for component in components_keys {
+    for component in components {
         let insert_component_data_query = sqlx::query(&formatted_query)
             .bind(device_id)
-            .bind(component)
-            .bind(device_data[component]["model"].as_str())
-            .bind(device_data[component]["manufacturer"].as_str())
+            .bind(component["name"].as_str())
+            .bind(component["model"].as_str())
+            .bind(component["manufacturer"].as_str())
             .fetch_one(&mut connection)
             .await?;
 
         let component_id: uuid::Uuid = insert_component_data_query.get("component_id");
-        let component_characteristics = device_data["components"][component]["characteristics"]
+        let component_characteristics = component["characteristics"]
             .as_object()
             .expect("Unable to read JSON Object.")
             .keys();
@@ -282,8 +283,8 @@ async fn insert_device_metadata(
             let formatted_query = "INSERT INTO component_characteristic (component_id, name, value) VALUES ($1, $2, $3)";
             let insert_component_characteristic_data_query = sqlx::query(&formatted_query)
                 .bind(component_id)
-                .bind(device_data[component][component_characteristic]["name"].as_str())
-                .bind(device_data[component][component_characteristic]["value"].as_str())
+                .bind(component[component_characteristic]["name"].as_str())
+                .bind(component[component_characteristic]["value"].as_str())
                 .execute(&mut connection)
                 .await?;
         }
@@ -545,30 +546,30 @@ mod tests {
             "lifetime": 5,
             "location": "FRA"
         },
-          "components": {
-            "cpu": {
+          "components": [{
+                    "name": "cpu",
                     "model": "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
                     "manufacturer": "Inter Corp.",
                     "characteristics": {
                       "units": 1,
                       "core_units": 4
-                    }
-            },
-            "ram": {
-              "manufacturer": "Inter Corp.",
-              "characteristics": {
-                "units": 2,
-                "capacity": 8
-              }
-            },
-            "storage": {
-              "manufacturer": "toshiba",
-              "characteristics": {
-                "type": "ssd",
-                "capacity": 238
-              }
-            }
-          }
+                    }},
+                    {
+                    "name": "ram",
+                    "model": "not implemented yet",
+                    "manufacturer": "Inter Corp.",
+                    "characteristics": {
+                    "units": 2,
+                    "capacity": 8
+                }},
+                    {
+                    "name": "disk",
+                    "model": "not implemented yet",
+                    "manufacturer": "toshiba",
+                "characteristics": {
+                    "type": "ssd",
+                    "capacity": 238
+              }}]
         });
 
         let db_connection = pool.acquire().await?;
@@ -602,29 +603,22 @@ mod tests {
             lifetime,
         )
         .unwrap();
+        
+        let device = hardware_data["device"].clone();
+        let cpu = hardware_data["components"][0].clone();
+        let ram = hardware_data["components"][1].clone();
+        let disk = hardware_data["components"][3].clone();
 
-        println!("{:?}", hardware_data);
-        /* let components: Vec<&String> = hardware_data["components"]
-            .as_object()
-            .unwrap()
-            .keys()
-            .collect(); */
+        println!("{}", hardware_data);
 
-        assert_eq!(hardware_data["device"]["name"], "dell r740");
-        assert_eq!(hardware_data["device"]["location"], "FRA");
-        assert_eq!(hardware_data["device"]["lifetime"], 5);
-        // assert_eq!(components, vec!["cpu", "ram", "disk"]);
-        assert_eq!(
-            hardware_data["components"]["cpu"]["model"],
-            "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz"
-        );
-        assert_eq!(
-            hardware_data["components"]["ram"]["characteristics"]["capacity"],
-            8
-        );
-        assert_eq!(
-            hardware_data["components"]["storage"]["characteristics"]["capacity"],
-            238
-        );
+        assert_eq!(device["name"], "dell r740");
+        assert_eq!(device["location"], "FRA");
+        assert_eq!(device["lifetime"], 5);
+        assert_eq!(cpu["name"], "cpu");
+        assert_eq!(ram["name"], "ram");
+        assert_eq!(ram["model"].as_str(), Some("not implemented"));
+        assert_eq!(ram["characteristics"][0]["value"], 4);
+        assert_eq!(disk["name"], "disk");
+        assert_eq!(disk["characteristics"][0]["value"], 238);
     }
 }
