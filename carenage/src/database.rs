@@ -10,7 +10,8 @@ use sqlx::types::uuid;
 use sqlx::Postgres;
 use sqlx::Row;
 use std::fs::File;
-use std::io::BufReader;
+use std::io::{BufReader, Write};
+use std::path::Path;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(untagged)]
@@ -80,14 +81,22 @@ pub fn query_boagent(
     response
 }
 
-fn deserialize_boagent_json(boagent_response_json: File) -> Result<Value, Error> {
+pub fn save_boagent_response(boagent_response: Response, boagent_response_fp: &Path) -> Result<(), std::io::Error> {
+
+    let mut buffer = File::create(boagent_response_fp)?;
+    let boagent_response_text = boagent_response.text().unwrap();
+    let _ = buffer.write(&boagent_response_text.as_bytes())?;
+    Ok(()) 
+}
+
+pub fn deserialize_boagent_json(boagent_response_json: File) -> Result<Value, Error> {
     let boagent_json_reader = BufReader::new(boagent_response_json);
     let deserialized_boagent_json = serde_json::from_reader(boagent_json_reader)?;
 
     Ok(deserialized_boagent_json)
 }
 
-fn format_hardware_data(
+pub fn format_hardware_data(
     deserialized_boagent_response: Value,
     device_name: Option<String>,
     location: String,
@@ -305,6 +314,7 @@ mod tests {
     use std::env::current_dir;
     use std::fs::File;
     use std::time::SystemTime;
+    use std::path::Path;
 
     #[test]
     fn it_queries_boagent_with_success_with_needed_query_paramaters() {
@@ -437,6 +447,51 @@ mod tests {
     }
 
     #[test]
+    fn it_saves_boagent_response_to_a_file() {
+        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
+        let now_timestamp_minus_one_minute =
+            Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
+
+        let mut boagent_server = Server::new();
+
+        let url = boagent_server.url();
+
+        let _mock = boagent_server
+            .mock("GET", "/query")
+            .match_query(Matcher::AllOf(vec![
+                Matcher::UrlEncoded(
+                    "start_time".to_string(),
+                    now_timestamp_minus_one_minute.to_string(),
+                ),
+                Matcher::UrlEncoded("end_time".to_string(), now_timestamp.to_string()),
+                Matcher::UrlEncoded("verbose".to_string(), "true".to_string()),
+                Matcher::UrlEncoded("location".to_string(), "FRA".to_string()),
+                Matcher::UrlEncoded("measure_power".to_string(), "true".to_string()),
+                Matcher::UrlEncoded("lifetime".to_string(), "5".to_string()),
+                Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
+            ]))
+            .with_status(200)
+            .with_body("FAKE BOAGENT RESPONSE")
+            .create();
+
+        let response = query_boagent(
+            url,
+            now_timestamp_minus_one_minute,
+            now_timestamp,
+            true,
+            "FRA".to_string(),
+            5,
+        )
+        .unwrap();
+
+        let boagent_response_fp = Path::new("boagent.json");
+        let boagent_response_file = save_boagent_response(response, boagent_response_fp);
+
+        assert_eq!(boagent_response_file.is_ok(), true);
+        assert_eq!(boagent_response_fp.exists(), true);
+    }
+
+    #[test]
     fn it_deserializes_json_from_boagent_response_as_a_saved_json_file() {
         let mut boagent_json_fp = current_dir().unwrap();
 
@@ -450,6 +505,7 @@ mod tests {
 
         assert_eq!(deserialized_json.is_ok(), true);
     }
+
 
     #[sqlx::test(migrations = "../db/")]
     async fn it_inserts_valid_data_in_projects_table_in_the_carenage_database(
