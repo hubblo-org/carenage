@@ -107,11 +107,11 @@ fn format_hardware_data(
     let rams = hardware_data["rams"].as_array();
     let disks = hardware_data["disks"].as_array();
 
-    for cpu in cpus.unwrap() {
+    for cpu in cpus.expect("Unable to parse CPUs JSON array from Boagent.") {
         let core_units = ComponentCharacteristic {
             name: "core_units".to_string(),
             value: CharacteristicValue::NumericValue(
-                cpu["core_units"].as_number().unwrap().clone(),
+                cpu["core_units"].as_number().expect("Unable to convert CPU core_units to an integer.").clone(),
             ),
         };
         let cpu = Component {
@@ -123,10 +123,10 @@ fn format_hardware_data(
         components.push(cpu);
     }
 
-    for ram in rams.unwrap() {
+    for ram in rams.expect("Unable to parse RAM JSON array from Boagent.") {
         let capacity = ComponentCharacteristic {
             name: "capacity".to_string(),
-            value: CharacteristicValue::NumericValue(ram["capacity"].as_number().unwrap().clone()),
+            value: CharacteristicValue::NumericValue(ram["capacity"].as_number().expect("Unable to convert RAM capacity to an integer.").clone()),
         };
         let ram = Component {
             name: "ram".to_string(),
@@ -137,10 +137,11 @@ fn format_hardware_data(
         components.push(ram);
     }
 
-    for disk in disks.unwrap() {
+    for disk in disks.expect("Unable to parse Disks JSON array from Boagent.") {
         let capacity = ComponentCharacteristic {
             name: "capacity".to_string(),
-            value: CharacteristicValue::NumericValue(disk["capacity"].as_number().unwrap().clone()).into(),
+            value: CharacteristicValue::NumericValue(disk["capacity"].as_number().expect("Unable to convert disk capacity to an integer.").clone())
+                .into(),
         };
         let disk_type = ComponentCharacteristic {
             name: "type".to_string(),
@@ -169,12 +170,12 @@ async fn insert_dimension_table_metadata(
         .get("start_date")
         .expect("Unable to read timestamp.")
         .as_str()
-        .expect("Unable to read string");
+        .expect("Unable to read string.");
     let project_stop_date = project_data
         .get("stop_date")
         .expect("Unable to read timestamp.")
         .as_str()
-        .expect("Unable to read string");
+        .expect("Unable to read string.");
 
     let start_date_timestamp =
         NaiveDateTime::parse_from_str(project_start_date, "%Y-%m-%d %H:%M:%S")
@@ -275,16 +276,17 @@ async fn insert_device_metadata(
             .await?;
 
         let component_id: uuid::Uuid = insert_component_data_query.get("component_id");
+
         let component_characteristics = component["characteristics"]
-            .as_object()
-            .expect("Unable to read JSON Object.")
-            .keys();
+            .as_array()
+            .expect("Unable to read JSON Array.");
+
         for component_characteristic in component_characteristics {
             let formatted_query = "INSERT INTO component_characteristic (component_id, name, value) VALUES ($1, $2, $3)";
             let insert_component_characteristic_data_query = sqlx::query(&formatted_query)
                 .bind(component_id)
-                .bind(component[component_characteristic]["name"].as_str())
-                .bind(component[component_characteristic]["value"].as_str())
+                .bind(component_characteristic["name"].as_str())
+                .bind(component_characteristic["value"].as_str())
                 .execute(&mut connection)
                 .await?;
         }
@@ -550,26 +552,22 @@ mod tests {
                     "name": "cpu",
                     "model": "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
                     "manufacturer": "Inter Corp.",
-                    "characteristics": {
-                      "units": 1,
-                      "core_units": 4
-                    }},
+                    "characteristics": [{
+                      "name": "core_unit", "value": 4}]},
                     {
                     "name": "ram",
                     "model": "not implemented yet",
                     "manufacturer": "Inter Corp.",
-                    "characteristics": {
-                    "units": 2,
-                    "capacity": 8
-                }},
+                    "characteristics": [{"name": "capacity", "value": 8}]
+                },
                     {
                     "name": "disk",
                     "model": "not implemented yet",
                     "manufacturer": "toshiba",
-                "characteristics": {
-                    "type": "ssd",
-                    "capacity": 238
-              }}]
+                "characteristics": [{
+                    "name": "type",
+                    "value": "ssd"}, {"name": "capacity", "value": 238}
+              ]}]
         });
 
         let db_connection = pool.acquire().await?;
@@ -603,13 +601,11 @@ mod tests {
             lifetime,
         )
         .unwrap();
-        
+
         let device = hardware_data["device"].clone();
         let cpu = hardware_data["components"][0].clone();
         let ram = hardware_data["components"][1].clone();
         let disk = hardware_data["components"][3].clone();
-
-        println!("{}", hardware_data);
 
         assert_eq!(device["name"], "dell r740");
         assert_eq!(device["location"], "FRA");
@@ -620,5 +616,32 @@ mod tests {
         assert_eq!(ram["characteristics"][0]["value"], 4);
         assert_eq!(disk["name"], "disk");
         assert_eq!(disk["characteristics"][0]["value"], 238);
+    }
+
+    #[sqlx::test(migrations = "../db/")]
+    async fn it_reads_a_json_file_and_inserts_needed_data_into_the_database(
+        pool: PgPool,
+    ) -> sqlx::Result<()> {
+        let mut boagent_json_fp = current_dir().unwrap();
+
+        boagent_json_fp.push("mocks");
+        boagent_json_fp.push("boagent_response");
+        boagent_json_fp.set_extension("json");
+
+        let boagent_response_json = File::open(boagent_json_fp).unwrap();
+        let location = "FRA".to_string();
+        let lifetime = 5;
+        let device_name = "dell r740".to_string();
+        let db_connection = pool.acquire().await?;
+
+        let deserialized_response = deserialize_boagent_json(boagent_response_json).unwrap();
+        let formatted_response =
+            format_hardware_data(deserialized_response, Some(device_name), location, lifetime);
+        let insert_device_data =
+            insert_device_metadata(db_connection, formatted_response.unwrap()).await;
+
+        assert_eq!(insert_device_data.is_ok(), true);
+
+        Ok(())
     }
 }
