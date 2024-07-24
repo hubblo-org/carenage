@@ -9,9 +9,7 @@ use sqlx::postgres::PgQueryResult;
 use sqlx::types::uuid;
 use sqlx::Postgres;
 use sqlx::Row;
-use std::fs::File;
-use std::io::{BufReader, Write};
-use std::path::Path;
+use std::io::BufReader;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(untagged)]
@@ -22,7 +20,7 @@ pub enum CharacteristicValue {
 
 #[derive(Serialize, Deserialize)]
 struct Device {
-    name: Option<String>,
+    name: String,
     location: String,
     lifetime: Number,
 }
@@ -46,8 +44,8 @@ pub fn query_boagent(
     start_time: Timestamp,
     end_time: Timestamp,
     fetch_hardware: bool,
-    location: String,
-    lifetime: u8,
+    location: &String,
+    lifetime: i16,
 ) -> Result<Response, reqwest::Error> {
     let mut query_parameters = vec![];
 
@@ -68,7 +66,7 @@ pub fn query_boagent(
         }
     }
     query_parameters.push(("verbose", "true".to_string()));
-    query_parameters.push(("location", location));
+    query_parameters.push(("location", location.to_string()));
     query_parameters.push(("measure_power", "true".to_string()));
     query_parameters.push(("lifetime", lifetime.to_string()));
     query_parameters.push(("fetch_hardware", fetch_hardware.to_string()));
@@ -76,21 +74,11 @@ pub fn query_boagent(
     let client = Client::new();
     let base_url = format!("{}/query", boagent_url);
 
-    let response = client.get(base_url).query(&query_parameters).send();
-
-    response
+    client.get(base_url).query(&query_parameters).send()
 }
 
-pub fn save_boagent_response(boagent_response: Response, boagent_response_fp: &Path) -> Result<(), std::io::Error> {
-
-    let mut buffer = File::create(boagent_response_fp)?;
-    let boagent_response_text = boagent_response.text().unwrap();
-    let _ = buffer.write(&boagent_response_text.as_bytes())?;
-    Ok(()) 
-}
-
-pub fn deserialize_boagent_json(boagent_response_json: File) -> Result<Value, Error> {
-    let boagent_json_reader = BufReader::new(boagent_response_json);
+pub fn deserialize_boagent_json(boagent_response: Response) -> Result<Value, Error> {
+    let boagent_json_reader = BufReader::new(boagent_response);
     let deserialized_boagent_json = serde_json::from_reader(boagent_json_reader)?;
 
     Ok(deserialized_boagent_json)
@@ -98,7 +86,7 @@ pub fn deserialize_boagent_json(boagent_response_json: File) -> Result<Value, Er
 
 pub fn format_hardware_data(
     deserialized_boagent_response: Value,
-    device_name: Option<String>,
+    device_name: String,
     location: String,
     lifetime: i16,
 ) -> Result<Value, Error> {
@@ -120,7 +108,10 @@ pub fn format_hardware_data(
         let core_units = ComponentCharacteristic {
             name: "core_units".to_string(),
             value: CharacteristicValue::NumericValue(
-                cpu["core_units"].as_number().expect("Unable to convert CPU core_units to an integer.").clone(),
+                cpu["core_units"]
+                    .as_number()
+                    .expect("Unable to convert CPU core_units to an integer.")
+                    .clone(),
             ),
         };
         let cpu = Component {
@@ -135,7 +126,12 @@ pub fn format_hardware_data(
     for ram in rams.expect("Unable to parse RAM JSON array from Boagent.") {
         let capacity = ComponentCharacteristic {
             name: "capacity".to_string(),
-            value: CharacteristicValue::NumericValue(ram["capacity"].as_number().expect("Unable to convert RAM capacity to an integer.").clone()),
+            value: CharacteristicValue::NumericValue(
+                ram["capacity"]
+                    .as_number()
+                    .expect("Unable to convert RAM capacity to an integer.")
+                    .clone(),
+            ),
         };
         let ram = Component {
             name: "ram".to_string(),
@@ -149,8 +145,12 @@ pub fn format_hardware_data(
     for disk in disks.expect("Unable to parse Disks JSON array from Boagent.") {
         let capacity = ComponentCharacteristic {
             name: "capacity".to_string(),
-            value: CharacteristicValue::NumericValue(disk["capacity"].as_number().expect("Unable to convert disk capacity to an integer.").clone())
-                .into(),
+            value: CharacteristicValue::NumericValue(
+                disk["capacity"]
+                    .as_number()
+                    .expect("Unable to convert disk capacity to an integer.")
+                    .clone(),
+            ),
         };
         let disk_type = ComponentCharacteristic {
             name: "type".to_string(),
@@ -169,7 +169,7 @@ pub fn format_hardware_data(
     Ok(formatted_hardware_data)
 }
 
-async fn insert_dimension_table_metadata(
+pub async fn insert_dimension_table_metadata(
     database_connection: PoolConnection<Postgres>,
     table: &str,
     project_data: Value,
@@ -198,17 +198,15 @@ async fn insert_dimension_table_metadata(
         "INSERT INTO {} (name, start_date, stop_date) VALUES ($1, $2, $3)",
         table
     );
-    let insert_data_query = sqlx::query(&insert_query)
+    sqlx::query(&insert_query)
         .bind(project_name)
         .bind(start_date_timestamp)
         .bind(stop_date_timestamp)
         .execute(&mut connection)
-        .await;
-
-    insert_data_query
+        .await
 }
 
-async fn insert_process_metadata(
+pub async fn insert_process_metadata(
     database_connection: PoolConnection<Postgres>,
     table: &str,
     process_data: Value,
@@ -239,19 +237,17 @@ async fn insert_process_metadata(
         "INSERT INTO {} (exe, cmdline, state, start_date, stop_date) VALUES ($1, $2, $3, $4, $5)",
         table
     );
-    let insert_data_query = sqlx::query(&insert_query)
+    sqlx::query(&insert_query)
         .bind(process_exe)
         .bind(process_cmdline)
         .bind(process_state)
         .bind(start_date_timestamp)
         .bind(stop_date_timestamp)
         .execute(&mut connection)
-        .await;
-
-    insert_data_query
+        .await
 }
 
-async fn insert_device_metadata(
+pub async fn insert_device_metadata(
     database_connection: PoolConnection<Postgres>,
     device_data: Value,
 ) -> Result<(), sqlx::Error> {
@@ -266,7 +262,7 @@ async fn insert_device_metadata(
 
     let formatted_query =
         "INSERT INTO devices (name, lifetime, location) VALUES ($1, $2, $3) RETURNING device_id";
-    let insert_device_data_query = sqlx::query(&formatted_query)
+    let insert_device_data_query = sqlx::query(formatted_query)
         .bind(device_name)
         .bind(device_lifetime)
         .bind(device_location)
@@ -276,7 +272,7 @@ async fn insert_device_metadata(
     let device_id: uuid::Uuid = insert_device_data_query.get("device_id");
     let formatted_query = "INSERT INTO components (device_id, name, model, manufacturer) VALUES ($1, $2, $3, $4) RETURNING component_id";
     for component in components {
-        let insert_component_data_query = sqlx::query(&formatted_query)
+        let insert_component_data_query = sqlx::query(formatted_query)
             .bind(device_id)
             .bind(component["name"].as_str())
             .bind(component["model"].as_str())
@@ -292,7 +288,8 @@ async fn insert_device_metadata(
 
         for component_characteristic in component_characteristics {
             let formatted_query = "INSERT INTO component_characteristic (component_id, name, value) VALUES ($1, $2, $3)";
-            let insert_component_characteristic_data_query = sqlx::query(&formatted_query)
+
+            sqlx::query(formatted_query)
                 .bind(component_id)
                 .bind(component_characteristic["name"].as_str())
                 .bind(component_characteristic["value"].as_str())
@@ -311,10 +308,7 @@ mod tests {
     use mockito::{Matcher, Server};
     use serde_json::json;
     use sqlx::PgPool;
-    use std::env::current_dir;
-    use std::fs::File;
     use std::time::SystemTime;
-    use std::path::Path;
 
     #[test]
     fn it_queries_boagent_with_success_with_needed_query_paramaters() {
@@ -347,7 +341,7 @@ mod tests {
             Timestamp::UnixTimestamp(Some(now_timestamp_minus_one_minute)),
             Timestamp::UnixTimestamp(Some(now_timestamp)),
             true,
-            "FRA".to_string(),
+            &"FRA".to_string(),
             5,
         )
         .unwrap();
@@ -380,7 +374,7 @@ mod tests {
             Timestamp::UnixTimestamp(None),
             Timestamp::UnixTimestamp(None),
             true,
-            "FRA".to_string(),
+            &"FRA".to_string(),
             5,
         )
         .unwrap();
@@ -420,7 +414,7 @@ mod tests {
             now_timestamp_minus_one_minute,
             now_timestamp,
             true,
-            "FRA".to_string(),
+            &"FRA".to_string(),
             5,
         )
         .unwrap();
@@ -439,7 +433,7 @@ mod tests {
             Timestamp::ISO8601Timestamp(None),
             Timestamp::ISO8601Timestamp(None),
             true,
-            "FRA".to_string(),
+            &"FRA".to_string(),
             5,
         );
 
@@ -447,7 +441,7 @@ mod tests {
     }
 
     #[test]
-    fn it_saves_boagent_response_to_a_file() {
+    fn it_deserializes_json_from_boagent_response() {
         let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
         let now_timestamp_minus_one_minute =
             Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
@@ -471,7 +465,7 @@ mod tests {
                 Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
             ]))
             .with_status(200)
-            .with_body("FAKE BOAGENT RESPONSE")
+            .with_body_from_file("mocks/boagent_response.json")
             .create();
 
         let response = query_boagent(
@@ -479,33 +473,32 @@ mod tests {
             now_timestamp_minus_one_minute,
             now_timestamp,
             true,
-            "FRA".to_string(),
+            &"FRA".to_string(),
             5,
         )
         .unwrap();
 
-        let boagent_response_fp = Path::new("boagent.json");
-        let boagent_response_file = save_boagent_response(response, boagent_response_fp);
+        let deserialized_json_result = deserialize_boagent_json(response);
 
-        assert_eq!(boagent_response_file.is_ok(), true);
-        assert_eq!(boagent_response_fp.exists(), true);
+        assert_eq!(
+            deserialized_json_result
+                .as_ref()
+                .is_ok_and(|response| response.is_object()),
+            true
+        );
+        assert_eq!(
+            deserialized_json_result.as_ref().unwrap()["raw_data"]["hardware_data"].is_object(),
+            true
+        );
+        assert_eq!(
+            deserialized_json_result.as_ref().unwrap()["raw_data"]["boaviztapi_data"].is_object(),
+            true
+        );
+        assert_eq!(
+            deserialized_json_result.as_ref().unwrap()["raw_data"]["power_data"].is_object(),
+            true
+        );
     }
-
-    #[test]
-    fn it_deserializes_json_from_boagent_response_as_a_saved_json_file() {
-        let mut boagent_json_fp = current_dir().unwrap();
-
-        boagent_json_fp.push("mocks");
-        boagent_json_fp.push("boagent_response");
-        boagent_json_fp.set_extension("json");
-
-        let boagent_response_json = File::open(boagent_json_fp).unwrap();
-
-        let deserialized_json = deserialize_boagent_json(boagent_response_json);
-
-        assert_eq!(deserialized_json.is_ok(), true);
-    }
-
 
     #[sqlx::test(migrations = "../db/")]
     async fn it_inserts_valid_data_in_projects_table_in_the_carenage_database(
@@ -636,23 +629,50 @@ mod tests {
 
     #[test]
     fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
-        let mut boagent_json_fp = current_dir().unwrap();
+        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
+        let now_timestamp_minus_one_minute =
+            Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
 
-        boagent_json_fp.push("mocks");
-        boagent_json_fp.push("boagent_response");
-        boagent_json_fp.set_extension("json");
+        let mut boagent_server = Server::new();
 
-        let boagent_response_json = File::open(boagent_json_fp).unwrap();
+        let url = boagent_server.url();
 
-        let deserialized_boagent_response =
-            deserialize_boagent_json(boagent_response_json).unwrap();
+        let _mock = boagent_server
+            .mock("GET", "/query")
+            .match_query(Matcher::AllOf(vec![
+                Matcher::UrlEncoded(
+                    "start_time".to_string(),
+                    now_timestamp_minus_one_minute.to_string(),
+                ),
+                Matcher::UrlEncoded("end_time".to_string(), now_timestamp.to_string()),
+                Matcher::UrlEncoded("verbose".to_string(), "true".to_string()),
+                Matcher::UrlEncoded("location".to_string(), "FRA".to_string()),
+                Matcher::UrlEncoded("measure_power".to_string(), "true".to_string()),
+                Matcher::UrlEncoded("lifetime".to_string(), "5".to_string()),
+                Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
+            ]))
+            .with_status(200)
+            .with_body_from_file("mocks/boagent_response.json")
+            .create();
+
+        let response = query_boagent(
+            url,
+            now_timestamp_minus_one_minute,
+            now_timestamp,
+            true,
+            &"FRA".to_string(),
+            5,
+        )
+        .unwrap();
+
+        let deserialized_boagent_response = deserialize_boagent_json(response).unwrap();
         let location = "FRA".to_string();
         let lifetime = 5;
         let device_name = "dell r740".to_string();
 
         let hardware_data = format_hardware_data(
             deserialized_boagent_response,
-            Some(device_name),
+            device_name,
             location,
             lifetime,
         )
@@ -672,32 +692,5 @@ mod tests {
         assert_eq!(ram["characteristics"][0]["value"], 4);
         assert_eq!(disk["name"], "disk");
         assert_eq!(disk["characteristics"][0]["value"], 238);
-    }
-
-    #[sqlx::test(migrations = "../db/")]
-    async fn it_reads_a_json_file_and_inserts_needed_data_into_the_database(
-        pool: PgPool,
-    ) -> sqlx::Result<()> {
-        let mut boagent_json_fp = current_dir().unwrap();
-
-        boagent_json_fp.push("mocks");
-        boagent_json_fp.push("boagent_response");
-        boagent_json_fp.set_extension("json");
-
-        let boagent_response_json = File::open(boagent_json_fp).unwrap();
-        let location = "FRA".to_string();
-        let lifetime = 5;
-        let device_name = "dell r740".to_string();
-        let db_connection = pool.acquire().await?;
-
-        let deserialized_response = deserialize_boagent_json(boagent_response_json).unwrap();
-        let formatted_response =
-            format_hardware_data(deserialized_response, Some(device_name), location, lifetime);
-        let insert_device_data =
-            insert_device_metadata(db_connection, formatted_response.unwrap()).await;
-
-        assert_eq!(insert_device_data.is_ok(), true);
-
-        Ok(())
     }
 }
