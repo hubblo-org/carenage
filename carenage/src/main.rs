@@ -1,9 +1,8 @@
 use crate::database::query_boagent;
 use crate::timestamp::Timestamp;
 use clap::Parser;
+use database::insert_device_metadata;
 use dotenv::var;
-use std::path::Path;
-use std::fs::File;
 
 pub mod cli;
 pub mod database;
@@ -16,9 +15,10 @@ fn main() {
     let location = var("LOCATION").expect("LOCATION environment variable is absent. It is needed to indicate the energy mix relevant to the evaluated environmental impacts");
     let lifetime_env = var("LIFETIME").expect("LIFETIME environment variable is absent. It is needed to calculate the environmental impact for the evaluated device.");
     let lifetime = lifetime_env
-        .parse::<u8>()
+        .parse::<i16>()
         .expect("Unable to parse LIFETIME environment variable. It must be an integer.");
-    let boagent_response_fp = var("BOAGENT_RESPONSE_FP").expect("BOAGENT_RESPONSE_FP environment variable is absent. It is needed to parse device data");
+    let device_name = var("DEVICE").unwrap_or("unknown".to_string());
+    let database_url = var("DATABASE_URL").expect("DATABASE_URL environment variable is absent.");
 
     let printable_boagent_url = boagent_url.clone();
 
@@ -35,7 +35,7 @@ fn main() {
                 start_timestamp,
                 stop_timestamp,
                 true,
-                location,
+                &location,
                 lifetime,
             );
             match boagent_query {
@@ -44,9 +44,16 @@ fn main() {
                         "Queried Boagent at {:?} : {:?}",
                         printable_boagent_url, response
                     );
-                let _save_response = database::save_boagent_response(response, Path::new(&boagent_response_fp)).expect("Failed to save Boagent response to filepath."); 
-                let deserialized_response = database::deserialize_boagent_json(File::open(boagent_response_fp).expect("Failed to open file."));
-
+                    let deserialized_response = database::deserialize_boagent_json(response)
+                        .expect("Failed to deserialize response");
+                    let hardware_data = database::format_hardware_data(
+                        deserialized_response,
+                        device_name,
+                        location,
+                        lifetime,
+                    ).expect("Failed to format hardware data");
+                    let pg_connection = database::connect_to_database(database_url);
+                    insert_device_metadata(pg_connection, hardware_data);
                 }
                 Err(err) => println!("Failed to query Boagent: {:?}", err),
             };
@@ -63,7 +70,7 @@ fn main() {
                 start_timestamp,
                 stop_timestamp,
                 false,
-                location,
+                &location,
                 lifetime,
             );
             match boagent_query {
