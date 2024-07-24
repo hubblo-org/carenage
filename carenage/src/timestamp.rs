@@ -11,16 +11,12 @@ pub enum Timestamp {
 impl Display for Timestamp {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         match self {
-            Timestamp::UnixTimestamp(value) => write!(
-                f,
-                "{}",
-                value.expect("Unable to parse Unix Timestamp").to_string()
-            ),
-            Timestamp::ISO8601Timestamp(value) => write!(
-                f,
-                "{}",
-                value.expect("Unable to parse ISO 8601").to_string()
-            ),
+            Timestamp::UnixTimestamp(value) => {
+                write!(f, "{}", value.expect("Unable to parse Unix Timestamp"))
+            }
+            Timestamp::ISO8601Timestamp(value) => {
+                write!(f, "{}", value.expect("Unable to parse ISO 8601"))
+            }
         }
     }
 }
