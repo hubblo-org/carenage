@@ -7,8 +7,8 @@ use serde_json::{json, Error, Value};
 use sqlx::pool::PoolConnection;
 use sqlx::postgres::PgQueryResult;
 use sqlx::types::uuid;
-use sqlx::{Acquire, PgPool, Postgres};
 use sqlx::Row;
+use sqlx::{Acquire, PgPool, Postgres};
 use std::io::BufReader;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -25,7 +25,7 @@ struct Device {
     lifetime: Number,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Component {
     name: String,
     model: String,
@@ -33,7 +33,7 @@ struct Component {
     characteristics: Vec<ComponentCharacteristic>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct ComponentCharacteristic {
     name: String,
     value: CharacteristicValue,
@@ -84,7 +84,9 @@ pub fn deserialize_boagent_json(boagent_response: Response) -> Result<Value, Err
     Ok(deserialized_boagent_json)
 }
 
-pub async fn connect_to_database(database_url: String) -> Result<PoolConnection<Postgres>, sqlx::Error> {
+pub async fn connect_to_database(
+    database_url: String,
+) -> Result<PoolConnection<Postgres>, sqlx::Error> {
     let connection_pool = PgPool::connect(database_url.as_str()).await?;
 
     connection_pool.acquire().await
@@ -106,11 +108,20 @@ pub fn format_hardware_data(
 
     let mut components = vec![];
 
-    let cpus = hardware_data["cpus"].as_array().expect("Unable to parse CPUs JSON array from Boagent.").into_iter();
-    let rams = hardware_data["rams"].as_array().expect("Unable to parse RAM JSON array from Boagent.").into_iter();
-    let disks = hardware_data["disks"].as_array().expect("Unable to parse Disks JSON array from Boagent.").into_iter();
+    let cpus = hardware_data["cpus"]
+        .as_array()
+        .expect("Unable to parse CPUs JSON array from Boagent.")
+        .into_iter();
+    let rams = hardware_data["rams"]
+        .as_array()
+        .expect("Unable to parse RAM JSON array from Boagent.")
+        .into_iter();
+    let disks = hardware_data["disks"]
+        .as_array()
+        .expect("Unable to parse Disks JSON array from Boagent.")
+        .into_iter();
 
-    cpus.map(|cpu| {
+    let cpu_components_iter = cpus.map(|cpu| {
         let core_units = ComponentCharacteristic {
             name: "core_units".to_string(),
             value: CharacteristicValue::NumericValue(
@@ -120,34 +131,17 @@ pub fn format_hardware_data(
                     .clone(),
             ),
         };
-        let cpu_component = Component {
+        Component {
             name: "cpu".to_string(),
             model: cpu["name"].to_string(),
             manufacturer: cpu["manufacturer"].to_string(),
             characteristics: vec![core_units],
-        };
-        components.push(cpu_component)
+        }
     });
 
-    /* for cpu in cpus {
-        let core_units = ComponentCharacteristic {
-            name: "core_units".to_string(),
-            value: CharacteristicValue::NumericValue(
-                cpu["core_units"]
-                    .as_number()
-                    .expect("Unable to convert CPU core_units to an integer.")
-                    .clone(),
-            ),
-        };
-        let cpu = Component {
-            name: "cpu".to_string(),
-            model: cpu["name"].to_string(),
-            manufacturer: cpu["manufacturer"].to_string(),
-            characteristics: vec![core_units],
-        };
-        components.push(cpu);
-    } */
-    rams.map(|ram| {
+    components.extend(cpu_components_iter);
+
+    let ram_components_iter = rams.map(|ram| {
         let capacity = ComponentCharacteristic {
             name: "capacity".to_string(),
             value: CharacteristicValue::NumericValue(
@@ -157,35 +151,17 @@ pub fn format_hardware_data(
                     .clone(),
             ),
         };
-        let ram_component = Component {
+        Component {
             name: "ram".to_string(),
             model: "not implemented".to_string(),
             manufacturer: ram["manufacturer"].to_string(),
             characteristics: vec![capacity],
-        };
-        components.push(ram_component);
+        }
     });
 
-    /* for ram in rams {
-        let capacity = ComponentCharacteristic {
-            name: "capacity".to_string(),
-            value: CharacteristicValue::NumericValue(
-                ram["capacity"]
-                    .as_number()
-                    .expect("Unable to convert RAM capacity to an integer.")
-                    .clone(),
-            ),
-        };
-        let ram = Component {
-            name: "ram".to_string(),
-            model: "not implemented".to_string(),
-            manufacturer: ram["manufacturer"].to_string(),
-            characteristics: vec![capacity],
-        };
-        components.push(ram);
-    } */
+    components.extend(ram_components_iter);
 
-    for disk in disks {
+    let disk_components_iter = disks.map(|disk| {
         let capacity = ComponentCharacteristic {
             name: "capacity".to_string(),
             value: CharacteristicValue::NumericValue(
@@ -199,14 +175,15 @@ pub fn format_hardware_data(
             name: "type".to_string(),
             value: CharacteristicValue::StringValue(disk["type"].to_string()),
         };
-        let disk = Component {
+        Component {
             name: "disk".to_string(),
             model: "not implemented".to_string(),
             manufacturer: disk["manufacturer"].to_string(),
             characteristics: vec![capacity, disk_type],
-        };
-        components.push(disk);
-    }
+        }
+    });
+
+    components.extend(disk_components_iter);
 
     let formatted_hardware_data = json!({"device": device, "components": components});
     Ok(formatted_hardware_data)
@@ -348,11 +325,11 @@ pub async fn insert_device_metadata(
 mod tests {
     use super::*;
     use chrono::{Duration, Utc};
+    use dotenv::var;
     use mockito::{Matcher, Server};
     use serde_json::json;
     use sqlx::PgPool;
     use std::time::SystemTime;
-    use dotenv::var;
 
     #[test]
     fn it_queries_boagent_with_success_with_needed_query_paramaters() {
