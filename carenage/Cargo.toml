@@ -7,12 +7,15 @@ license = "Apache-2.0"
 description = "Continuous integration tool to assess the environmental impacts and energy consumption of an application in development."
 repository = "https://gitlab.com/hubblo/carenage/"
 
+[workspace]
+
+members = ["cli", "database", "daemon"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 assert_cmd = "2.0.14"
 chrono = "0.4.38"
-clap = { version = "4.5.9", features = ["derive"] }
+clap = { version = "4.5.11", features = ["derive"] }
 dotenv = "0.15.0"
 mockito = "1.4.0"
 predicates = "3.1.0"

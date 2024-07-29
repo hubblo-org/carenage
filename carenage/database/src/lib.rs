@@ -11,6 +11,8 @@ use sqlx::Row;
 use sqlx::{Acquire, PgPool, Postgres};
 use std::io::BufReader;
 
+pub mod timestamp;
+
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(untagged)]
 pub enum CharacteristicValue {
@@ -486,7 +488,7 @@ mod tests {
                 Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
             ]))
             .with_status(200)
-            .with_body_from_file("mocks/boagent_response.json")
+            .with_body_from_file("../mocks/boagent_response.json")
             .create();
 
         let response = query_boagent(
@@ -521,7 +523,7 @@ mod tests {
         );
     }
 
-    #[sqlx::test(migrations = "../db/")]
+    #[sqlx::test(migrations = "../../db/")]
     async fn it_inserts_valid_data_in_projects_table_in_the_carenage_database(
         pool: PgPool,
     ) -> sqlx::Result<()> {
@@ -544,7 +546,7 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test(migrations = "../db/")]
+    #[sqlx::test(migrations = "../../db/")]
     async fn it_inserts_valid_data_for_several_dimension_tables_in_the_carenage_database(
         pool: PgPool,
     ) -> sqlx::Result<()> {
@@ -582,7 +584,7 @@ mod tests {
 
         Ok(())
     }
-    #[sqlx::test(migrations = "../db/")]
+    #[sqlx::test(migrations = "../../db/")]
     async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage_database(
         pool: PgPool,
     ) -> sqlx::Result<()> {
@@ -608,7 +610,7 @@ mod tests {
         Ok(())
     }
 
-    #[sqlx::test(migrations = "../db/")]
+    #[sqlx::test(migrations = "../../db/")]
     async fn it_inserts_valid_data_for_the_devices_components_and_components_characteristics_dimensions_tables_in_the_carenage_database(
         pool: PgPool,
     ) -> sqlx::Result<()> {
@@ -673,7 +675,7 @@ mod tests {
                 Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
             ]))
             .with_status(200)
-            .with_body_from_file("mocks/boagent_response.json")
+            .with_body_from_file("../mocks/boagent_response.json")
             .create();
 
         let response = query_boagent(

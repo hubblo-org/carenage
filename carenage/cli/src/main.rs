@@ -1,12 +1,8 @@
-use crate::database::query_boagent;
-use crate::timestamp::Timestamp;
+use database::timestamp;
 use clap::Parser;
-use database::insert_device_metadata;
 use dotenv::var;
 
 pub mod cli;
-pub mod database;
-pub mod timestamp;
 
 fn main() {
     let cli = cli::Cli::parse();
@@ -22,15 +18,15 @@ fn main() {
 
     let printable_boagent_url = boagent_url.clone();
 
-    let start_timestamp: Timestamp = Timestamp::new(cli.unix);
-    let stop_timestamp: Timestamp;
+    let start_timestamp: timestamp::Timestamp = timestamp::Timestamp::new(cli.unix);
+    let stop_timestamp: timestamp::Timestamp;
 
     match &cli.event {
         Some(cli::Events::Start(step)) => {
-            stop_timestamp = Timestamp::new(cli.unix);
+            stop_timestamp = timestamp::Timestamp::new(cli.unix);
             println!("Carenage start event, time step of {:?} seconds", step.step);
             println!("Start event timestamp is {:?}", start_timestamp.to_string());
-            let boagent_query = query_boagent(
+            let boagent_query = database::query_boagent(
                 boagent_url,
                 start_timestamp,
                 stop_timestamp,
@@ -53,19 +49,19 @@ fn main() {
                         lifetime,
                     ).expect("Failed to format hardware data");
                     let pg_connection = database::connect_to_database(database_url);
-                    insert_device_metadata(pg_connection, hardware_data);
+                    // insert_device_metadata(pg_connection, hardware_data);
                 }
                 Err(err) => println!("Failed to query Boagent: {:?}", err),
             };
         }
         Some(cli::Events::Stop) => {
-            let stop_timestamp = Timestamp::new(cli.unix);
+            let stop_timestamp = timestamp::Timestamp::new(cli.unix);
 
             let printable_start_timestamp = start_timestamp.to_string();
             let printable_stop_timestamp = stop_timestamp.to_string();
             println!("Carenage stop event");
             println!("Stop event timestamp is {:?}", printable_stop_timestamp);
-            let boagent_query = query_boagent(
+            let boagent_query = database::query_boagent(
                 boagent_url,
                 start_timestamp,
                 stop_timestamp,
