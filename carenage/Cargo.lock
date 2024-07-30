@@ -258,6 +258,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "carenage-cli"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "database",
+ "dotenv",
+]
+
+[[package]]
+name = "carenaged"
+version = "0.1.0"
+
+[[package]]
 name = "cc"
 version = "1.0.104"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -322,15 +335,6 @@ name = "clap_lex"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4b82cf0babdbd58558212896d1a4272303a57bdb245c2bf1147185fb45640e70"
-
-[[package]]
-name = "cli"
-version = "0.1.0"
-dependencies = [
- "clap",
- "database",
- "dotenv",
-]
 
 [[package]]
 name = "colorchoice"
@@ -418,10 +422,6 @@ dependencies = [
  "generic-array",
  "typenum",
 ]
-
-[[package]]
-name = "daemon"
-version = "0.1.0"
 
 [[package]]
 name = "database"
