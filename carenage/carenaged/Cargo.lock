@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "daemon"
+name = "carenaged"
 version = "0.1.0"
