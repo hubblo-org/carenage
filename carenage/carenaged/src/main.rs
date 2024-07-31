@@ -1,4 +1,3 @@
-use chrono::NaiveDateTime;
 use database::{query_boagent, timestamp::Timestamp};
 use dotenv::var;
 use std::{env, process};
@@ -14,31 +13,38 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let unix_is_set: bool = args[3]
         .parse()
         .expect("Failed to parse unix_is_set variable");
-    let mut interval = time::interval(Duration::from_secs(time_step));
     let start_time_timestamp: Timestamp;
 
-    println!("Time step is : {} seconds", args[1]);
-    println!("Start timestamp is {}", args[2]);
+    println!("Time step is : {} seconds", time_step);
+    println!("Start timestamp is {}", start_time_str);
+    println!("Is UNIX flag set for timestamp? {}", unix_is_set);
 
     match unix_is_set {
         true => {
-            start_time_timestamp =
-                Timestamp::UnixTimestamp(Some(start_time_str.parse::<u64>().unwrap()))
+            start_time_timestamp = Timestamp::UnixTimestamp(Some(
+                start_time_str
+                    .parse::<u64>()
+                    .expect("Failed to parse string to convert to POSIX timestamp."),
+            ))
         }
         false => {
             start_time_timestamp = Timestamp::ISO8601Timestamp(Some(
-                NaiveDateTime::parse_from_str(&start_time_str, "%Y-%m-%d %H:%M:%S:%.9f")
-                    .unwrap()
-                    .and_utc(),
-            ))
+                start_time_str
+                    .parse()
+                    .expect("The string should be parsable to convert it to ISO8601 timestamp."),
+            ));
         }
     }
 
-    // "2024-07-31 11:38:10.916053897 UTC"
     loop {
         println!("Started carenage daemon with PID: {}", process::id());
+        let query = tokio::spawn(async move {
+            let mut interval = time::interval(Duration::from_secs(time_step));
+            let _ = query_and_insert_data(start_time_timestamp).await;
+            interval.tick().await;
+        });
+        println!("{:?}", query.await.unwrap());
         sigterm.recv().await;
-        query_and_insert_data(interval, start_time_timestamp);
         println!("Received SIGTERM signal");
         println!("Stopped carenage daemon.");
         process::exit(0x0100);
@@ -47,7 +53,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn query_and_insert_data(
-    mut time_step: Interval,
     start_time: Timestamp,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let boagent_url = var("BOAGENT_URL").expect("BOAGENT_URL environment variable is absent. It is needed to connect to Boagent and query necessary data");
@@ -55,15 +60,17 @@ async fn query_and_insert_data(
     let lifetime: i16 = var("LIFETIME").expect("LIFETIME environment variable is absent. It is needed to calculate the environmental impact for the evaluated device.").parse().expect("Failed to parse lifetime value");
     let end_time = Timestamp::new(false);
 
-    let _ = query_boagent(
+    println!("{}", boagent_url);
+
+    let query = query_boagent(
         boagent_url,
         start_time,
         end_time,
         true,
         &location,
         lifetime.into(),
-    );
-    time_step.tick().await;
+    ).await;
+    println!("{:?}", query);
     Ok("Inserted data".to_string())
 }
 
