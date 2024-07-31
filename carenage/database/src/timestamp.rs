@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use std::fmt::{Display, Formatter};
 use std::time::SystemTime;
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Timestamp {
     UnixTimestamp(Option<u64>),
     ISO8601Timestamp(Option<DateTime<Utc>>),
