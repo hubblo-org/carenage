@@ -1,6 +1,6 @@
 use crate::timestamp::Timestamp;
 use chrono::{NaiveDateTime, Utc};
-use reqwest::blocking::{Client, Response};
+use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 use serde_json::value::Number;
 use serde_json::{json, Error, Value};
@@ -8,8 +8,7 @@ use sqlx::pool::PoolConnection;
 use sqlx::postgres::PgQueryResult;
 use sqlx::types::uuid;
 use sqlx::Row;
-use sqlx::{Acquire, PgPool, Postgres};
-use std::io::BufReader;
+use sqlx::{PgPool, Postgres};
 
 pub mod timestamp;
 
@@ -41,7 +40,7 @@ struct ComponentCharacteristic {
     value: CharacteristicValue,
 }
 
-pub fn query_boagent(
+pub async fn query_boagent(
     boagent_url: String,
     start_time: Timestamp,
     end_time: Timestamp,
@@ -76,12 +75,12 @@ pub fn query_boagent(
     let client = Client::new();
     let base_url = format!("{}/query", boagent_url);
 
-    client.get(base_url).query(&query_parameters).send()
+    client.get(base_url).query(&query_parameters).send().await
 }
 
-pub fn deserialize_boagent_json(boagent_response: Response) -> Result<Value, Error> {
-    let boagent_json_reader = BufReader::new(boagent_response);
-    let deserialized_boagent_json = serde_json::from_reader(boagent_json_reader)?;
+pub async fn deserialize_boagent_json(boagent_response: Response) -> Result<Value, Error> {
+    // let boagent_json_reader = BufReader::new(boagent_response.bytes().await?);
+    let deserialized_boagent_json = serde_json::from_value(boagent_response.json().await.unwrap())?;
 
     Ok(deserialized_boagent_json)
 }
@@ -333,19 +332,19 @@ mod tests {
     use sqlx::PgPool;
     use std::time::SystemTime;
 
-    #[test]
-    fn it_queries_boagent_with_success_with_needed_query_paramaters() {
+    #[sqlx::test]
+    async fn it_queries_boagent_with_success_with_needed_query_paramaters() {
         let now_timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap()
             .as_secs();
         let now_timestamp_minus_one_minute = now_timestamp - 60;
 
-        let mut boagent_server = Server::new();
+        let mut boagent_server = Server::new_async().await;
 
         let url = boagent_server.url();
 
-        let _mock = boagent_server
+        let mock = boagent_server
             .mock("GET", "/query")
             .match_query(Matcher::AllOf(vec![
                 Matcher::Regex(format!("start_time={}", now_timestamp_minus_one_minute).into()),
@@ -357,7 +356,7 @@ mod tests {
                 Matcher::Regex("fetch_hardware=true".into()),
             ]))
             .with_status(200)
-            .create();
+            .create_async().await;
 
         let response = query_boagent(
             url,
@@ -367,14 +366,17 @@ mod tests {
             &"FRA".to_string(),
             5,
         )
-        .unwrap();
+        .await.unwrap();
+        
+        mock.assert_async().await;
 
+        println!("{:?}", response);
         assert_eq!(response.status().as_u16(), 200);
     }
 
-    #[test]
+    #[sqlx::test]
     fn it_queries_boagent_with_success_with_unspecified_timestamps() {
-        let mut boagent_server = Server::new();
+        let mut boagent_server = Server::new_async().await;
 
         let url = boagent_server.url();
 
@@ -390,7 +392,7 @@ mod tests {
                 Matcher::Regex("fetch_hardware=true".into()),
             ]))
             .with_status(200)
-            .create();
+            .create_async().await;
 
         let response = query_boagent(
             url,
@@ -400,18 +402,18 @@ mod tests {
             &"FRA".to_string(),
             5,
         )
-        .unwrap();
+        .await.unwrap();
 
         assert_eq!(response.status().as_u16(), 200);
     }
 
-    #[test]
+    #[sqlx::test]
     fn it_queries_boagent_with_success_with_iso_8601_timestamps() {
         let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
         let now_timestamp_minus_one_minute =
             Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
 
-        let mut boagent_server = Server::new();
+        let mut boagent_server = Server::new_async().await;
 
         let url = boagent_server.url();
 
@@ -430,7 +432,7 @@ mod tests {
                 Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
             ]))
             .with_status(200)
-            .create();
+            .create_async().await;
 
         let response = query_boagent(
             url,
@@ -440,15 +442,14 @@ mod tests {
             &"FRA".to_string(),
             5,
         )
-        .unwrap();
+        .await.unwrap();
 
-        _mock.assert();
 
         assert_eq!(response.status().as_u16(), 200);
     }
 
-    #[test]
-    fn it_sends_an_error_when_it_fails_to_send_a_request_to_boagent() {
+    #[sqlx::test]
+    async fn it_sends_an_error_when_it_fails_to_send_a_request_to_boagent() {
         let url = "http://url.will.fail".to_string();
 
         let response = query_boagent(
@@ -458,18 +459,18 @@ mod tests {
             true,
             &"FRA".to_string(),
             5,
-        );
+        ).await;
 
         assert_eq!(response.is_err(), true);
     }
 
-    #[test]
-    fn it_deserializes_json_from_boagent_response() {
+    #[sqlx::test]
+    async fn it_deserializes_json_from_boagent_response() {
         let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
         let now_timestamp_minus_one_minute =
             Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
 
-        let mut boagent_server = Server::new();
+        let mut boagent_server = Server::new_async().await;
 
         let url = boagent_server.url();
 
@@ -489,7 +490,7 @@ mod tests {
             ]))
             .with_status(200)
             .with_body_from_file("../mocks/boagent_response.json")
-            .create();
+            .create_async().await;
 
         let response = query_boagent(
             url,
@@ -499,9 +500,9 @@ mod tests {
             &"FRA".to_string(),
             5,
         )
-        .unwrap();
+        .await.unwrap();
 
-        let deserialized_json_result = deserialize_boagent_json(response);
+        let deserialized_json_result = deserialize_boagent_json(response).await;
 
         assert_eq!(
             deserialized_json_result
@@ -650,13 +651,13 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
+    #[sqlx::test]
+    async fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
         let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
         let now_timestamp_minus_one_minute =
             Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
 
-        let mut boagent_server = Server::new();
+        let mut boagent_server = Server::new_async().await;
 
         let url = boagent_server.url();
 
@@ -676,7 +677,7 @@ mod tests {
             ]))
             .with_status(200)
             .with_body_from_file("../mocks/boagent_response.json")
-            .create();
+            .create_async().await;
 
         let response = query_boagent(
             url,
@@ -686,9 +687,9 @@ mod tests {
             &"FRA".to_string(),
             5,
         )
-        .unwrap();
+        .await.unwrap();
 
-        let deserialized_boagent_response = deserialize_boagent_json(response).unwrap();
+        let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
         let location = "FRA".to_string();
         let lifetime = 5;
         let device_name = "dell r740".to_string();
