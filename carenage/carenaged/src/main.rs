@@ -2,52 +2,54 @@ use database::{query_boagent, timestamp::Timestamp};
 use dotenv::var;
 use std::{env, process};
 use tokio::signal::unix::{signal, SignalKind};
-use tokio::time::{self, Duration, Interval};
+use tokio::time::{self, Duration};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut sigterm = signal(SignalKind::terminate())?;
     let args: Vec<String> = env::args().collect();
-    let time_step: u64 = args[1].parse().expect("Failed to parse time_step");
+    let time_step: u64 = args[1].parse().expect("Failed to parse time_step.");
     let start_time_str = args[2].to_string();
     let unix_is_set: bool = args[3]
         .parse()
-        .expect("Failed to parse unix_is_set variable");
-    let start_time_timestamp: Timestamp;
+        .expect("Failed to parse unix_is_set variable.");
 
-    println!("Time step is : {} seconds", time_step);
-    println!("Start timestamp is {}", start_time_str);
+    println!("Time step is : {} seconds.", time_step);
+    println!("Start timestamp is {}.", start_time_str);
     println!("Is UNIX flag set for timestamp? {}", unix_is_set);
 
-    match unix_is_set {
-        true => {
-            start_time_timestamp = Timestamp::UnixTimestamp(Some(
-                start_time_str
-                    .parse::<u64>()
-                    .expect("Failed to parse string to convert to POSIX timestamp."),
-            ))
-        }
-        false => {
-            start_time_timestamp = Timestamp::ISO8601Timestamp(Some(
-                start_time_str
-                    .parse()
-                    .expect("The string should be parsable to convert it to ISO8601 timestamp."),
-            ));
-        }
-    }
+    let start_time_timestamp: Timestamp = match unix_is_set {
+        true => Timestamp::UnixTimestamp(Some(
+            start_time_str
+                .parse::<u64>()
+                .expect("Failed to parse string to convert to UNIX epoch timestamp."),
+        )),
+        false => Timestamp::ISO8601Timestamp(Some(
+            start_time_str
+                .parse()
+                .expect("The string should be parsable to convert it to ISO8601 timestamp."),
+        )),
+    };
 
-    loop {
-        println!("Started carenage daemon with PID: {}", process::id());
-        let query = tokio::spawn(async move {
-            let mut interval = time::interval(Duration::from_secs(time_step));
+    println!("Started carenage daemon with PID: {}", process::id());
+
+    let _query = tokio::spawn(async move {
+        let mut interval = time::interval(Duration::from_secs(time_step));
+        loop {
             let _ = query_and_insert_data(start_time_timestamp).await;
             interval.tick().await;
-        });
-        println!("{:?}", query.await.unwrap());
-        sigterm.recv().await;
-        println!("Received SIGTERM signal");
-        println!("Stopped carenage daemon.");
-        process::exit(0x0100);
+        }
+    });
+
+    match sigterm.recv().await {
+        Some(()) => {
+            println!("Received SIGTERM signal.");
+            println!("Stopped carenage daemon.");
+            process::exit(0x0100);
+        }
+        _ => {
+            eprintln!("Unable to listen to SIGTERM signal.")
+        }
     }
     Ok(())
 }
@@ -55,22 +57,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 async fn query_and_insert_data(
     start_time: Timestamp,
 ) -> Result<String, Box<dyn std::error::Error>> {
-    let boagent_url = var("BOAGENT_URL").expect("BOAGENT_URL environment variable is absent. It is needed to connect to Boagent and query necessary data");
-    let location = var("LOCATION").expect("LOCATION environment variable is absent. It is needed to indicate the energy mix relevant to the evaluated environmental impacts");
-    let lifetime: i16 = var("LIFETIME").expect("LIFETIME environment variable is absent. It is needed to calculate the environmental impact for the evaluated device.").parse().expect("Failed to parse lifetime value");
+    let boagent_url = var("BOAGENT_URL").expect("BOAGENT_URL environment variable is absent. It is needed to connect to Boagent and query necessary data.");
+    let location = var("LOCATION").expect("LOCATION environment variable is absent. It is needed to indicate the energy mix relevant to the evaluated environmental impacts.");
+    let lifetime: i16 = var("LIFETIME").expect("LIFETIME environment variable is absent. It is needed to calculate the environmental impact for the evaluated device.").parse().expect("Failed to parse lifetime value.");
     let end_time = Timestamp::new(false);
 
-    println!("{}", boagent_url);
-
-    let query = query_boagent(
-        boagent_url,
-        start_time,
-        end_time,
-        true,
-        &location,
-        lifetime.into(),
-    ).await;
-    println!("{:?}", query);
+    let _query = query_boagent(boagent_url, start_time, end_time, true, location, lifetime).await;
     Ok("Inserted data".to_string())
 }
 
