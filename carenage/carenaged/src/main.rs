@@ -1,3 +1,6 @@
+use database::{
+    connect_to_database, deserialize_boagent_json, format_hardware_data, insert_device_metadata,
+};
 use database::{query_boagent, timestamp::Timestamp};
 use dotenv::var;
 use std::{env, process};
@@ -10,15 +13,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
     let time_step: u64 = args[1].parse().expect("Failed to parse time_step.");
     let start_time_str = args[2].to_string();
-    let unix_is_set: bool = args[3]
+    let is_unix_set: bool = args[3]
         .parse()
-        .expect("Failed to parse unix_is_set variable.");
+        .expect("Failed to parse is_unix_set variable.");
 
     println!("Time step is : {} seconds.", time_step);
     println!("Start timestamp is {}.", start_time_str);
-    println!("Is UNIX flag set for timestamp? {}", unix_is_set);
+    println!("Is UNIX flag set for timestamp? {}", is_unix_set);
 
-    let start_time_timestamp: Timestamp = match unix_is_set {
+    let start_time_timestamp: Timestamp = match is_unix_set {
         true => Timestamp::UnixTimestamp(Some(
             start_time_str
                 .parse::<u64>()
@@ -33,10 +36,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Started carenage daemon with PID: {}", process::id());
 
+    // TODO : first query to get hardware_data, format it, send to database with other project
+    // metadata
+    // Exit process if database error
+    let _first_query = query_and_insert_data(start_time_timestamp, is_unix_set, true).await;
+
+    // Loop to query and insert data for events table
     let _query = tokio::spawn(async move {
         let mut interval = time::interval(Duration::from_secs(time_step));
         loop {
-            let _ = query_and_insert_data(start_time_timestamp).await;
+            let _ = query_and_insert_data(start_time_timestamp, is_unix_set, false).await;
             interval.tick().await;
         }
     });
@@ -56,78 +65,45 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn query_and_insert_data(
     start_time: Timestamp,
-) -> Result<String, Box<dyn std::error::Error>> {
+    is_unix_set: bool,
+    fetch_hardware: bool,
+) -> Result<(), Box<dyn std::error::Error>> {
     let boagent_url = var("BOAGENT_URL").expect("BOAGENT_URL environment variable is absent. It is needed to connect to Boagent and query necessary data.");
     let location = var("LOCATION").expect("LOCATION environment variable is absent. It is needed to indicate the energy mix relevant to the evaluated environmental impacts.");
     let lifetime: i16 = var("LIFETIME").expect("LIFETIME environment variable is absent. It is needed to calculate the environmental impact for the evaluated device.").parse().expect("Failed to parse lifetime value.");
-    let end_time = Timestamp::new(false);
+    let device_name = var("DEVICE").unwrap_or("unknown".to_string());
+    let database_url = var("DATABASE_URL").expect("DATABASE_URL environment variable is absent.");
+    let end_time = Timestamp::new(is_unix_set);
 
-    let _query = query_boagent(boagent_url, start_time, end_time, true, location, lifetime).await;
-    Ok("Inserted data".to_string())
+    let response = query_boagent(
+        boagent_url,
+        start_time,
+        end_time,
+        fetch_hardware,
+        location.clone(),
+        lifetime,
+    )
+    .await?;
+    let deserialized_response = deserialize_boagent_json(response).await?;
+
+    match fetch_hardware {
+        true => {
+            let device_data =
+                format_hardware_data(deserialized_response, device_name, location, lifetime)?;
+            let database_connection = connect_to_database(database_url).await?;
+            let insert_device_data = insert_device_metadata(database_connection, device_data).await;
+            match insert_device_data {
+                Ok(()) => (),
+                Err(err) => {
+                    eprintln!(
+                        "Error while processing first query to project and device tables: {}",
+                        err
+                    );
+                    process::exit(0x0100)
+                }
+            }
+        }
+        false => ()
+    };
+    Ok(())
 }
-
-/* #[cfg(test)]
-mod tests {
-    use super::*;
-    use database::timestamp;
-    use predicates::prelude::*;
-    use std::{io::Read, process::Command};
-    use tokio::time::{self, Duration};
-
-    #[test]
-    #[ignore]
-    fn it_prints_process_pid() {
-        // Does not presently capture output to buffer
-        let mut carenaged = Command::new("../target/debug/carenaged")
-            .spawn()
-            .expect("Failed to execute carenaged");
-
-        let start_daemon_message = "Started carenage daemon with PID".to_string();
-        let carenaged_stdout = carenaged.stdout.take();
-        let mut carenage_buffer = String::new();
-        let _ = carenaged_stdout
-            .expect("Failed to read output")
-            .read_to_string(&mut carenage_buffer);
-
-        let _ = carenaged.kill();
-        let predicate_fn = predicate::str::contains(start_daemon_message);
-        assert_eq!(true, predicate_fn.eval(&carenage_buffer));
-    }
-
-    #[tokio::test]
-    #[ignore]
-    async fn it_queries_boagent_and_insert_data_in_database_every_interval_of_given_timestamp() {
-        let start_time = timestamp::Timestamp::new(false);
-        let time_step = time::interval(Duration::from_secs(5));
-        let opts = mockito::ServerOpts {
-            host: "127.0.0.1",
-            port: 3000,
-            ..Default::default()
-        };
-        let mut boagent_server = Server::new_with_opts_async(opts).await;
-
-        let mock = boagent_server
-            .mock("GET", "/query")
-            .match_query(Matcher::AllOf(vec![
-                Matcher::Regex(format!("start_time={}", start_time).into()),
-                Matcher::Regex("verbose=true".into()),
-                Matcher::Regex("location=FRA".into()),
-                Matcher::Regex("measure_power=true".into()),
-                Matcher::Regex("lifetime=5".into()),
-                Matcher::Regex("fetch_hardware=true".into()),
-            ]))
-            .with_status(200)
-            .create_async()
-            .await;
-
-        println!("{:?}", mock);
-
-        let boagent_query = query_and_insert_data(time_step, start_time).await;
-        println!("{:?}", boagent_query);
-
-        mock.assert_async().await;
-
-        assert_eq!(boagent_query.is_ok(), true);
-        assert_eq!(boagent_query.unwrap(), "Inserted data");
-    }
-} */
