@@ -45,7 +45,7 @@ pub async fn query_boagent(
     start_time: Timestamp,
     end_time: Timestamp,
     fetch_hardware: bool,
-    location: &String,
+    location: String,
     lifetime: i16,
 ) -> Result<Response, reqwest::Error> {
     let mut query_parameters = vec![];
@@ -79,7 +79,6 @@ pub async fn query_boagent(
 }
 
 pub async fn deserialize_boagent_json(boagent_response: Response) -> Result<Value, Error> {
-    // let boagent_json_reader = BufReader::new(boagent_response.bytes().await?);
     let deserialized_boagent_json = serde_json::from_value(boagent_response.json().await.unwrap())?;
 
     Ok(deserialized_boagent_json)
@@ -112,15 +111,15 @@ pub fn format_hardware_data(
     let cpus = hardware_data["cpus"]
         .as_array()
         .expect("Unable to parse CPUs JSON array from Boagent.")
-        .into_iter();
+        .iter();
     let rams = hardware_data["rams"]
         .as_array()
         .expect("Unable to parse RAM JSON array from Boagent.")
-        .into_iter();
+        .iter();
     let disks = hardware_data["disks"]
         .as_array()
         .expect("Unable to parse Disks JSON array from Boagent.")
-        .into_iter();
+        .iter();
 
     let cpu_components_iter = cpus.map(|cpu| {
         let core_units = ComponentCharacteristic {
@@ -347,8 +346,8 @@ mod tests {
         let mock = boagent_server
             .mock("GET", "/query")
             .match_query(Matcher::AllOf(vec![
-                Matcher::Regex(format!("start_time={}", now_timestamp_minus_one_minute).into()),
-                Matcher::Regex(format!("end_time={}", now_timestamp).into()),
+                Matcher::Regex(format!("start_time={}", now_timestamp_minus_one_minute)),
+                Matcher::Regex(format!("end_time={}", now_timestamp)),
                 Matcher::Regex("verbose=true".into()),
                 Matcher::Regex("location=FRA".into()),
                 Matcher::Regex("measure_power=true".into()),
@@ -363,7 +362,7 @@ mod tests {
             Timestamp::UnixTimestamp(Some(now_timestamp_minus_one_minute)),
             Timestamp::UnixTimestamp(Some(now_timestamp)),
             true,
-            &"FRA".to_string(),
+            "FRA".to_string(),
             5,
         )
         .await.unwrap();
@@ -399,7 +398,7 @@ mod tests {
             Timestamp::UnixTimestamp(None),
             Timestamp::UnixTimestamp(None),
             true,
-            &"FRA".to_string(),
+            "FRA".to_string(),
             5,
         )
         .await.unwrap();
@@ -439,7 +438,7 @@ mod tests {
             now_timestamp_minus_one_minute,
             now_timestamp,
             true,
-            &"FRA".to_string(),
+            "FRA".to_string(),
             5,
         )
         .await.unwrap();
@@ -457,11 +456,11 @@ mod tests {
             Timestamp::ISO8601Timestamp(None),
             Timestamp::ISO8601Timestamp(None),
             true,
-            &"FRA".to_string(),
+            "FRA".to_string(),
             5,
         ).await;
 
-        assert_eq!(response.is_err(), true);
+        assert!(response.is_err());
     }
 
     #[sqlx::test]
@@ -497,30 +496,26 @@ mod tests {
             now_timestamp_minus_one_minute,
             now_timestamp,
             true,
-            &"FRA".to_string(),
+            "FRA".to_string(),
             5,
         )
         .await.unwrap();
 
         let deserialized_json_result = deserialize_boagent_json(response).await;
 
-        assert_eq!(
+        assert!(
             deserialized_json_result
                 .as_ref()
-                .is_ok_and(|response| response.is_object()),
-            true
+                .is_ok_and(|response| response.is_object())
         );
-        assert_eq!(
-            deserialized_json_result.as_ref().unwrap()["raw_data"]["hardware_data"].is_object(),
-            true
+        assert!(
+            deserialized_json_result.as_ref().unwrap()["raw_data"]["hardware_data"].is_object()
         );
-        assert_eq!(
-            deserialized_json_result.as_ref().unwrap()["raw_data"]["boaviztapi_data"].is_object(),
-            true
+        assert!(
+            deserialized_json_result.as_ref().unwrap()["raw_data"]["boaviztapi_data"].is_object()
         );
-        assert_eq!(
-            deserialized_json_result.as_ref().unwrap()["raw_data"]["power_data"].is_object(),
-            true
+        assert!(
+            deserialized_json_result.as_ref().unwrap()["raw_data"]["power_data"].is_object()
         );
     }
 
@@ -542,7 +537,7 @@ mod tests {
         let insert_query =
             insert_dimension_table_metadata(db_connection, "projects", project_metadata).await;
 
-        assert_eq!(insert_query.is_ok(), true);
+        assert!(insert_query.is_ok());
         assert_eq!(insert_query.unwrap().rows_affected(), 1);
         Ok(())
     }
@@ -579,7 +574,7 @@ mod tests {
                 dimension_table_metadata.clone(),
             )
             .await;
-            assert_eq!(insert_query.is_ok(), true);
+            assert!(insert_query.is_ok());
             assert_eq!(insert_query.unwrap().rows_affected(), 1);
         }
 
@@ -606,7 +601,7 @@ mod tests {
         let insert_query =
             insert_process_metadata(db_connection, "processes", process_metadata).await;
 
-        assert_eq!(insert_query.is_ok(), true);
+        assert!(insert_query.is_ok());
         assert_eq!(insert_query.unwrap().rows_affected(), 1);
         Ok(())
     }
@@ -647,7 +642,7 @@ mod tests {
 
         let insert_query = insert_device_metadata(db_connection, device_metadata).await;
 
-        assert_eq!(insert_query.is_ok(), true);
+        assert!(insert_query.is_ok());
         Ok(())
     }
 
@@ -684,7 +679,7 @@ mod tests {
             now_timestamp_minus_one_minute,
             now_timestamp,
             true,
-            &"FRA".to_string(),
+            "FRA".to_string(),
             5,
         )
         .await.unwrap();
@@ -724,6 +719,6 @@ mod tests {
 
         let db_connect = connect_to_database(database_url).await;
 
-        assert_eq!(db_connect.is_ok(), true);
+        assert!(db_connect.is_ok());
     }
 }
