@@ -1,5 +1,6 @@
 use crate::timestamp::Timestamp;
 use chrono::{NaiveDateTime, Utc};
+use dotenv::{from_path, var};
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 use serde_json::value::Number;
@@ -9,6 +10,7 @@ use sqlx::postgres::PgQueryResult;
 use sqlx::types::uuid;
 use sqlx::Row;
 use sqlx::{PgPool, Postgres};
+use std::path::Path;
 
 pub mod timestamp;
 
@@ -38,6 +40,15 @@ struct Component {
 struct ComponentCharacteristic {
     name: String,
     value: CharacteristicValue,
+}
+
+pub fn check_configuration(config_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    let _load_config = from_path(config_path);
+    let _boagent_url = var("BOAGENT_URL").expect("BOAGENT_URL environment variable is absent. It is needed to connect to Boagent and query necessary data.");
+    let _location = var("LOCATION").expect("LOCATION environment variable is absent. It is needed to indicate the energy mix relevant to the evaluated environmental impacts.");
+    let _lifetime: i16 = var("LIFETIME").expect("LIFETIME environment variable is absent. It is needed to calculate the environmental impact for the evaluated device.").parse().expect("Failed to parse lifetime value.");
+    let _database_url = var("DATABASE_URL").expect("DATABASE_URL environment variable is absent.");
+    Ok(())
 }
 
 pub async fn query_boagent(
@@ -329,7 +340,7 @@ mod tests {
     use mockito::{Matcher, Server};
     use serde_json::json;
     use sqlx::PgPool;
-    use std::time::SystemTime;
+    use std::{io::Write, time::SystemTime};
 
     #[sqlx::test]
     async fn it_queries_boagent_with_success_with_needed_query_paramaters() {
@@ -355,7 +366,8 @@ mod tests {
                 Matcher::Regex("fetch_hardware=true".into()),
             ]))
             .with_status(200)
-            .create_async().await;
+            .create_async()
+            .await;
 
         let response = query_boagent(
             url,
@@ -365,8 +377,9 @@ mod tests {
             "FRA".to_string(),
             5,
         )
-        .await.unwrap();
-        
+        .await
+        .unwrap();
+
         mock.assert_async().await;
 
         println!("{:?}", response);
@@ -391,7 +404,8 @@ mod tests {
                 Matcher::Regex("fetch_hardware=true".into()),
             ]))
             .with_status(200)
-            .create_async().await;
+            .create_async()
+            .await;
 
         let response = query_boagent(
             url,
@@ -401,7 +415,8 @@ mod tests {
             "FRA".to_string(),
             5,
         )
-        .await.unwrap();
+        .await
+        .unwrap();
 
         assert_eq!(response.status().as_u16(), 200);
     }
@@ -431,7 +446,8 @@ mod tests {
                 Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
             ]))
             .with_status(200)
-            .create_async().await;
+            .create_async()
+            .await;
 
         let response = query_boagent(
             url,
@@ -441,8 +457,8 @@ mod tests {
             "FRA".to_string(),
             5,
         )
-        .await.unwrap();
-
+        .await
+        .unwrap();
 
         assert_eq!(response.status().as_u16(), 200);
     }
@@ -458,7 +474,8 @@ mod tests {
             true,
             "FRA".to_string(),
             5,
-        ).await;
+        )
+        .await;
 
         assert!(response.is_err());
     }
@@ -489,7 +506,8 @@ mod tests {
             ]))
             .with_status(200)
             .with_body_from_file("../mocks/boagent_response.json")
-            .create_async().await;
+            .create_async()
+            .await;
 
         let response = query_boagent(
             url,
@@ -499,24 +517,21 @@ mod tests {
             "FRA".to_string(),
             5,
         )
-        .await.unwrap();
+        .await
+        .unwrap();
 
         let deserialized_json_result = deserialize_boagent_json(response).await;
 
-        assert!(
-            deserialized_json_result
-                .as_ref()
-                .is_ok_and(|response| response.is_object())
-        );
+        assert!(deserialized_json_result
+            .as_ref()
+            .is_ok_and(|response| response.is_object()));
         assert!(
             deserialized_json_result.as_ref().unwrap()["raw_data"]["hardware_data"].is_object()
         );
         assert!(
             deserialized_json_result.as_ref().unwrap()["raw_data"]["boaviztapi_data"].is_object()
         );
-        assert!(
-            deserialized_json_result.as_ref().unwrap()["raw_data"]["power_data"].is_object()
-        );
+        assert!(deserialized_json_result.as_ref().unwrap()["raw_data"]["power_data"].is_object());
     }
 
     #[sqlx::test(migrations = "../../db/")]
@@ -672,7 +687,8 @@ mod tests {
             ]))
             .with_status(200)
             .with_body_from_file("../mocks/boagent_response.json")
-            .create_async().await;
+            .create_async()
+            .await;
 
         let response = query_boagent(
             url,
@@ -682,7 +698,8 @@ mod tests {
             "FRA".to_string(),
             5,
         )
-        .await.unwrap();
+        .await
+        .unwrap();
 
         let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
         let location = "FRA".to_string();
@@ -720,5 +737,25 @@ mod tests {
         let db_connect = connect_to_database(database_url).await;
 
         assert!(db_connect.is_ok());
+    }
+
+    #[test]
+    fn it_checks_that_all_needed_configuration_details_are_set() -> std::io::Result<()> {
+        let current_dir = std::env::current_dir().unwrap();
+        let config_path = current_dir.join("../mocks/").canonicalize().unwrap();
+        let env_file = config_path.join(".env");
+        let mut config_file =
+            std::fs::File::create(env_file).expect("Failed to create env file for testing");
+        config_file.write_all(
+            b"DATABASE_URL='postgres://carenage:password@localhost:5432/carenage'
+BOAGENT_URL='http://localhost:8000'
+LOCATION='FRA'
+LIFETIME=5
+",
+        )?;
+        let config_check = check_configuration(config_path.as_path());
+
+        assert!(config_check.is_ok());
+        Ok(())
     }
 }

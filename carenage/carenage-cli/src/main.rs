@@ -1,5 +1,5 @@
 use clap::Parser;
-use database::timestamp;
+use database::{check_configuration, timestamp};
 use std::{fs::File, io::Write, process::Command};
 use sysinfo::{Pid, Signal, System};
 
@@ -8,13 +8,18 @@ pub mod cli;
 fn main() {
     let cli = cli::Cli::parse();
 
-    /*     let device_name = var("DEVICE").unwrap_or("unknown".to_string());
-    let database_url = var("DATABASE_URL").expect("DATABASE_URL environment variable is absent.");
+    /*     let device_name = var("DEVICE").unwrap_or("unknown".to_string()); */
 
-    let printable_boagent_url = boagent_url.clone(); */
 
     match &cli.event {
         Some(cli::Events::Start(step)) => {
+            let project_root_path = std::env::current_dir().unwrap().join("..");
+            let config_check = check_configuration(&project_root_path);
+
+            if let Ok(()) = config_check {
+                println!("Needed environment variables are set.");
+            }
+
             let start_timestamp: timestamp::Timestamp = timestamp::Timestamp::new(cli.unix);
 
             println!("Carenage start event, time step of {:?} seconds", step.step);
@@ -61,7 +66,7 @@ fn main() {
                 .expect("Failed to kill with SIGTERM");
         }
         None => {
-            println!("Unknown command")
+            println!("Unknown command.")
         }
     }
 }
