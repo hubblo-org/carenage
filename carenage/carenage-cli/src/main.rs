@@ -1,5 +1,5 @@
 use clap::Parser;
-use database::{check_configuration, timestamp};
+use database::{Config, timestamp};
 use std::{fs::File, io::Write, process::Command};
 use sysinfo::{Pid, Signal, System};
 
@@ -14,9 +14,9 @@ fn main() {
     match &cli.event {
         Some(cli::Events::Start(step)) => {
             let project_root_path = std::env::current_dir().unwrap().join("..");
-            let config_check = check_configuration(&project_root_path);
+            let config_check = Config::check_configuration(&project_root_path);
 
-            if let Ok(()) = config_check {
+            if let Ok(_config) = config_check {
                 println!("Needed environment variables are set.");
             }
 

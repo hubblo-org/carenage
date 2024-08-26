@@ -42,13 +42,34 @@ struct ComponentCharacteristic {
     value: CharacteristicValue,
 }
 
-pub fn check_configuration(config_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
-    let _load_config = from_path(config_path);
-    let _boagent_url = var("BOAGENT_URL").expect("BOAGENT_URL environment variable is absent. It is needed to connect to Boagent and query necessary data.");
-    let _location = var("LOCATION").expect("LOCATION environment variable is absent. It is needed to indicate the energy mix relevant to the evaluated environmental impacts.");
-    let _lifetime: i16 = var("LIFETIME").expect("LIFETIME environment variable is absent. It is needed to calculate the environmental impact for the evaluated device.").parse().expect("Failed to parse lifetime value.");
-    let _database_url = var("DATABASE_URL").expect("DATABASE_URL environment variable is absent.");
-    Ok(())
+pub struct Config {
+    pub boagent_url: String,
+    pub database_url: String,
+    pub location: String,
+    pub lifetime: i16,
+    pub device_name: String,
+    pub project_name: String,
+}
+
+impl Config {
+    pub fn check_configuration(config_path: &Path) -> Result<Config, Box<dyn std::error::Error>> {
+        let _load_config = from_path(config_path);
+        let boagent_url = var("BOAGENT_URL").expect("BOAGENT_URL environment variable is absent. It is needed to connect to Boagent and query necessary data.");
+        let project_name = var("PROJECT_NAME").expect("PROJECT_NAME environment variable is absent. It is needed to refer to the project in collected data.");
+        let location = var("LOCATION").expect("LOCATION environment variable is absent. It is needed to indicate the energy mix relevant to the evaluated environmental impacts.");
+        let lifetime: i16 = var("LIFETIME").expect("LIFETIME environment variable is absent. It is needed to calculate the environmental impact for the evaluated device.").parse().expect("Failed to parse lifetime value.");
+        let device_name = var("DEVICE").unwrap_or("unknown".to_string());
+        let database_url =
+            var("DATABASE_URL").expect("DATABASE_URL environment variable is absent.");
+        Ok(Config {
+            boagent_url,
+            project_name,
+            location,
+            lifetime,
+            device_name,
+            database_url
+        })
+    }
 }
 
 pub async fn query_boagent(
@@ -748,12 +769,13 @@ mod tests {
             std::fs::File::create(env_file).expect("Failed to create env file for testing");
         config_file.write_all(
             b"DATABASE_URL='postgres://carenage:password@localhost:5432/carenage'
+PROJECT_NAME='carenage_webapp'
 BOAGENT_URL='http://localhost:8000'
 LOCATION='FRA'
 LIFETIME=5
 ",
         )?;
-        let config_check = check_configuration(config_path.as_path());
+        let config_check = Config::check_configuration(config_path.as_path());
 
         assert!(config_check.is_ok());
         Ok(())
