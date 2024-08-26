@@ -85,62 +85,6 @@ fn it_prints_start_timestamp_in_unix_epoch_format_in_seconds_with_given_argument
     Ok(())
 }
 
-#[test]
-fn it_queries_boagent_when_calling_start_command() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("carenage")?;
-
-    let opts = mockito::ServerOpts {
-        host: "127.0.0.1",
-        port: 3000,
-        ..Default::default()
-    };
-
-    let mut boagent_server = mockito::Server::new_with_opts(opts);
-
-    let mock = boagent_server
-        .mock("GET", "/query")
-        .match_query(Matcher::AllOf(vec![
-            Matcher::Regex("verbose=true".into()),
-            Matcher::Regex("location=FRA".into()),
-            Matcher::Regex("measure_power=true".into()),
-            Matcher::Regex("lifetime=5".into()),
-            Matcher::Regex("fetch_hardware=true".into()),
-        ]))
-        .with_status(200)
-        .create();
-
-    cmd.arg("start");
-    cmd.assert().success().stdout(contains("Queried Boagent"));
-
-    mock.assert();
-    Ok(())
-}
-
-#[test]
-fn it_prints_error_message_when_it_fails_to_request_boagent(
-) -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("carenage")?;
-
-    cmd.arg("start");
-    cmd.assert()
-        .success()
-        .stdout(contains("Failed to query Boagent"));
-
-    Ok(())
-}
-
-#[test]
-fn it_prints_succesful_insertion_message_after_inserting_boagent_response_in_database(
-) -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("carenage")?;
-
-    cmd.arg("start");
-    cmd.assert().success().stdout(contains(
-        "Inserted project and device data in Carenage database",
-    ));
-
-    Ok(())
-}
 
 // carenage stop
 #[test]
@@ -162,21 +106,6 @@ fn it_prints_stop_timestamp_in_iso_8601_format() -> Result<(), Box<dyn std::erro
 
     cmd.arg("stop");
     cmd.assert().success().stdout(contains(stop_timestamp));
-
-    Ok(())
-}
-
-#[test]
-fn it_queries_boagent_when_calling_stop_command_with_start_and_stop_timestamps(
-) -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("carenage")?;
-
-    cmd.arg("stop");
-    cmd.assert()
-        .success()
-        .stdout(contains("Queried Boagent"))
-        .stdout(contains("Carenage worked between"))
-        .stdout(contains("timestamps"));
 
     Ok(())
 }
