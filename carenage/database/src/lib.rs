@@ -222,24 +222,23 @@ pub fn format_hardware_data(
 pub async fn insert_dimension_table_metadata(
     database_connection: PoolConnection<Postgres>,
     table: &str,
-    project_data: Value,
+    data: Value,
 ) -> Result<PgQueryResult, sqlx::Error> {
-    let project_name = project_data["name"].as_str();
-    let project_start_date = project_data
+    let name = data["name"].as_str();
+    let start_date = data
         .get("start_date")
         .expect("Unable to read timestamp.")
         .as_str()
         .expect("Unable to read string.");
-    let project_stop_date = project_data
+    let stop_date = data
         .get("stop_date")
         .expect("Unable to read timestamp.")
         .as_str()
         .expect("Unable to read string.");
 
-    let start_date_timestamp =
-        NaiveDateTime::parse_from_str(project_start_date, "%Y-%m-%d %H:%M:%S")
-            .expect("Unable to convert to Postgres timestamp type.");
-    let stop_date_timestamp = NaiveDateTime::parse_from_str(project_stop_date, "%Y-%m-%d %H:%M:%S")
+    let start_date_timestamp = NaiveDateTime::parse_from_str(start_date, "%Y-%m-%d %H:%M:%S")
+        .expect("Unable to convert to Postgres timestamp type.");
+    let stop_date_timestamp = NaiveDateTime::parse_from_str(stop_date, "%Y-%m-%d %H:%M:%S")
         .expect("Unable to convert to Postgres timestamp type.");
 
     let mut connection = database_connection.detach();
@@ -249,7 +248,7 @@ pub async fn insert_dimension_table_metadata(
         table
     );
     sqlx::query(&insert_query)
-        .bind(project_name)
+        .bind(name)
         .bind(start_date_timestamp)
         .bind(stop_date_timestamp)
         .execute(&mut connection)
@@ -258,7 +257,6 @@ pub async fn insert_dimension_table_metadata(
 
 pub async fn insert_process_metadata(
     database_connection: PoolConnection<Postgres>,
-    table: &str,
     process_data: Value,
 ) -> Result<PgQueryResult, sqlx::Error> {
     let process_exe = process_data["exe"].as_str();
@@ -284,8 +282,7 @@ pub async fn insert_process_metadata(
     let mut connection = database_connection.detach();
 
     let insert_query = format!(
-        "INSERT INTO {} (exe, cmdline, state, start_date, stop_date) VALUES ($1, $2, $3, $4, $5)",
-        table
+        "INSERT INTO processes (exe, cmdline, state, start_date, stop_date) VALUES ($1, $2, $3, $4, $5)"
     );
     sqlx::query(&insert_query)
         .bind(process_exe)
@@ -632,8 +629,7 @@ mod tests {
 
         let db_connection = pool.acquire().await?;
 
-        let insert_query =
-            insert_process_metadata(db_connection, "processes", process_metadata).await;
+        let insert_query = insert_process_metadata(db_connection, process_metadata).await;
 
         assert!(insert_query.is_ok());
         assert_eq!(insert_query.unwrap().rows_affected(), 1);
