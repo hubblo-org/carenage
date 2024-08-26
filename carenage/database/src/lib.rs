@@ -116,12 +116,10 @@ pub async fn deserialize_boagent_json(boagent_response: Response) -> Result<Valu
     Ok(deserialized_boagent_json)
 }
 
-pub async fn connect_to_database(
-    database_url: String,
-) -> Result<PoolConnection<Postgres>, sqlx::Error> {
-    let connection_pool = PgPool::connect(database_url.as_str()).await?;
+pub async fn get_db_connection_pool(database_url: String) -> Result<PgPool, sqlx::Error> {
+    let connection_pool = PgPool::connect(database_url.as_str());
 
-    connection_pool.acquire().await
+    connection_pool.await
 }
 
 pub fn format_hardware_data(
@@ -755,7 +753,11 @@ mod tests {
     async fn it_acquires_a_connection_to_the_database() {
         let database_url = var("DATABASE_URL").expect("Failed to get DATABASE_URL");
 
-        let db_connect = connect_to_database(database_url).await;
+        let db_connect = get_db_connection_pool(database_url)
+            .await
+            .unwrap()
+            .acquire()
+            .await;
 
         assert!(db_connect.is_ok());
     }
