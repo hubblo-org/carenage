@@ -1,5 +1,5 @@
 use clap::Parser;
-use database::{Config, timestamp};
+use database::{timestamp, Config};
 use std::{fs::File, io::Write, process::Command};
 use sysinfo::{Pid, Signal, System};
 
@@ -10,9 +10,15 @@ fn main() {
 
     /*     let device_name = var("DEVICE").unwrap_or("unknown".to_string()); */
 
-
     match &cli.event {
-        Some(cli::Events::Start(step)) => {
+        Some(cli::Events::Start(args)) => {
+            let init_flag_check = match args.init {
+                true => println!(
+                    "`init` flag set: this is the first time Carenage is used for this project."
+                ),
+                false => println!("`init` flag is not set."),
+            };
+
             let project_root_path = std::env::current_dir().unwrap().join("..");
             let config_check = Config::check_configuration(&project_root_path);
 
@@ -22,11 +28,11 @@ fn main() {
 
             let start_timestamp: timestamp::Timestamp = timestamp::Timestamp::new(cli.unix);
 
-            println!("Carenage start event, time step of {:?} seconds", step.step);
+            println!("Carenage start event, time step of {:?} seconds", args.step);
             println!("Start event timestamp is {:?}", start_timestamp.to_string());
 
             let carenaged = Command::new("./target/debug/carenaged")
-                .arg(step.step.to_string())
+                .arg(args.step.to_string())
                 .arg(start_timestamp.to_string())
                 .arg(cli.unix.to_string())
                 .spawn()

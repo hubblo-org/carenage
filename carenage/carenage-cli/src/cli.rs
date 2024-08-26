@@ -15,6 +15,9 @@ pub struct StartArgs {
     /// Time step in seconds between events
     #[arg(short, long, default_value_t = 5)]
     pub step: u64,
+    /// Project initialization: this flag allows to record project metadata
+    #[arg(short, long, default_value_t = false)]
+    pub init: bool,
 }
 
 #[derive(Subcommand)]
