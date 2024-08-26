@@ -1,8 +1,9 @@
 use database::{
-    connect_to_database, deserialize_boagent_json, format_hardware_data, insert_device_metadata,
+    deserialize_boagent_json, format_hardware_data, get_db_connection_pool, insert_device_metadata,
+    insert_dimension_table_metadata, query_boagent, timestamp::Timestamp,
 };
-use database::{query_boagent, timestamp::Timestamp};
 use dotenv::var;
+use serde_json::json;
 use std::{env, process};
 use tokio::signal::unix::{signal, SignalKind};
 use tokio::time::{self, Duration};
@@ -63,47 +64,67 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+
 async fn query_and_insert_data(
     start_time: Timestamp,
     is_unix_set: bool,
     fetch_hardware: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let boagent_url = var("BOAGENT_URL")?;    
-    let location = var("LOCATION")?;
-    let lifetime: i16 = var("LIFETIME")?.parse().expect("Failed to parse lifetime value.");
-    let device_name = var("DEVICE").unwrap_or("unknown".to_string());
-    let database_url = var("DATABASE_URL")?;
-    let end_time = Timestamp::new(is_unix_set);
+    let project_root_path = std::env::current_dir().unwrap().join("..");
+    let config = database::Config::check_configuration(&project_root_path)?;
 
+    let end_time = Timestamp::new(is_unix_set);
     let response = query_boagent(
-        boagent_url,
+        config.boagent_url,
         start_time,
         end_time,
         fetch_hardware,
-        location.clone(),
-        lifetime,
+        config.location.clone(),
+        config.lifetime,
     )
     .await?;
     let deserialized_response = deserialize_boagent_json(response).await?;
+    let db_pool = get_db_connection_pool(config.database_url).await?;
 
     match fetch_hardware {
         true => {
+            let project_data = json!({
+                "name": config.project_name,
+                "start_date": "to_implement",
+                "stop_date": "to_implement",
+            });
+            let insert_project_data =
+                insert_dimension_table_metadata(db_pool.acquire().await?, "projects", project_data)
+                    .await;
+            match insert_project_data {
+                Ok(insert_project_data) => println!(
+                    "Inserted project metadata into database, affected rows: {}",
+                    insert_project_data.rows_affected()
+                ),
+                Err(err) => {
+                    eprintln!(
+                        "Error while processing first query to project table: {}",
+                        err
+                    );
+                    process::exit(0x0100)
+                }
+            };
             let device_data =
-                format_hardware_data(deserialized_response, device_name, location, lifetime)?;
-            let database_connection = connect_to_database(database_url).await?;
-            let insert_device_data = insert_device_metadata(database_connection, device_data).await;
+                format_hardware_data(deserialized_response, config.device_name, config.location, config.lifetime)?;
+            let insert_device_data =
+                insert_device_metadata(db_pool.acquire().await?, device_data).await;
             match insert_device_data {
                 Ok(()) => (),
                 Err(err) => {
                     eprintln!(
-                        "Error while processing first query to project and device tables: {}",
+                        "Error while processing first query to device table: {}",
                         err
                     );
                     process::exit(0x0100)
                 }
             }
         }
-        false => ()
+        false => (),
     };
     Ok(())
 }
