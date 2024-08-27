@@ -230,27 +230,18 @@ pub async fn insert_dimension_table_metadata(
         .expect("Unable to read timestamp.")
         .as_str()
         .expect("Unable to read string.");
-    let stop_date = data
-        .get("stop_date")
-        .expect("Unable to read timestamp.")
-        .as_str()
-        .expect("Unable to read string.");
 
     let start_date_timestamp = NaiveDateTime::parse_from_str(start_date, "%Y-%m-%d %H:%M:%S")
         .expect("Unable to convert to Postgres timestamp type.");
-    let stop_date_timestamp = NaiveDateTime::parse_from_str(stop_date, "%Y-%m-%d %H:%M:%S")
-        .expect("Unable to convert to Postgres timestamp type.");
-
     let mut connection = database_connection.detach();
 
     let insert_query = format!(
-        "INSERT INTO {} (name, start_date, stop_date) VALUES ($1, $2, $3)",
+        "INSERT INTO {} (name, start_date) VALUES ($1, $2)",
         table
     );
     sqlx::query(&insert_query)
         .bind(name)
         .bind(start_date_timestamp)
-        .bind(stop_date_timestamp)
         .execute(&mut connection)
         .await
 }
@@ -281,10 +272,10 @@ pub async fn insert_process_metadata(
 
     let mut connection = database_connection.detach();
 
-    let insert_query = format!(
-        "INSERT INTO processes (exe, cmdline, state, start_date, stop_date) VALUES ($1, $2, $3, $4, $5)"
-    );
-    sqlx::query(&insert_query)
+    let insert_query = 
+        "INSERT INTO processes (exe, cmdline, state, start_date, stop_date) VALUES ($1, $2, $3, $4, $5)";
+    
+    sqlx::query(insert_query)
         .bind(process_exe)
         .bind(process_cmdline)
         .bind(process_state)
@@ -555,12 +546,10 @@ mod tests {
         pool: PgPool,
     ) -> sqlx::Result<()> {
         let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
-        let later_timestamp = (Utc::now() + Duration::weeks(4)).format("%Y-%m-%d %H:%M:%S");
 
         let project_metadata = json!({
             "name": "my_web_application",
             "start_date": now_timestamp.to_string(),
-            "stop_date": later_timestamp.to_string(),
         });
 
         let db_connection = pool.acquire().await?;
@@ -578,7 +567,6 @@ mod tests {
         pool: PgPool,
     ) -> sqlx::Result<()> {
         let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
-        let later_timestamp = (Utc::now() + Duration::weeks(4)).format("%Y-%m-%d %H:%M:%S");
 
         let dimension_tables = vec![
             "projects",
@@ -594,7 +582,6 @@ mod tests {
         let dimension_table_metadata = json!({
             "name": "dimension_table_metadata",
             "start_date": now_timestamp.to_string(),
-            "stop_date": later_timestamp.to_string(),
         });
 
         for table in dimension_tables {
