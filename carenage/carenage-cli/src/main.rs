@@ -13,10 +13,16 @@ fn main() {
     match &cli.event {
         Some(cli::Events::Start(args)) => {
             let init_flag_check = match args.init {
-                true => println!(
+                true => {
+                    println!(
                     "`init` flag set: this is the first time Carenage is used for this project."
-                ),
-                false => println!("`init` flag is not set."),
+                );
+                    true
+                }
+                false => {
+                    println!("`init` flag is not set.");
+                    false
+                }
             };
 
             let project_root_path = std::env::current_dir().unwrap().join("..");
@@ -35,6 +41,7 @@ fn main() {
                 .arg(args.step.to_string())
                 .arg(start_timestamp.to_string())
                 .arg(cli.unix.to_string())
+                .arg(init_flag_check.to_string())
                 .spawn()
                 .expect("Failed to fork carenaged.");
 
