@@ -339,6 +339,22 @@ pub async fn insert_device_metadata(
     Ok(())
 }
 
+pub async fn update_project_data(database_connection: PoolConnection<Postgres>, project_name: String, stop_date: String) -> Result<(), sqlx::Error> {
+    let mut connection = database_connection.detach();
+
+    let stop_date_timestamp = NaiveDateTime::parse_from_str(&stop_date, "%Y-%m-%d %H:%M:%S")
+        .expect("Unable to convert to Postgres timestamp type.");
+    let formatted_query =
+        "UPDATE projects SET stop_date = ($1) WHERE name = ($2)";
+    sqlx::query(formatted_query)
+        .bind(stop_date_timestamp)
+        .bind(project_name)
+        .execute(&mut connection)
+        .await?;
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -730,6 +746,26 @@ mod tests {
         assert_eq!(ram["characteristics"][0]["value"], 4);
         assert_eq!(disk["name"], "disk");
         assert_eq!(disk["characteristics"][0]["value"], 238);
+    }
+
+    #[sqlx::test(migrations = "../../db/")]
+    async fn it_updates_stop_date_field_in_project_row(
+        pool: PgPool,
+    ) -> sqlx::Result<()> {
+        let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
+
+        let project_metadata = json!({
+            "name": "my_web_application",
+            "start_date": now_timestamp.to_string(),
+        });
+
+        let _insert_query =
+            insert_dimension_table_metadata(pool.acquire().await?, "projects", project_metadata).await;
+
+        let stop_date_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S").to_string();
+        let update_query = update_project_data(pool.acquire().await?, "my_web_application".to_string(), stop_date_timestamp).await;
+        assert!(update_query.is_ok());
+        Ok(())
     }
 
     #[sqlx::test]
