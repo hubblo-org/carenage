@@ -31,22 +31,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let start_time_timestamp = Timestamp::parse_str(start_time_str, is_unix_set);
 
-    match is_init_set {
-        true => {
+    if is_init_set {
             let _ = insert_project_metadata().await;
             print!("Project initialization, inserted project metadata into Carenage database.")
-        }
-        false => (),
     }
 
-
-    // TODO : first query to get hardware_data, format it, send to database with other project
-    // metadata
-    // Exit process if database error
     let _first_query = query_and_insert_data(start_time_timestamp, is_unix_set, true).await;
 
-    // Loop to query and insert data for events table
-    let _query = tokio::spawn(async move {
+    let _query_insert_loop = tokio::spawn(async move {
         let mut interval = time::interval(Duration::from_secs(time_step));
         loop {
             let _ = query_and_insert_data(start_time_timestamp, is_unix_set, false).await;
@@ -116,8 +108,7 @@ async fn query_and_insert_data(
     let deserialized_response = deserialize_boagent_json(response).await?;
     let db_pool = get_db_connection_pool(config.database_url).await?;
 
-    match fetch_hardware {
-        true => {
+    if fetch_hardware {
             let device_data = format_hardware_data(
                 deserialized_response,
                 config.device_name,
@@ -136,8 +127,6 @@ async fn query_and_insert_data(
                     process::exit(0x0100)
                 }
             }
-        }
-        false => (),
     };
     Ok(())
 }
