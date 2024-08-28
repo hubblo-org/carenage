@@ -1,11 +1,11 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
 use std::fmt::{Display, Formatter};
 use std::time::SystemTime;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Timestamp {
     UnixTimestamp(Option<u64>),
-    ISO8601Timestamp(Option<DateTime<Utc>>),
+    ISO8601Timestamp(Option<DateTime<Local>>),
 }
 
 impl Display for Timestamp {
@@ -30,7 +30,7 @@ impl Timestamp {
                     .unwrap()
                     .as_secs(),
             )),
-            false => Timestamp::ISO8601Timestamp(Some(Utc::now())),
+            false => Timestamp::ISO8601Timestamp(Some(Local::now())),
         }
     }
 
@@ -53,7 +53,7 @@ impl Timestamp {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::Utc;
+    use chrono::Local;
 
     #[test]
     fn it_parses_a_string_to_return_an_unix_timestamp() {
@@ -64,8 +64,8 @@ mod tests {
 
     #[test]
     fn it_parses_a_string_to_return_an_iso8601_timestamp() {
-        let now_iso8601 = Utc::now();
-        let iso8601_timestamp_str = now_iso8601.to_string(); 
+        let now_iso8601 = Local::now();
+        let iso8601_timestamp_str = now_iso8601.to_string();
         let parsed_string = Timestamp::parse_str(iso8601_timestamp_str, false);
         assert_eq!(parsed_string, Timestamp::ISO8601Timestamp(Some(now_iso8601)));
     }

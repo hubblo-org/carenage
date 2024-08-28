@@ -404,7 +404,6 @@ mod tests {
 
         mock.assert_async().await;
 
-        println!("{:?}", response);
         assert_eq!(response.status().as_u16(), 200);
     }
 
