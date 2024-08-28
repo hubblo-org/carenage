@@ -1,5 +1,5 @@
 use crate::timestamp::Timestamp;
-use chrono::{NaiveDateTime, Utc};
+use chrono::{DateTime, Local};
 use dotenv::{from_path, var};
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
@@ -67,7 +67,7 @@ impl Config {
             location,
             lifetime,
             device_name,
-            database_url
+            database_url,
         })
     }
 }
@@ -87,7 +87,7 @@ pub async fn query_boagent(
             query_parameters.push(("start_time", start_time.unwrap_or(0).to_string()))
         }
         Timestamp::ISO8601Timestamp(start_time) => {
-            query_parameters.push(("start_time", start_time.unwrap_or(Utc::now()).to_string()))
+            query_parameters.push(("start_time", start_time.unwrap_or(Local::now()).to_string()))
         }
     }
     match end_time {
@@ -95,7 +95,7 @@ pub async fn query_boagent(
             query_parameters.push(("end_time", end_time.unwrap_or(0).to_string()))
         }
         Timestamp::ISO8601Timestamp(end_time) => {
-            query_parameters.push(("end_time", end_time.unwrap_or(Utc::now()).to_string()))
+            query_parameters.push(("end_time", end_time.unwrap_or(Local::now()).to_string()))
         }
     }
     query_parameters.push(("verbose", "true".to_string()));
@@ -358,7 +358,7 @@ pub async fn update_project_data(database_connection: PoolConnection<Postgres>, 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::{Duration, Utc};
+    use chrono::{Duration, Local};
     use dotenv::var;
     use mockito::{Matcher, Server};
     use serde_json::json;
@@ -446,9 +446,9 @@ mod tests {
 
     #[sqlx::test]
     fn it_queries_boagent_with_success_with_iso_8601_timestamps() {
-        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
+        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
         let now_timestamp_minus_one_minute =
-            Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
+            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
 
         let mut boagent_server = Server::new_async().await;
 
@@ -505,9 +505,9 @@ mod tests {
 
     #[sqlx::test]
     async fn it_deserializes_json_from_boagent_response() {
-        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
+        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
         let now_timestamp_minus_one_minute =
-            Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
+            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
 
         let mut boagent_server = Server::new_async().await;
 
@@ -561,7 +561,7 @@ mod tests {
     async fn it_inserts_valid_data_in_projects_table_in_the_carenage_database(
         pool: PgPool,
     ) -> sqlx::Result<()> {
-        let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
+        let now_timestamp = Local::now();
 
         let project_metadata = json!({
             "name": "my_web_application",
@@ -582,7 +582,7 @@ mod tests {
     async fn it_inserts_valid_data_for_several_dimension_tables_in_the_carenage_database(
         pool: PgPool,
     ) -> sqlx::Result<()> {
-        let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
+        let now_timestamp = Local::now();
 
         let dimension_tables = vec![
             "projects",
@@ -618,8 +618,8 @@ mod tests {
     async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage_database(
         pool: PgPool,
     ) -> sqlx::Result<()> {
-        let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
-        let later_timestamp = (Utc::now() + Duration::weeks(4)).format("%Y-%m-%d %H:%M:%S");
+        let now_timestamp = Local::now();
+        let later_timestamp = Local::now() + Duration::weeks(4);
 
         let process_metadata = json!({
             "exe": "/snap/firefox/4336/usr/lib/firefox/firefox",
@@ -681,9 +681,9 @@ mod tests {
 
     #[sqlx::test]
     async fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
-        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Utc::now()));
+        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
         let now_timestamp_minus_one_minute =
-            Timestamp::ISO8601Timestamp(Some(Utc::now() - Duration::minutes(1)));
+            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
 
         let mut boagent_server = Server::new_async().await;
 
@@ -749,10 +749,8 @@ mod tests {
     }
 
     #[sqlx::test(migrations = "../../db/")]
-    async fn it_updates_stop_date_field_in_project_row(
-        pool: PgPool,
-    ) -> sqlx::Result<()> {
-        let now_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S");
+    async fn it_updates_stop_date_field_in_project_row(pool: PgPool) -> sqlx::Result<()> {
+        let now_timestamp = Local::now();
 
         let project_metadata = json!({
             "name": "my_web_application",
@@ -760,10 +758,16 @@ mod tests {
         });
 
         let _insert_query =
-            insert_dimension_table_metadata(pool.acquire().await?, "projects", project_metadata).await;
+            insert_dimension_table_metadata(pool.acquire().await?, "projects", project_metadata)
+                .await;
 
-        let stop_date_timestamp = Utc::now().format("%Y-%m-%d %H:%M:%S").to_string();
-        let update_query = update_project_data(pool.acquire().await?, "my_web_application".to_string(), stop_date_timestamp).await;
+        let stop_date_timestamp = Local::now().to_string();
+        let update_query = update_project_data(
+            pool.acquire().await?,
+            "my_web_application".to_string(),
+            stop_date_timestamp.as_str(),
+        )
+        .await;
         assert!(update_query.is_ok());
         Ok(())
     }
