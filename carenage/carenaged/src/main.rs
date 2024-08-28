@@ -29,18 +29,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Start timestamp is {}.", start_time_str);
     println!("Is UNIX flag set for timestamp? {}", is_unix_set);
 
-    let start_time_timestamp: Timestamp = match is_unix_set {
-        true => Timestamp::UnixTimestamp(Some(
-            start_time_str
-                .parse::<u64>()
-                .expect("Failed to parse string to convert to UNIX epoch timestamp."),
-        )),
-        false => Timestamp::ISO8601Timestamp(Some(
-            start_time_str
-                .parse()
-                .expect("The string should be parsable to convert it to ISO8601 timestamp."),
-        )),
-    };
+    let start_time_timestamp = Timestamp::parse_str(start_time_str, is_unix_set);
 
     match is_init_set {
         true => {
