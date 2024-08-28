@@ -1,57 +1,57 @@
 CREATE TABLE projects (
   project_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
-  start_date TIMESTAMP,
-  stop_date TIMESTAMP
+  start_date TIMESTAMPTZ,
+  stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE repositories (
   repository_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
-  start_date TIMESTAMP,
-  stop_date TIMESTAMP
+  start_date TIMESTAMPTZ,
+  stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE workflows (
   workflow_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
-  start_date TIMESTAMP,
-  stop_date TIMESTAMP
+  start_date TIMESTAMPTZ,
+  stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE pipelines (
   pipeline_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
-  start_date TIMESTAMP,
-  stop_date TIMESTAMP
+  start_date TIMESTAMPTZ,
+  stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE runs (
   run_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
-  start_date TIMESTAMP,
-  stop_date TIMESTAMP
+  start_date TIMESTAMPTZ,
+  stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE jobs (
   job_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
-  start_date TIMESTAMP,
-  stop_date TIMESTAMP
+  start_date TIMESTAMPTZ,
+  stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE tasks (
   task_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
-  start_date TIMESTAMP,
-  stop_date TIMESTAMP
+  start_date TIMESTAMPTZ,
+  stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE containers (
   container_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
-  start_date TIMESTAMP,
-  stop_date TIMESTAMP
+  start_date TIMESTAMPTZ,
+  stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE processes (
@@ -60,8 +60,8 @@ CREATE TABLE processes (
   exe VARCHAR(255),
   cmdline TEXT,
   state VARCHAR(255),
-  start_date TIMESTAMP,
-  stop_date TIMESTAMP
+  start_date TIMESTAMPTZ,
+  stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE devices (
@@ -88,7 +88,7 @@ CREATE TABLE component_characteristic (
 CREATE TYPE event_type AS ENUM ('regular', 'custom', 'start', 'stop');
 
 CREATE TABLE events (
-  timestamp TIMESTAMP,
+  timestamp TIMESTAMPTZ,
   process_id uuid REFERENCES processes(process_id),
   task_id uuid REFERENCES tasks(task_id),
   job_id uuid REFERENCES jobs(job_id),
