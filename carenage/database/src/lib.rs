@@ -790,7 +790,7 @@ mod tests {
         let config_path = current_dir.join("../mocks/").canonicalize().unwrap();
         let env_file = config_path.join(".env");
         let mut config_file =
-            std::fs::File::create(env_file).expect("Failed to create env file for testing");
+            std::fs::File::create(env_file.clone()).expect("Failed to create env file for testing");
         config_file.write_all(
             b"DATABASE_URL='postgres://carenage:password@localhost:5432/carenage'
 PROJECT_NAME='carenage_webapp'
@@ -799,7 +799,7 @@ LOCATION='FRA'
 LIFETIME=5
 ",
         )?;
-        let config_check = Config::check_configuration(config_path.as_path());
+        let config_check = Config::check_configuration(env_file.as_path());
 
         assert!(config_check.is_ok());
         Ok(())
