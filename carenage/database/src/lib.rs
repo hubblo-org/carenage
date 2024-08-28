@@ -122,6 +122,11 @@ pub async fn get_db_connection_pool(database_url: String) -> Result<PgPool, sqlx
     connection_pool.await
 }
 
+pub fn to_datetime_local(timestamp_str: &str) -> chrono::DateTime<Local> {
+    DateTime::parse_from_str(timestamp_str, "%Y-%m-%d %H:%M:%S%.9f %:z")
+        .expect("It should be a parsable string to be converted to an ISO8601 timestamp with local timezone.").into()
+}
+
 pub fn format_hardware_data(
     deserialized_boagent_response: Value,
     device_name: String,
@@ -231,17 +236,13 @@ pub async fn insert_dimension_table_metadata(
         .as_str()
         .expect("Unable to read string.");
 
-    let start_date_timestamp = NaiveDateTime::parse_from_str(start_date, "%Y-%m-%d %H:%M:%S")
-        .expect("Unable to convert to Postgres timestamp type.");
+    let start_timestamptz = to_datetime_local(start_date);
     let mut connection = database_connection.detach();
 
-    let insert_query = format!(
-        "INSERT INTO {} (name, start_date) VALUES ($1, $2)",
-        table
-    );
+    let insert_query = format!("INSERT INTO {} (name, start_date) VALUES ($1, $2)", table);
     sqlx::query(&insert_query)
         .bind(name)
-        .bind(start_date_timestamp)
+        .bind(start_timestamptz)
         .execute(&mut connection)
         .await
 }
@@ -264,23 +265,19 @@ pub async fn insert_process_metadata(
         .as_str()
         .expect("Unable to read string");
 
-    let start_date_timestamp =
-        NaiveDateTime::parse_from_str(process_start_date, "%Y-%m-%d %H:%M:%S")
-            .expect("Unable to convert to Postgres timestamp type.");
-    let stop_date_timestamp = NaiveDateTime::parse_from_str(process_stop_date, "%Y-%m-%d %H:%M:%S")
-        .expect("Unable to convert to Postgres timestamp type.");
+    let start_timestamptz = to_datetime_local(process_start_date);
+    let stop_timestamptz = to_datetime_local(process_stop_date);
 
     let mut connection = database_connection.detach();
 
-    let insert_query = 
-        "INSERT INTO processes (exe, cmdline, state, start_date, stop_date) VALUES ($1, $2, $3, $4, $5)";
-    
+    let insert_query = "INSERT INTO processes (exe, cmdline, state, start_date, stop_date) VALUES ($1, $2, $3, $4, $5)";
+
     sqlx::query(insert_query)
         .bind(process_exe)
         .bind(process_cmdline)
         .bind(process_state)
-        .bind(start_date_timestamp)
-        .bind(stop_date_timestamp)
+        .bind(start_timestamptz)
+        .bind(stop_timestamptz)
         .execute(&mut connection)
         .await
 }
@@ -339,15 +336,17 @@ pub async fn insert_device_metadata(
     Ok(())
 }
 
-pub async fn update_project_data(database_connection: PoolConnection<Postgres>, project_name: String, stop_date: String) -> Result<(), sqlx::Error> {
+pub async fn update_project_data(
+    database_connection: PoolConnection<Postgres>,
+    project_name: String,
+    stop_date: &str,
+) -> Result<(), sqlx::Error> {
     let mut connection = database_connection.detach();
 
-    let stop_date_timestamp = NaiveDateTime::parse_from_str(&stop_date, "%Y-%m-%d %H:%M:%S")
-        .expect("Unable to convert to Postgres timestamp type.");
-    let formatted_query =
-        "UPDATE projects SET stop_date = ($1) WHERE name = ($2)";
+    let stop_timestamptz = to_datetime_local(stop_date);
+    let formatted_query = "UPDATE projects SET stop_date = ($1) WHERE name = ($2)";
     sqlx::query(formatted_query)
-        .bind(stop_date_timestamp)
+        .bind(stop_timestamptz)
         .bind(project_name)
         .execute(&mut connection)
         .await?;
@@ -804,5 +803,13 @@ LIFETIME=5
 
         assert!(config_check.is_ok());
         Ok(())
+    }
+
+    #[test]
+    fn it_converts_a_parsable_string_containing_an_iso8601_timestamp_to_a_datetime_with_local_offset(
+    ) {
+        let dt_local_timestamp = Local::now();
+        let converted_string = to_datetime_local(dt_local_timestamp.to_string().as_str());
+        assert_eq!(dt_local_timestamp, converted_string);
     }
 }
