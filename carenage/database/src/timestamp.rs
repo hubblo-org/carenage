@@ -16,6 +16,18 @@ impl UnixFlag {
         }
     }
 }
+impl Display for UnixFlag {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        match self {
+            UnixFlag::Set => {
+                write!(f, "UnixFlag is set.")
+            }
+            UnixFlag::Unset => {
+                write!(f, "UnixFlag is unset")
+            }
+        }
+    }
+}
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Timestamp {
