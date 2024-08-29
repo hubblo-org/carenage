@@ -1,5 +1,6 @@
 use crate::carenaged::{insert_project_metadata, query_and_insert_data};
 use carenaged::DaemonArgs;
+use database::HardwareData;
 use std::process;
 use tokio::signal::unix::{signal, SignalKind};
 use tokio::time::{self, Duration};
@@ -22,12 +23,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             print!("Project initialization, inserted project metadata into Carenage database.")
     }
 
-    let _first_query = query_and_insert_data(args.start_timestamp, args.unix_flag, true).await;
+    let _first_query = query_and_insert_data(args.start_timestamp, args.unix_flag, HardwareData::Inspect).await;
 
     let _query_insert_loop = tokio::spawn(async move {
         let mut interval = time::interval(Duration::from_secs(args.time_step));
         loop {
-            let _ = query_and_insert_data(args.start_timestamp, args.unix_flag, false).await;
+            let _ = query_and_insert_data(args.start_timestamp, args.unix_flag, HardwareData::Ignore).await;
             interval.tick().await;
         }
     });

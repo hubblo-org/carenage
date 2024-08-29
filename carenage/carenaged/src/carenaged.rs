@@ -1,7 +1,7 @@
 use database::timestamp::UnixFlag;
 use database::{
     deserialize_boagent_json, format_hardware_data, get_db_connection_pool, insert_device_metadata,
-    insert_dimension_table_metadata, query_boagent, timestamp::Timestamp,
+    insert_dimension_table_metadata, query_boagent, timestamp::Timestamp, HardwareData,
 };
 use serde_json::json;
 use std::env;
@@ -71,7 +71,7 @@ pub async fn insert_project_metadata(
 pub async fn query_and_insert_data(
     start_time: Timestamp,
     unix_flag: UnixFlag,
-    fetch_hardware: bool,
+    fetch_hardware: HardwareData,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let project_root_path = std::env::current_dir().unwrap().join("..");
     let config = database::Config::check_configuration(&project_root_path)?;
@@ -89,7 +89,7 @@ pub async fn query_and_insert_data(
     let deserialized_response = deserialize_boagent_json(response).await?;
     let db_pool = get_db_connection_pool(config.database_url).await?;
 
-    if fetch_hardware {
+    if let HardwareData::Inspect = fetch_hardware {
         let device_data = format_hardware_data(
             deserialized_response,
             config.device_name,

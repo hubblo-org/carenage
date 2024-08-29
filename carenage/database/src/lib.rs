@@ -10,9 +10,29 @@ use sqlx::postgres::PgQueryResult;
 use sqlx::types::uuid;
 use sqlx::Row;
 use sqlx::{PgPool, Postgres};
+use std::fmt::{Display, Formatter};
 use std::path::Path;
 
 pub mod timestamp;
+
+#[derive(Clone, Copy)]
+pub enum HardwareData {
+    Inspect,
+    Ignore,
+}
+
+impl Display for HardwareData {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        match self {
+            HardwareData::Inspect => {
+                write!(f, "true")
+            }
+            HardwareData::Ignore => {
+                write!(f, "false")
+            }
+        }
+    }
+}
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(untagged)]
@@ -76,7 +96,7 @@ pub async fn query_boagent(
     boagent_url: String,
     start_time: Timestamp,
     end_time: Timestamp,
-    fetch_hardware: bool,
+    fetch_hardware: HardwareData,
     location: String,
     lifetime: i16,
 ) -> Result<Response, reqwest::Error> {
@@ -395,7 +415,7 @@ mod tests {
             url,
             Timestamp::UnixTimestamp(Some(now_timestamp_minus_one_minute)),
             Timestamp::UnixTimestamp(Some(now_timestamp)),
-            true,
+            HardwareData::Inspect,
             "FRA".to_string(),
             5,
         )
@@ -432,7 +452,7 @@ mod tests {
             url,
             Timestamp::UnixTimestamp(None),
             Timestamp::UnixTimestamp(None),
-            true,
+            HardwareData::Inspect,
             "FRA".to_string(),
             5,
         )
@@ -474,7 +494,7 @@ mod tests {
             url,
             now_timestamp_minus_one_minute,
             now_timestamp,
-            true,
+            HardwareData::Inspect,
             "FRA".to_string(),
             5,
         )
@@ -492,7 +512,7 @@ mod tests {
             url,
             Timestamp::ISO8601Timestamp(None),
             Timestamp::ISO8601Timestamp(None),
-            true,
+            HardwareData::Inspect,
             "FRA".to_string(),
             5,
         )
@@ -534,7 +554,7 @@ mod tests {
             url,
             now_timestamp_minus_one_minute,
             now_timestamp,
-            true,
+            HardwareData::Inspect,
             "FRA".to_string(),
             5,
         )
@@ -710,7 +730,7 @@ mod tests {
             url,
             now_timestamp_minus_one_minute,
             now_timestamp,
-            true,
+            HardwareData::Inspect,
             "FRA".to_string(),
             5,
         )
