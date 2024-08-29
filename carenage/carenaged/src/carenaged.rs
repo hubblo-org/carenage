@@ -1,8 +1,9 @@
-use database::timestamp::UnixFlag;
-use database::{
-    deserialize_boagent_json, format_hardware_data, get_db_connection_pool, insert_device_metadata,
-    insert_dimension_table_metadata, query_boagent, timestamp::Timestamp, HardwareData,
+use database::boagent::{Config, deserialize_boagent_json, query_boagent, HardwareData};
+use database::database::{
+    format_hardware_data, get_db_connection_pool, insert_device_metadata,
+    insert_dimension_table_metadata,
 };
+use database::timestamp::{Timestamp, UnixFlag};
 use serde_json::json;
 use std::env;
 use std::process;
@@ -37,7 +38,7 @@ pub async fn insert_project_metadata(
     start_timestamp: Timestamp,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let project_root_path = std::env::current_dir().unwrap().join("..");
-    let config = database::Config::check_configuration(&project_root_path)?;
+    let config = Config::check_configuration(&project_root_path)?;
     let db_pool = get_db_connection_pool(config.database_url).await?;
     let project_data = json!({
         "name": config.project_name,
@@ -68,7 +69,7 @@ pub async fn query_and_insert_data(
     fetch_hardware: HardwareData,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let project_root_path = std::env::current_dir().unwrap().join("..");
-    let config = database::Config::check_configuration(&project_root_path)?;
+    let config = Config::check_configuration(&project_root_path)?;
 
     let end_time = Timestamp::new(unix_flag);
     let response = query_boagent(

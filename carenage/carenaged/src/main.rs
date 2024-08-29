@@ -1,6 +1,6 @@
 use crate::carenaged::{insert_project_metadata, query_and_insert_data};
 use carenaged::DaemonArgs;
-use database::HardwareData;
+use database::boagent::HardwareData;
 use std::process;
 use tokio::signal::unix::{signal, SignalKind};
 use tokio::time::{self, Duration};

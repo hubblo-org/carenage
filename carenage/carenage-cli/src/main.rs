@@ -1,5 +1,5 @@
 use clap::Parser;
-use database::{timestamp::{self, UnixFlag}, Config};
+use database::{timestamp::{self, UnixFlag}, boagent::Config};
 use std::{fs::File, io::Write, process::Command};
 use sysinfo::{Pid, Signal, System};
 
