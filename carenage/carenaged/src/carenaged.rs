@@ -17,16 +17,10 @@ pub struct DaemonArgs {
 impl DaemonArgs {
     pub fn parse_args() -> Result<DaemonArgs, Box<dyn std::error::Error>> {
         let args: Vec<String> = env::args().collect();
-        let time_step: u64 = args[1]
-            .parse()
-            .expect("time_step variable should be parsable.");
+        let time_step: u64 = args[1].parse()?;
         let start_time_str = args[2].to_string();
-        let is_unix_set: bool = args[3]
-            .parse()
-            .expect("is_unix_set variable should be parsable.");
-        let init_flag: bool = args[4]
-            .parse()
-            .expect("is_init_set variable should be parsable.");
+        let is_unix_set: bool = args[3].parse()?;
+        let init_flag: bool = args[4].parse()?;
         let unix_flag = UnixFlag::from_bool(is_unix_set);
         let start_timestamp = Timestamp::parse_str(start_time_str, unix_flag);
 
