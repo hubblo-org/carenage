@@ -1,50 +1,33 @@
-use database::timestamp::UnixFlag;
-use database::{
-    deserialize_boagent_json, format_hardware_data, get_db_connection_pool, insert_device_metadata,
-    insert_dimension_table_metadata, query_boagent, timestamp::Timestamp,
-};
-use serde_json::json;
-use std::{env, process};
+use crate::carenaged::{insert_project_metadata, query_and_insert_data};
+use carenaged::DaemonArgs;
+use std::process;
 use tokio::signal::unix::{signal, SignalKind};
 use tokio::time::{self, Duration};
+
+pub mod carenaged;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Started carenage daemon with PID: {}", process::id());
 
     let mut sigterm = signal(SignalKind::terminate())?;
-    // TODO : create DaemonArgs enum
-    let args: Vec<String> = env::args().collect();
-    let time_step: u64 = args[1]
-        .parse()
-        .expect("time_step variable should be parsable.");
-    let start_time_str = args[2].to_string();
-    let is_unix_set: bool = args[3]
-        .parse()
-        .expect("is_unix_set variable should be parsable.");
-    let is_init_set: bool = args[4]
-        .parse()
-        .expect("is_init_set variable should be parsable.");
+    let args = DaemonArgs::parse_args()?;
 
-    println!("Time step is : {} seconds.", time_step);
-    println!("Start timestamp is {}.", start_time_str);
-    println!("Is UNIX flag set for timestamp? {}", is_unix_set);
+    println!("Time step is : {} seconds.", args.time_step);
+    println!("Start timestamp is {}.", args.start_timestamp);
+    println!("{}", args.unix_flag);
 
-    let unix_flag = UnixFlag::from_bool(is_unix_set);
-
-    let start_timestamp = Timestamp::parse_str(start_time_str, unix_flag);
-
-    if is_init_set {
-            let _ = insert_project_metadata(start_timestamp).await;
+    if args.init_flag {
+            let _ = insert_project_metadata(args.start_timestamp).await;
             print!("Project initialization, inserted project metadata into Carenage database.")
     }
 
-    let _first_query = query_and_insert_data(start_timestamp, unix_flag, true).await;
+    let _first_query = query_and_insert_data(args.start_timestamp, args.unix_flag, true).await;
 
     let _query_insert_loop = tokio::spawn(async move {
-        let mut interval = time::interval(Duration::from_secs(time_step));
+        let mut interval = time::interval(Duration::from_secs(args.time_step));
         loop {
-            let _ = query_and_insert_data(start_timestamp, unix_flag, false).await;
+            let _ = query_and_insert_data(args.start_timestamp, args.unix_flag, false).await;
             interval.tick().await;
         }
     });
