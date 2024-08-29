@@ -2,6 +2,21 @@ use chrono::{DateTime, Local};
 use std::fmt::{Display, Formatter};
 use std::time::SystemTime;
 
+#[derive(Copy, Clone)]
+pub enum UnixFlag {
+    Set,
+    Unset,
+}
+
+impl UnixFlag {
+    pub fn from_bool(unix_bool: bool) -> UnixFlag {
+        match unix_bool {
+            true => UnixFlag::Set,
+            false => UnixFlag::Unset
+        }
+    }
+}
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Timestamp {
     UnixTimestamp(Option<u64>),
@@ -22,26 +37,26 @@ impl Display for Timestamp {
 }
 
 impl Timestamp {
-    pub fn new(unix: bool) -> Timestamp {
-        match unix {
-            true => Timestamp::UnixTimestamp(Some(
+    pub fn new(unix_flag: UnixFlag) -> Timestamp {
+        match unix_flag {
+            UnixFlag::Set => Timestamp::UnixTimestamp(Some(
                 SystemTime::now()
                     .duration_since(SystemTime::UNIX_EPOCH)
                     .unwrap()
                     .as_secs(),
             )),
-            false => Timestamp::ISO8601Timestamp(Some(Local::now())),
+            UnixFlag::Unset => Timestamp::ISO8601Timestamp(Some(Local::now())),
         }
     }
 
-    pub fn parse_str(timestamp_str: String, unix: bool) -> Timestamp {
-        match unix {
-            true => Timestamp::UnixTimestamp(Some(
+    pub fn parse_str(timestamp_str: String, unix_flag: UnixFlag) -> Timestamp {
+        match unix_flag {
+            UnixFlag::Set => Timestamp::UnixTimestamp(Some(
                 timestamp_str
                     .parse::<u64>()
                     .expect("The string should be parsable to convert it to UNIX timestamp."),
             )),
-            false => Timestamp::ISO8601Timestamp(Some(
+            UnixFlag::Unset => Timestamp::ISO8601Timestamp(Some(
                 timestamp_str
                     .parse()
                     .expect("The string should be parsable to convert it to ISO8601 timestamp."),
@@ -58,7 +73,7 @@ mod tests {
     #[test]
     fn it_parses_a_string_to_return_an_unix_timestamp() {
         let unix_timestamp_str = "1724833101".to_string();
-        let parsed_string = Timestamp::parse_str(unix_timestamp_str, true);
+        let parsed_string = Timestamp::parse_str(unix_timestamp_str, UnixFlag::Set);
         assert_eq!(parsed_string, Timestamp::UnixTimestamp(Some(1724833101)));
     }
 
@@ -66,7 +81,7 @@ mod tests {
     fn it_parses_a_string_to_return_an_iso8601_timestamp() {
         let now_iso8601 = Local::now();
         let iso8601_timestamp_str = now_iso8601.to_string();
-        let parsed_string = Timestamp::parse_str(iso8601_timestamp_str, false);
+        let parsed_string = Timestamp::parse_str(iso8601_timestamp_str, UnixFlag::Unset);
         assert_eq!(parsed_string, Timestamp::ISO8601Timestamp(Some(now_iso8601)));
     }
 
@@ -74,13 +89,13 @@ mod tests {
     #[should_panic]
     fn it_fails_to_parse_a_string_as_unix_timestamp() {
         let bound_to_fail = "boundtofail".to_string();
-        let _parsed_string = Timestamp::parse_str(bound_to_fail, true);
+        let _parsed_string = Timestamp::parse_str(bound_to_fail, UnixFlag::Set);
     }
 
     #[test]
     #[should_panic]
     fn it_fails_to_parse_a_string_as_iso8601_timestamp() {
         let bound_to_fail = "boundtofail".to_string();
-        let _parsed_string = Timestamp::parse_str(bound_to_fail, false);
+        let _parsed_string = Timestamp::parse_str(bound_to_fail, UnixFlag::Unset);
     }
 }

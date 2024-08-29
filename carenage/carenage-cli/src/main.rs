@@ -1,5 +1,5 @@
 use clap::Parser;
-use database::{timestamp, Config};
+use database::{timestamp::{self, UnixFlag}, Config};
 use std::{fs::File, io::Write, process::Command};
 use sysinfo::{Pid, Signal, System};
 
@@ -7,8 +7,6 @@ pub mod cli;
 
 fn main() {
     let cli = cli::Cli::parse();
-
-    /*     let device_name = var("DEVICE").unwrap_or("unknown".to_string()); */
 
     match &cli.event {
         Some(cli::Events::Start(args)) => {
@@ -25,6 +23,8 @@ fn main() {
                 }
             };
 
+            let unix_flag = UnixFlag::from_bool(cli.unix); 
+
             let project_root_path = std::env::current_dir().unwrap().join("..");
             let config_check = Config::check_configuration(&project_root_path);
 
@@ -32,7 +32,7 @@ fn main() {
                 println!("Needed environment variables are set.");
             }
 
-            let start_timestamp: timestamp::Timestamp = timestamp::Timestamp::new(cli.unix);
+            let start_timestamp: timestamp::Timestamp = timestamp::Timestamp::new(unix_flag);
 
             println!("Carenage start event, time step of {:?} seconds", args.step);
             println!("Start event timestamp is {:?}", start_timestamp.to_string());
@@ -55,7 +55,8 @@ fn main() {
                 .expect("Failed to save child process PID in file.");
         }
         Some(cli::Events::Stop) => {
-            let stop_timestamp = timestamp::Timestamp::new(cli.unix);
+            let unix_flag = UnixFlag::from_bool(cli.unix); 
+            let stop_timestamp = timestamp::Timestamp::new(unix_flag);
             let system = System::new_all();
 
             let printable_stop_timestamp = stop_timestamp.to_string();

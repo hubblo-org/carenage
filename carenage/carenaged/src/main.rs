@@ -1,4 +1,4 @@
-use chrono::Utc;
+use database::timestamp::UnixFlag;
 use database::{
     deserialize_boagent_json, format_hardware_data, get_db_connection_pool, insert_device_metadata,
     insert_dimension_table_metadata, query_boagent, timestamp::Timestamp,
@@ -13,6 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Started carenage daemon with PID: {}", process::id());
 
     let mut sigterm = signal(SignalKind::terminate())?;
+    // TODO : create DaemonArgs enum
     let args: Vec<String> = env::args().collect();
     let time_step: u64 = args[1]
         .parse()
@@ -29,19 +30,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Start timestamp is {}.", start_time_str);
     println!("Is UNIX flag set for timestamp? {}", is_unix_set);
 
-    let start_time_timestamp = Timestamp::parse_str(start_time_str, is_unix_set);
+    let unix_flag = UnixFlag::from_bool(is_unix_set);
+
+    let start_timestamp = Timestamp::parse_str(start_time_str, unix_flag);
 
     if is_init_set {
-            let _ = insert_project_metadata().await;
+            let _ = insert_project_metadata(start_timestamp).await;
             print!("Project initialization, inserted project metadata into Carenage database.")
     }
 
-    let _first_query = query_and_insert_data(start_time_timestamp, is_unix_set, true).await;
+    let _first_query = query_and_insert_data(start_timestamp, unix_flag, true).await;
 
     let _query_insert_loop = tokio::spawn(async move {
         let mut interval = time::interval(Duration::from_secs(time_step));
         loop {
-            let _ = query_and_insert_data(start_time_timestamp, is_unix_set, false).await;
+            let _ = query_and_insert_data(start_timestamp, unix_flag, false).await;
             interval.tick().await;
         }
     });
@@ -59,14 +62,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-async fn insert_project_metadata() -> Result<(), Box<dyn std::error::Error>> {
+async fn insert_project_metadata(start_timestamp: Timestamp) -> Result<(), Box<dyn std::error::Error>> {
     let project_root_path = std::env::current_dir().unwrap().join("..");
     let config = database::Config::check_configuration(&project_root_path)?;
     let db_pool = get_db_connection_pool(config.database_url).await?;
-    let start_date = Utc::now().format("%Y-%m-%d %H:%M:%S").to_string();    
     let project_data = json!({
         "name": config.project_name,
-        "start_date": start_date,
+        "start_date": start_timestamp.to_string(),
     });
 
     let insert_project_data =
@@ -89,13 +91,13 @@ async fn insert_project_metadata() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn query_and_insert_data(
     start_time: Timestamp,
-    is_unix_set: bool,
+    unix_flag: UnixFlag,
     fetch_hardware: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let project_root_path = std::env::current_dir().unwrap().join("..");
     let config = database::Config::check_configuration(&project_root_path)?;
 
-    let end_time = Timestamp::new(is_unix_set);
+    let end_time = Timestamp::new(unix_flag);
     let response = query_boagent(
         config.boagent_url,
         start_time,
