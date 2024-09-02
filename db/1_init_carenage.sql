@@ -1,6 +1,6 @@
 CREATE TABLE projects (
   project_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(255),
+  name VARCHAR(255) UNIQUE,
   start_date TIMESTAMPTZ,
   stop_date TIMESTAMPTZ
 );
