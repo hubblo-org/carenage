@@ -1,10 +1,11 @@
-use database::boagent::{Config, deserialize_boagent_json, query_boagent, HardwareData};
+use database::boagent::{deserialize_boagent_json, query_boagent, Config, HardwareData};
 use database::database::{
     format_hardware_data, get_db_connection_pool, insert_device_metadata,
     insert_dimension_table_metadata,
 };
 use database::timestamp::{Timestamp, UnixFlag};
 use serde_json::json;
+use sqlx::error::ErrorKind;
 use std::env;
 use std::process;
 
@@ -12,7 +13,6 @@ pub struct DaemonArgs {
     pub time_step: u64,
     pub start_timestamp: Timestamp,
     pub unix_flag: UnixFlag,
-    pub init_flag: bool,
 }
 
 impl DaemonArgs {
@@ -21,7 +21,6 @@ impl DaemonArgs {
         let time_step: u64 = args[1].parse()?;
         let start_time_str = args[2].to_string();
         let is_unix_set: bool = args[3].parse()?;
-        let init_flag: bool = args[4].parse()?;
         let unix_flag = UnixFlag::from_bool(is_unix_set);
         let start_timestamp = Timestamp::parse_str(start_time_str, unix_flag);
 
@@ -29,8 +28,19 @@ impl DaemonArgs {
             time_step,
             start_timestamp,
             unix_flag,
-            init_flag,
         })
+    }
+}
+
+pub struct GitlabVariables {
+    pub project_path: String,
+}
+
+impl GitlabVariables {
+    pub fn parse_env_variables() -> Result<GitlabVariables, Box<dyn std::error::Error>> {
+        let project_path = env::var("CI_PROJECT_PATH").is_ok().to_string();
+
+        Ok(GitlabVariables { project_path })
     }
 }
 
@@ -52,14 +62,21 @@ pub async fn insert_project_metadata(
             "Inserted project metadata into database, affected rows: {}",
             insert_project_data.rows_affected()
         ),
-        Err(err) => {
-            eprintln!(
-                "Error while processing first query to project table: {}",
-                err
-            );
-            process::exit(0x0100)
-        }
-    };
+        Err(err) => match err
+            .into_database_error()
+            .expect("It should be a DatabaseError")
+            .kind()
+        {
+            ErrorKind::UniqueViolation => {
+                println!("Project name already present in database, not a project initialization.")
+            }
+            _ => {
+                eprintln!("Error while processing project metadata insertion");
+                process::exit(0x0100)
+            }
+        },
+    }
+
     Ok(())
 }
 

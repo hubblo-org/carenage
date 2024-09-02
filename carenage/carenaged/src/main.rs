@@ -18,17 +18,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Start timestamp is {}.", args.start_timestamp);
     println!("{}", args.unix_flag);
 
-    if args.init_flag {
-            let _ = insert_project_metadata(args.start_timestamp).await;
-            print!("Project initialization, inserted project metadata into Carenage database.")
-    }
+    let _ = insert_project_metadata(args.start_timestamp).await;
 
-    let _first_query = query_and_insert_data(args.start_timestamp, args.unix_flag, HardwareData::Inspect).await;
+    let _first_query =
+        query_and_insert_data(args.start_timestamp, args.unix_flag, HardwareData::Inspect).await;
 
     let _query_insert_loop = tokio::spawn(async move {
         let mut interval = time::interval(Duration::from_secs(args.time_step));
         loop {
-            let _ = query_and_insert_data(args.start_timestamp, args.unix_flag, HardwareData::Ignore).await;
+            let _ =
+                query_and_insert_data(args.start_timestamp, args.unix_flag, HardwareData::Ignore)
+                    .await;
             interval.tick().await;
         }
     });
