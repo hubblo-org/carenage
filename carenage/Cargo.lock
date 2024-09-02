@@ -276,6 +276,7 @@ dependencies = [
  "database",
  "dotenv",
  "serde_json",
+ "sqlx",
  "sysinfo",
  "tokio",
  "tokio-macros",
