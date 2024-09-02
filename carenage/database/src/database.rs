@@ -513,6 +513,22 @@ mod tests {
         assert!(db_connect.is_ok());
     }
 
+    #[sqlx::test(migrations = "../../db/")]
+    async fn it_gets_the_project_path_as_an_environment_variable_and_inserts_it_as_project_name(pool: PgPool) -> sqlx::Result<()> {
+
+        let now_timestamp = Local::now();
+        std::env::set_var("CI_PROJECT_PATH", "hubblo/carenage");
+
+        let project_metadata = json!({
+            "name": std::env::var("CI_PROJECT_PATH").is_ok().to_string(),
+            "start_date": now_timestamp.to_string(),
+        });
+
+        let _insert_query =
+            insert_dimension_table_metadata(pool.acquire().await?, "projects", project_metadata);
+        Ok(())
+    }
+
     #[test]
     fn it_checks_that_all_needed_configuration_details_are_set() -> std::io::Result<()> {
         let current_dir = std::env::current_dir().unwrap();
