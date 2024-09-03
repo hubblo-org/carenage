@@ -256,16 +256,17 @@ pub async fn insert_device_metadata(
     Ok(())
 }
 
-pub async fn update_project_data(
+pub async fn update_stop_date(
     database_connection: PoolConnection<Postgres>,
+    table_name: &str,
     project_name: String,
     stop_date: &str,
 ) -> Result<(), sqlx::Error> {
     let mut connection = database_connection.detach();
 
     let stop_timestamptz = to_datetime_local(stop_date);
-    let formatted_query = "UPDATE projects SET stop_date = ($1) WHERE name = ($2)";
-    sqlx::query(formatted_query)
+    let formatted_query = format!("UPDATE {} SET stop_date = ($1) WHERE name = ($2)", table_name);
+    sqlx::query(&formatted_query)
         .bind(stop_timestamptz)
         .bind(project_name)
         .execute(&mut connection)
@@ -490,8 +491,9 @@ mod tests {
                 .await;
 
         let stop_date_timestamp = Local::now().to_string();
-        let update_query = update_project_data(
+        let update_query = update_stop_date(
             pool.acquire().await?,
+            "projects",
             "my_web_application".to_string(),
             stop_date_timestamp.as_str(),
         )
