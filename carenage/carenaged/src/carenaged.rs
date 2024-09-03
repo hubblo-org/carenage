@@ -123,3 +123,29 @@ pub async fn query_and_insert_data(
     };
     Ok(())
 }
+
+fn check_unique_constraint(
+    insert_attempt: Result<PgQueryResult, sqlx::Error>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    match insert_attempt {
+        Ok(insert_attempt) => println!(
+            "Inserted metadata into database, affected rows: {}",
+            insert_attempt.rows_affected()
+        ),
+        Err(err) => match err
+            .as_database_error()
+            .expect("It should be a DatabaseError")
+            .kind()
+        {
+            ErrorKind::UniqueViolation => {
+                println!("Metadata already present in database, not a project initialization: {}", err)
+            }
+            _ => {
+                eprintln!("Error while processing metadata insertion: {}", err);
+                process::exit(0x0100)
+            }
+        },
+    }
+
+    Ok(())
+}
