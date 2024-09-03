@@ -1,6 +1,7 @@
 use crate::carenaged::{insert_project_metadata, query_and_insert_data};
 use carenaged::DaemonArgs;
 use database::boagent::HardwareData;
+use database::ci::GitlabVariables;
 use std::process;
 use tokio::signal::unix::{signal, SignalKind};
 use tokio::time::{self, Duration};
@@ -18,9 +19,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Start timestamp is {}.", args.start_timestamp);
     println!("{}", args.unix_flag);
 
-    let _ = insert_project_metadata(args.start_timestamp).await;
+    let gitlab_vars = GitlabVariables::parse_env_variables()?;
 
-    let _first_query =
+    let _ = insert_project_metadata(gitlab_vars, args.start_timestamp).await;
+
+    let _insert_hardware_data =
         query_and_insert_data(args.start_timestamp, args.unix_flag, HardwareData::Inspect).await;
 
     let _query_insert_loop = tokio::spawn(async move {
