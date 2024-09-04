@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::value::Number;
 use serde_json::{json, Error, Value};
 use sqlx::pool::PoolConnection;
-use sqlx::postgres::PgQueryResult;
+use sqlx::postgres::PgRow;
 use sqlx::types::uuid;
 use sqlx::Row;
 use sqlx::{PgPool, Postgres};
@@ -148,7 +148,7 @@ pub async fn insert_dimension_table_metadata(
     database_connection: PoolConnection<Postgres>,
     table: &str,
     data: Value,
-) -> Result<PgQueryResult, sqlx::Error> {
+) -> Result<Vec<PgRow>, sqlx::Error> {
     let name = data["name"].as_str();
     let start_date = data
         .get("start_date")
@@ -159,18 +159,23 @@ pub async fn insert_dimension_table_metadata(
     let start_timestamptz = to_datetime_local(start_date);
     let mut connection = database_connection.detach();
 
-    let insert_query = format!("INSERT INTO {} (name, start_date) VALUES ($1, $2)", table);
-    sqlx::query(&insert_query)
+    let insert_query = format!(
+        "INSERT INTO {} (name, start_date) VALUES ($1, $2) RETURNING *",
+        table
+    );
+
+    let rows = sqlx::query(&insert_query)
         .bind(name)
         .bind(start_timestamptz)
-        .execute(&mut connection)
-        .await
+        .fetch_all(&mut connection)
+        .await?;
+    Ok(rows)
 }
 
 pub async fn insert_process_metadata(
     database_connection: PoolConnection<Postgres>,
     process_data: Value,
-) -> Result<PgQueryResult, sqlx::Error> {
+) -> Result<Vec<PgRow>, sqlx::Error> {
     let process_exe = process_data["exe"].as_str();
     let process_cmdline = process_data["cmdline"].as_str();
     let process_state = process_data["state"].as_str();
@@ -190,22 +195,24 @@ pub async fn insert_process_metadata(
 
     let mut connection = database_connection.detach();
 
-    let insert_query = "INSERT INTO processes (exe, cmdline, state, start_date, stop_date) VALUES ($1, $2, $3, $4, $5)";
+    let insert_query = "INSERT INTO processes (exe, cmdline, state, start_date, stop_date) VALUES ($1, $2, $3, $4, $5) RETURNING *";
 
-    sqlx::query(insert_query)
+    let process_rows = sqlx::query(insert_query)
         .bind(process_exe)
         .bind(process_cmdline)
         .bind(process_state)
         .bind(start_timestamptz)
         .bind(stop_timestamptz)
-        .execute(&mut connection)
-        .await
+        .fetch_all(&mut connection)
+        .await?;
+
+    Ok(process_rows)
 }
 
 pub async fn insert_device_metadata(
     database_connection: PoolConnection<Postgres>,
     device_data: Value,
-) -> Result<(), sqlx::Error> {
+) -> Result<Vec<PgRow>, sqlx::Error> {
     let device_name = device_data["device"]["name"].as_str();
     let device_lifetime = device_data["device"]["lifetime"].as_i64();
     let device_location = device_data["device"]["location"].as_str();
@@ -216,15 +223,15 @@ pub async fn insert_device_metadata(
     let mut connection = database_connection.detach();
 
     let formatted_query =
-        "INSERT INTO devices (name, lifetime, location) VALUES ($1, $2, $3) RETURNING device_id";
-    let insert_device_data_query = sqlx::query(formatted_query)
+        "INSERT INTO devices (name, lifetime, location) VALUES ($1, $2, $3) RETURNING *";
+    let device_rows = sqlx::query(formatted_query)
         .bind(device_name)
         .bind(device_lifetime)
         .bind(device_location)
-        .fetch_one(&mut connection)
+        .fetch_all(&mut connection)
         .await?;
 
-    let device_id: uuid::Uuid = insert_device_data_query.get("device_id");
+    let device_id: uuid::Uuid = device_rows[0].get("device_id");
     let formatted_query = "INSERT INTO components (device_id, name, model, manufacturer) VALUES ($1, $2, $3, $4) RETURNING component_id";
     for component in components {
         let insert_component_data_query = sqlx::query(formatted_query)
@@ -253,7 +260,7 @@ pub async fn insert_device_metadata(
         }
     }
 
-    Ok(())
+    Ok(device_rows)
 }
 
 pub async fn update_stop_date(
@@ -265,7 +272,10 @@ pub async fn update_stop_date(
     let mut connection = database_connection.detach();
 
     let stop_timestamptz = to_datetime_local(stop_date);
-    let formatted_query = format!("UPDATE {} SET stop_date = ($1) WHERE name = ($2)", table_name);
+    let formatted_query = format!(
+        "UPDATE {} SET stop_date = ($1) WHERE name = ($2)",
+        table_name
+    );
     sqlx::query(&formatted_query)
         .bind(stop_timestamptz)
         .bind(project_name)
@@ -275,11 +285,26 @@ pub async fn update_stop_date(
     Ok(())
 }
 
+pub async fn get_project_id(
+    database_connection: PoolConnection<Postgres>,
+    project_name: String,
+) -> Result<PgRow, sqlx::Error> {
+    let mut connection = database_connection.detach();
+
+    let formatted_query = "SELECT project_id FROM PROJECTS WHERE name = ($1)";
+
+    let project_id = sqlx::query(formatted_query)
+        .bind(project_name)
+        .fetch_one(&mut connection)
+        .await?;
+    Ok(project_id)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::boagent::{deserialize_boagent_json, query_boagent, Config, HardwareData};
     use crate::timestamp::Timestamp;
-    use crate::boagent::{Config, deserialize_boagent_json, query_boagent, HardwareData};
     use chrono::{Duration, Local};
     use dotenv::var;
     use mockito::{Matcher, Server};
@@ -300,10 +325,15 @@ mod tests {
         let db_connection = pool.acquire().await?;
 
         let insert_query =
-            insert_dimension_table_metadata(db_connection, "projects", project_metadata).await;
+            insert_dimension_table_metadata(db_connection, "projects", project_metadata.clone())
+                .await;
 
         assert!(insert_query.is_ok());
-        assert_eq!(insert_query.unwrap().rows_affected(), 1);
+
+        let rows = insert_query.unwrap();
+        let project_name: String = rows[0].get("name");
+        assert_eq!(project_name, project_metadata["name"]);
+        assert_eq!(rows.len(), 1);
         Ok(())
     }
 
@@ -338,7 +368,8 @@ mod tests {
             )
             .await;
             assert!(insert_query.is_ok());
-            assert_eq!(insert_query.unwrap().rows_affected(), 1);
+            let rows = insert_query.unwrap();
+            assert_eq!(rows.len(), 1);
         }
 
         Ok(())
@@ -361,10 +392,14 @@ mod tests {
 
         let db_connection = pool.acquire().await?;
 
-        let insert_query = insert_process_metadata(db_connection, process_metadata).await;
+        let insert_query = insert_process_metadata(db_connection, process_metadata.clone()).await;
 
         assert!(insert_query.is_ok());
-        assert_eq!(insert_query.unwrap().rows_affected(), 1);
+
+        let rows = insert_query.unwrap();
+        let process_exe: String = rows[0].get("exe");
+        assert_eq!(rows.len(), 1);
+        assert_eq!(process_exe, process_metadata["exe"]);
         Ok(())
     }
 
@@ -516,8 +551,9 @@ mod tests {
     }
 
     #[sqlx::test(migrations = "../../db/")]
-    async fn it_gets_the_project_path_as_an_environment_variable_and_inserts_it_as_project_name(pool: PgPool) -> sqlx::Result<()> {
-
+    async fn it_gets_the_project_path_as_an_environment_variable_and_inserts_it_as_project_name(
+        pool: PgPool,
+    ) -> sqlx::Result<()> {
         let now_timestamp = Local::now();
         std::env::set_var("CI_PROJECT_PATH", "hubblo/carenage");
 
@@ -528,6 +564,36 @@ mod tests {
 
         let _insert_query =
             insert_dimension_table_metadata(pool.acquire().await?, "projects", project_metadata);
+        Ok(())
+    }
+
+    #[sqlx::test(migrations = "../../db/")]
+    async fn it_gets_project_id_from_projects_table_with_queried_project_name(
+        pool: PgPool,
+    ) -> sqlx::Result<()> {
+        let now_timestamp = Local::now();
+
+        let project_name = "my_web_application";
+
+        let project_metadata = json!({
+            "name": project_name,
+            "start_date": now_timestamp.to_string(),
+        });
+
+        let db_connection = pool.acquire().await?;
+
+        insert_dimension_table_metadata(db_connection, "projects", project_metadata).await?;
+
+        let db_connection = pool.acquire().await?;
+
+        let project_id_query = get_project_id(db_connection, project_name.to_string()).await;
+
+        assert!(project_id_query.is_ok());
+
+        let project_row = project_id_query.unwrap();
+
+        assert_eq!(project_row.len(), 1);
+
         Ok(())
     }
 
