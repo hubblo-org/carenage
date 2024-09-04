@@ -21,16 +21,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let gitlab_vars = GitlabVariables::parse_env_variables()?;
 
-    let _ = insert_project_metadata(gitlab_vars, args.start_timestamp).await;
+    let project_ids = insert_project_metadata(gitlab_vars, args.start_timestamp).await?;
 
     let _insert_hardware_data =
-        query_and_insert_data(args.start_timestamp, args.unix_flag, HardwareData::Inspect).await;
+        query_and_insert_data(None, args.start_timestamp, args.unix_flag, HardwareData::Inspect).await;
 
     let _query_insert_loop = tokio::spawn(async move {
         let mut interval = time::interval(Duration::from_secs(args.time_step));
         loop {
             let _ =
-                query_and_insert_data(args.start_timestamp, args.unix_flag, HardwareData::Ignore)
+                query_and_insert_data(Some(&project_ids), args.start_timestamp, args.unix_flag, HardwareData::Ignore)
                     .await;
             interval.tick().await;
         }

@@ -7,7 +7,9 @@ use database::database::{
 use database::timestamp::{Timestamp, UnixFlag};
 use serde_json::json;
 use sqlx::error::ErrorKind;
-use sqlx::postgres::PgQueryResult;
+use sqlx::postgres::PgRow;
+use sqlx::types::uuid;
+use sqlx::Row;
 use std::env;
 use std::process;
 
@@ -37,7 +39,7 @@ impl DaemonArgs {
 pub async fn insert_project_metadata(
     gitlab_vars: GitlabVariables,
     start_timestamp: Timestamp,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<Vec<uuid::Uuid>, Box<dyn std::error::Error>> {
     let project_root_path = std::env::current_dir().unwrap().join("..");
     let config = Config::check_configuration(&project_root_path)?;
     let db_pool = get_db_connection_pool(config.database_url).await?;
@@ -46,34 +48,65 @@ pub async fn insert_project_metadata(
         "start_date": start_timestamp.to_string(),
     });
 
-    let insert_project_data =
+    let insert_project_metadata_query =
         insert_dimension_table_metadata(db_pool.acquire().await?, "projects", project_data).await;
-
-    let _result = check_unique_constraint(insert_project_data);
+    let project_id = get_project_id(
+        insert_project_metadata_query,
+        gitlab_vars.project_path.clone(),
+    )
+    .await?;
 
     let workflow_name = format!("workflow_{}", gitlab_vars.project_path);
     let workflow_data = json!({
     "name": workflow_name,
     "start_date": gitlab_vars.pipeline_created_at.to_string(),
     });
+    let workflow_rows =
+        insert_dimension_table_metadata(db_pool.acquire().await?, "workflows", workflow_data)
+            .await?;
+    let workflow_id = workflow_rows[0].get("workflow_id");
 
-    let insert_workflow_data =
-        insert_dimension_table_metadata(db_pool.acquire().await?, "workflows", workflow_data).await;
-    
-    let _result = check_unique_constraint(insert_workflow_data);
+    let pipeline_data = json!({
+    "name": gitlab_vars.pipeline_name,
+    "start_date": start_timestamp.to_string(),
+    });
+    let pipeline_rows =
+        insert_dimension_table_metadata(db_pool.acquire().await?, "pipelines", pipeline_data)
+            .await?;
+    let pipeline_id: uuid::Uuid = pipeline_rows[0].get("pipeline_id");
 
     let job_data = json!({
     "name": gitlab_vars.job_name.to_string(),
     "start_date": gitlab_vars.job_started_at.to_string(),
     });
+    let job_rows =
+        insert_dimension_table_metadata(db_pool.acquire().await?, "jobs", job_data).await?;
+    let job_id: uuid::Uuid = job_rows[0].get("job_id");
 
-    let insert_job_data =
-        insert_dimension_table_metadata(db_pool.acquire().await?, "jobs", job_data).await;
+    let run_name = format!("run_{}", gitlab_vars.job_name);
+    let run_data = json!({
+    "name": run_name,
+    "start_date": start_timestamp.to_string()
+    });
+    let run_rows =
+        insert_dimension_table_metadata(db_pool.acquire().await?, "runs", run_data).await?;
+    let run_id: uuid::Uuid = run_rows[0].get("run_id");
 
-    Ok(())
+    let task_data = json!({
+    "name": gitlab_vars.job_stage.to_string(),
+    "start_date": start_timestamp.to_string()
+    });
+    let task_rows = 
+        insert_dimension_table_metadata(db_pool.acquire().await?, "tasks", task_data).await?;
+    let task_id: uuid::Uuid = task_rows[0].get("task_id");
+
+    let id_vector: Vec<uuid::Uuid> = vec![project_id, workflow_id, pipeline_id, job_id, run_id, task_id];
+    Ok(id_vector)
 }
 
+// Will return device_id on first_query, implement option for fn result
 pub async fn query_and_insert_data(
+    metadata_ids: Option<&Vec<uuid::Uuid>>,
     start_time: Timestamp,
     unix_flag: UnixFlag,
     fetch_hardware: HardwareData,
@@ -104,7 +137,7 @@ pub async fn query_and_insert_data(
         let insert_device_data =
             insert_device_metadata(db_pool.acquire().await?, device_data).await;
         match insert_device_data {
-            Ok(()) => (),
+            Ok(_insert_device_data) => println!("Inserted device data into database."),
             Err(err) => {
                 eprintln!(
                     "Error while processing first query to device table: {}",
@@ -117,28 +150,40 @@ pub async fn query_and_insert_data(
     Ok(())
 }
 
-fn check_unique_constraint(
-    insert_attempt: Result<PgQueryResult, sqlx::Error>,
-) -> Result<(), Box<dyn std::error::Error>> {
-    match insert_attempt {
-        Ok(insert_attempt) => println!(
-            "Inserted metadata into database, affected rows: {}",
-            insert_attempt.rows_affected()
-        ),
+async fn get_project_id(
+    insert_attempt: Result<Vec<PgRow>, sqlx::Error>,
+    project_name: String,
+) -> Result<uuid::Uuid, Box<dyn std::error::Error>> {
+    let project_root_path = std::env::current_dir().unwrap().join("..");
+    let config = Config::check_configuration(&project_root_path)?;
+    let db_pool = get_db_connection_pool(config.database_url).await?;
+
+    let project_id: uuid::Uuid = match insert_attempt {
+        Ok(project_rows) => {
+            println!("Inserted project metadata into database.",);
+            project_rows[0].get("project_id")
+        }
         Err(err) => match err
             .as_database_error()
             .expect("It should be a DatabaseError")
             .kind()
         {
             ErrorKind::UniqueViolation => {
-                println!("Metadata already present in database, not a project initialization: {}", err)
+                println!(
+                    "Metadata already present in database, not a project initialization: {}",
+                    err
+                );
+                let select_project_id_query =
+                    database::database::get_project_id(db_pool.acquire().await?, project_name)
+                        .await?;
+                select_project_id_query.get("project_id")
             }
             _ => {
                 eprintln!("Error while processing metadata insertion: {}", err);
                 process::exit(0x0100)
             }
         },
-    }
+    };
 
-    Ok(())
+    Ok(project_id)
 }
