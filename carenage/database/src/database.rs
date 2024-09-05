@@ -291,7 +291,7 @@ pub async fn get_project_id(
 ) -> Result<PgRow, sqlx::Error> {
     let mut connection = database_connection.detach();
 
-    let formatted_query = "SELECT project_id FROM PROJECTS WHERE name = ($1)";
+    let formatted_query = "SELECT id FROM PROJECTS WHERE name = ($1)";
 
     let project_id = sqlx::query(formatted_query)
         .bind(project_name)

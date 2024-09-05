@@ -5,7 +5,7 @@ use database::database::{
     insert_dimension_table_metadata,
 };
 use database::timestamp::{Timestamp, UnixFlag};
-use serde_json::json;
+use serde_json::{json, Value};
 use sqlx::error::ErrorKind;
 use sqlx::postgres::PgRow;
 use sqlx::types::uuid;
@@ -36,6 +36,113 @@ impl DaemonArgs {
     }
 }
 
+pub trait Create {
+    fn set_name(&self) -> String;
+    fn set_start_date(&self, start_timestamp: Timestamp) -> Timestamp;
+    fn serialize(&self, start_timestamp: Timestamp) -> Value;
+}
+
+trait Insert {
+    async fn insert(
+        &self,
+        start_timestamp: Timestamp,
+    ) -> Result<Vec<PgRow>, Box<dyn std::error::Error>>;
+    fn get_id(&self, rows: Vec<PgRow>) -> uuid::Uuid;
+}
+
+pub enum CarenageRow {
+    Project,
+    Workflow,
+    Pipeline,
+    Job,
+    Run,
+    Task,
+}
+
+impl CarenageRow {
+    fn table_name(&self) -> &str {
+        match self {
+            CarenageRow::Project => "projects",
+            CarenageRow::Workflow => "workflows",
+            CarenageRow::Pipeline => "pipelines",
+            CarenageRow::Job => "jobs",
+            CarenageRow::Run => "runs",
+            CarenageRow::Task => "tasks",
+        }
+    }
+}
+
+impl Create for CarenageRow {
+    fn set_name(&self) -> String {
+        let gitlab_vars = GitlabVariables::parse_env_variables()
+            .expect("Gitlab variables should be available to parse");
+        let row_name: String = match self {
+            CarenageRow::Project => gitlab_vars.project_path.to_string(),
+            CarenageRow::Workflow => format!("workflow_{}", gitlab_vars.project_path),
+            CarenageRow::Pipeline => gitlab_vars.pipeline_name,
+            CarenageRow::Job => gitlab_vars.job_name,
+            CarenageRow::Run => format!("run_{}", gitlab_vars.job_name),
+            CarenageRow::Task => gitlab_vars.job_stage,
+        };
+        row_name
+    }
+
+    fn set_start_date(&self, start_timestamp: Timestamp) -> Timestamp {
+        let gitlab_vars = GitlabVariables::parse_env_variables()
+            .expect("Gitlab variables should be available to parse");
+        let start_date: Timestamp = match self {
+            CarenageRow::Project => start_timestamp,
+            CarenageRow::Workflow => gitlab_vars.pipeline_created_at,
+            CarenageRow::Pipeline => start_timestamp,
+            CarenageRow::Job => gitlab_vars.job_started_at,
+            CarenageRow::Run => start_timestamp,
+            CarenageRow::Task => start_timestamp,
+        };
+
+        start_date
+    }
+
+    fn serialize(&self, start_timestamp: Timestamp) -> Value {
+        let name = self.set_name();
+        let start_date = self.set_start_date(start_timestamp);
+        json!({
+             "name": name,
+             "start_date": start_date.to_string()
+        })
+    }
+}
+
+impl Insert for CarenageRow {
+    async fn insert(
+        &self,
+        start_timestamp: Timestamp,
+    ) -> Result<Vec<PgRow>, Box<dyn std::error::Error>> {
+        let project_root_path = std::env::current_dir().unwrap().join("..");
+        let config = Config::check_configuration(&project_root_path)?;
+        let db_pool = get_db_connection_pool(config.database_url).await?;
+        let rows: Vec<PgRow> = match self {
+            CarenageRow::Project
+            | CarenageRow::Workflow
+            | CarenageRow::Pipeline
+            | CarenageRow::Job
+            | CarenageRow::Run
+            | CarenageRow::Task => {
+                insert_dimension_table_metadata(
+                    db_pool.acquire().await?,
+                    self.table_name(),
+                    self.serialize(start_timestamp),
+                )
+                .await?
+            }
+        };
+        Ok(rows)
+    }
+
+    fn get_id(&self, rows: Vec<PgRow>) -> uuid::Uuid {
+        rows[0].get("id")
+    }
+}
+
 pub async fn insert_project_metadata(
     gitlab_vars: GitlabVariables,
     start_timestamp: Timestamp,
@@ -43,64 +150,42 @@ pub async fn insert_project_metadata(
     let project_root_path = std::env::current_dir().unwrap().join("..");
     let config = Config::check_configuration(&project_root_path)?;
     let db_pool = get_db_connection_pool(config.database_url).await?;
-    let project_data = json!({
-        "name": gitlab_vars.project_path,
-        "start_date": start_timestamp.to_string(),
-    });
 
-    let insert_project_metadata_query =
-        insert_dimension_table_metadata(db_pool.acquire().await?, "projects", project_data).await;
+    let insert_project_metadata_query = insert_dimension_table_metadata(
+        db_pool.acquire().await?,
+        CarenageRow::Project.table_name(),
+        CarenageRow::Project.serialize(start_timestamp),
+    )
+    .await;
     let project_id = get_project_id(
         insert_project_metadata_query,
         gitlab_vars.project_path.clone(),
     )
     .await?;
 
-    let workflow_name = format!("workflow_{}", gitlab_vars.project_path);
-    let workflow_data = json!({
-    "name": workflow_name,
-    "start_date": gitlab_vars.pipeline_created_at.to_string(),
-    });
-    let workflow_rows =
-        insert_dimension_table_metadata(db_pool.acquire().await?, "workflows", workflow_data)
-            .await?;
-    let workflow_id = workflow_rows[0].get("workflow_id");
+    let workflow_rows = CarenageRow::Workflow.insert(start_timestamp).await?;
+    let workflow_id = CarenageRow::Workflow.get_id(workflow_rows);
 
-    let pipeline_data = json!({
-    "name": gitlab_vars.pipeline_name,
-    "start_date": start_timestamp.to_string(),
-    });
-    let pipeline_rows =
-        insert_dimension_table_metadata(db_pool.acquire().await?, "pipelines", pipeline_data)
-            .await?;
-    let pipeline_id: uuid::Uuid = pipeline_rows[0].get("pipeline_id");
+    let pipeline_rows = CarenageRow::Pipeline.insert(start_timestamp).await?;
+    let pipeline_id = CarenageRow::Pipeline.get_id(pipeline_rows);
 
-    let job_data = json!({
-    "name": gitlab_vars.job_name.to_string(),
-    "start_date": gitlab_vars.job_started_at.to_string(),
-    });
-    let job_rows =
-        insert_dimension_table_metadata(db_pool.acquire().await?, "jobs", job_data).await?;
-    let job_id: uuid::Uuid = job_rows[0].get("job_id");
+    let job_rows = CarenageRow::Job.insert(start_timestamp).await?;
+    let job_id = CarenageRow::Job.get_id(job_rows);
 
-    let run_name = format!("run_{}", gitlab_vars.job_name);
-    let run_data = json!({
-    "name": run_name,
-    "start_date": start_timestamp.to_string()
-    });
-    let run_rows =
-        insert_dimension_table_metadata(db_pool.acquire().await?, "runs", run_data).await?;
-    let run_id: uuid::Uuid = run_rows[0].get("run_id");
+    let run_rows = CarenageRow::Run.insert(start_timestamp).await?;
+    let run_id = CarenageRow::Run.get_id(run_rows);
 
-    let task_data = json!({
-    "name": gitlab_vars.job_stage.to_string(),
-    "start_date": start_timestamp.to_string()
-    });
-    let task_rows = 
-        insert_dimension_table_metadata(db_pool.acquire().await?, "tasks", task_data).await?;
-    let task_id: uuid::Uuid = task_rows[0].get("task_id");
+    let task_rows = CarenageRow::Task.insert(start_timestamp).await?;
+    let task_id = CarenageRow::Task.get_id(task_rows);
 
-    let id_vector: Vec<uuid::Uuid> = vec![project_id, workflow_id, pipeline_id, job_id, run_id, task_id];
+    let id_vector: Vec<uuid::Uuid> = vec![
+        project_id,
+        workflow_id,
+        pipeline_id,
+        job_id,
+        run_id,
+        task_id,
+    ];
     Ok(id_vector)
 }
 
@@ -161,7 +246,7 @@ async fn get_project_id(
     let project_id: uuid::Uuid = match insert_attempt {
         Ok(project_rows) => {
             println!("Inserted project metadata into database.",);
-            project_rows[0].get("project_id")
+            project_rows[0].get("id")
         }
         Err(err) => match err
             .as_database_error()
@@ -176,7 +261,7 @@ async fn get_project_id(
                 let select_project_id_query =
                     database::database::get_project_id(db_pool.acquire().await?, project_name)
                         .await?;
-                select_project_id_query.get("project_id")
+                select_project_id_query.get("id")
             }
             _ => {
                 eprintln!("Error while processing metadata insertion: {}", err);
