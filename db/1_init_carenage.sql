@@ -1,61 +1,61 @@
 CREATE TABLE projects (
-  project_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) UNIQUE,
   start_date TIMESTAMPTZ,
   stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE repositories (
-  repository_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
   start_date TIMESTAMPTZ,
   stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE workflows (
-  workflow_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
   start_date TIMESTAMPTZ,
   stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE pipelines (
-  pipeline_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
   start_date TIMESTAMPTZ,
   stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE runs (
-  run_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
   start_date TIMESTAMPTZ,
   stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE jobs (
-  job_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
   start_date TIMESTAMPTZ,
   stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE tasks (
-  task_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
   start_date TIMESTAMPTZ,
   stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE containers (
-  container_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
   start_date TIMESTAMPTZ,
   stop_date TIMESTAMPTZ
 );
 
 CREATE TABLE processes (
-  process_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   container_id uuid REFERENCES containers(container_id),
   exe VARCHAR(255),
   cmdline TEXT,
@@ -65,14 +65,14 @@ CREATE TABLE processes (
 );
 
 CREATE TABLE devices (
-  device_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255),
   lifetime INTEGER,
   location CHARACTER(3)
 );
 
 CREATE TABLE components (
-  component_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   device_id uuid REFERENCES devices(device_id),
   name VARCHAR(255),
   model VARCHAR(255),
@@ -80,7 +80,7 @@ CREATE TABLE components (
 );
 
 CREATE TABLE component_characteristic (
-  component_id uuid REFERENCES components(component_id),
+  id uuid REFERENCES components(component_id),
   name VARCHAR(255),
   value VARCHAR(255)
 );
