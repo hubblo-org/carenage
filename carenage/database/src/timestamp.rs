@@ -8,11 +8,11 @@ pub enum UnixFlag {
     Unset,
 }
 
-impl UnixFlag {
-    pub fn from_bool(unix_bool: bool) -> UnixFlag {
-        match unix_bool {
-            true => UnixFlag::Set,
-            false => UnixFlag::Unset
+impl From<bool> for UnixFlag {
+    fn from(b: bool) -> Self {
+        match b {
+            true => Self::Set,
+            false => Self::Unset
         }
     }
 }

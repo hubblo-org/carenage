@@ -25,7 +25,7 @@ impl DaemonArgs {
         let time_step: u64 = args[1].parse()?;
         let start_time_str = args[2].to_string();
         let is_unix_set: bool = args[3].parse()?;
-        let unix_flag = UnixFlag::from_bool(is_unix_set);
+        let unix_flag: UnixFlag = is_unix_set.into();
         let start_timestamp = Timestamp::parse_str(start_time_str, unix_flag);
 
         Ok(DaemonArgs {

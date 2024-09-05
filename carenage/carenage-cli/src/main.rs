@@ -11,7 +11,7 @@ fn main() {
     match &cli.event {
         Some(cli::Events::Start(args)) => {
 
-            let unix_flag = UnixFlag::from_bool(cli.unix); 
+            let unix_flag: UnixFlag = cli.unix.into(); 
 
             let project_root_path = std::env::current_dir().unwrap().join("..");
             let config_check = Config::check_configuration(&project_root_path);
@@ -42,7 +42,7 @@ fn main() {
                 .expect("Failed to save child process PID in file.");
         }
         Some(cli::Events::Stop) => {
-            let unix_flag = UnixFlag::from_bool(cli.unix); 
+            let unix_flag: UnixFlag = cli.unix.into(); 
             let stop_timestamp = timestamp::Timestamp::new(unix_flag);
             let system = System::new_all();
 
