@@ -231,8 +231,8 @@ pub async fn insert_device_metadata(
         .fetch_all(&mut connection)
         .await?;
 
-    let device_id: uuid::Uuid = device_rows[0].get("device_id");
-    let formatted_query = "INSERT INTO components (device_id, name, model, manufacturer) VALUES ($1, $2, $3, $4) RETURNING component_id";
+    let device_id: uuid::Uuid = device_rows[0].get("id");
+    let formatted_query = "INSERT INTO components (device_id, name, model, manufacturer) VALUES ($1, $2, $3, $4) RETURNING id";
     for component in components {
         let insert_component_data_query = sqlx::query(formatted_query)
             .bind(device_id)
@@ -242,7 +242,7 @@ pub async fn insert_device_metadata(
             .fetch_one(&mut connection)
             .await?;
 
-        let component_id: uuid::Uuid = insert_component_data_query.get("component_id");
+        let component_id: uuid::Uuid = insert_component_data_query.get("id");
 
         let component_characteristics = component["characteristics"]
             .as_array()

@@ -56,7 +56,7 @@ CREATE TABLE containers (
 
 CREATE TABLE processes (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  container_id uuid REFERENCES containers(container_id),
+  container_id uuid REFERENCES containers(id),
   exe VARCHAR(255),
   cmdline TEXT,
   state VARCHAR(255),
@@ -73,14 +73,14 @@ CREATE TABLE devices (
 
 CREATE TABLE components (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  device_id uuid REFERENCES devices(device_id),
+  device_id uuid REFERENCES devices(id),
   name VARCHAR(255),
   model VARCHAR(255),
   manufacturer VARCHAR(255)
 );
 
 CREATE TABLE component_characteristic (
-  id uuid REFERENCES components(component_id),
+  component_id uuid REFERENCES components(id),
   name VARCHAR(255),
   value VARCHAR(255)
 );
@@ -89,15 +89,15 @@ CREATE TYPE event_type AS ENUM ('regular', 'custom', 'start', 'stop');
 
 CREATE TABLE events (
   timestamp TIMESTAMPTZ,
-  process_id uuid REFERENCES processes(process_id),
-  task_id uuid REFERENCES tasks(task_id),
-  job_id uuid REFERENCES jobs(job_id),
-  run_id uuid REFERENCES runs(run_id),
-  pipeline_id uuid REFERENCES pipelines(pipeline_id),
-  workflow_id uuid REFERENCES workflows(workflow_id),
-  repository_id uuid REFERENCES repositories(repository_id),
-  project_id uuid REFERENCES projects(project_id),
-  device_id uuid REFERENCES devices(device_id),
+  process_id uuid REFERENCES processes(id),
+  task_id uuid REFERENCES tasks(id),
+  job_id uuid REFERENCES jobs(id),
+  run_id uuid REFERENCES runs(id),
+  pipeline_id uuid REFERENCES pipelines(id),
+  workflow_id uuid REFERENCES workflows(id),
+  repository_id uuid REFERENCES repositories(id),
+  project_id uuid REFERENCES projects(id),
+  device_id uuid REFERENCES devices(id),
   event_type event_type,
   user_label TEXT,
   CPU_time_percent FLOAT,
