@@ -184,25 +184,18 @@ pub async fn insert_process_metadata(
         .expect("Unable to read timestamp.")
         .as_str()
         .expect("Unable to read string");
-    let process_stop_date = process_data
-        .get("stop_date")
-        .expect("Unable to read timestamp.")
-        .as_str()
-        .expect("Unable to read string");
 
     let start_timestamptz = to_datetime_local(process_start_date);
-    let stop_timestamptz = to_datetime_local(process_stop_date);
 
     let mut connection = database_connection.detach();
 
-    let insert_query = "INSERT INTO processes (exe, cmdline, state, start_date, stop_date) VALUES ($1, $2, $3, $4, $5) RETURNING *";
+    let insert_query = "INSERT INTO processes (exe, cmdline, state, start_date) VALUES ($1, $2, $3, $4) RETURNING *";
 
     let process_rows = sqlx::query(insert_query)
         .bind(process_exe)
         .bind(process_cmdline)
         .bind(process_state)
         .bind(start_timestamptz)
-        .bind(stop_timestamptz)
         .fetch_all(&mut connection)
         .await?;
 
@@ -379,7 +372,6 @@ mod tests {
         pool: PgPool,
     ) -> sqlx::Result<()> {
         let now_timestamp = Local::now();
-        let later_timestamp = Local::now() + Duration::weeks(4);
 
         let process_metadata = json!({
             "exe": "/snap/firefox/4336/usr/lib/firefox/firefox",
@@ -387,7 +379,6 @@ mod tests {
         usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab",
             "state": "running",
             "start_date": now_timestamp.to_string(),
-            "stop_date": later_timestamp.to_string(),
         });
 
         let db_connection = pool.acquire().await?;
