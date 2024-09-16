@@ -4,8 +4,8 @@ use database::database::{
     format_hardware_data, get_db_connection_pool, insert_device_metadata,
     insert_dimension_table_metadata,
 };
+use database::tables::{CarenageRow, Create, Insert};
 use database::timestamp::{Timestamp, UnixFlag};
-use database::tables::{Insert, Create, CarenageRow};
 use sqlx::error::ErrorKind;
 use sqlx::postgres::PgRow;
 use sqlx::types::uuid;
@@ -151,10 +151,7 @@ async fn get_project_id(
                     "Metadata already present in database, not a project initialization: {}",
                     err
                 );
-                let select_project_id_query =
-                    database::database::get_project_id(db_pool.acquire().await?, project_name)
-                        .await?;
-                select_project_id_query.get("id")
+                database::database::get_project_id(db_pool.acquire().await?, project_name).await?
             }
             _ => {
                 eprintln!("Error while processing metadata insertion: {}", err);

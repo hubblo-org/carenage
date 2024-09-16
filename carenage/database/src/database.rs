@@ -259,19 +259,19 @@ pub async fn insert_device_metadata(
 pub async fn update_stop_date(
     database_connection: PoolConnection<Postgres>,
     table_name: &str,
-    project_name: String,
+    row_id: uuid::Uuid,
     stop_date: &str,
 ) -> Result<(), sqlx::Error> {
     let mut connection = database_connection.detach();
 
     let stop_timestamptz = to_datetime_local(stop_date);
     let formatted_query = format!(
-        "UPDATE {} SET stop_date = ($1) WHERE name = ($2)",
+        "UPDATE {} SET stop_date = ($1) WHERE id = ($2)",
         table_name
     );
     sqlx::query(&formatted_query)
         .bind(stop_timestamptz)
-        .bind(project_name)
+        .bind(row_id)
         .execute(&mut connection)
         .await?;
 
@@ -281,16 +281,16 @@ pub async fn update_stop_date(
 pub async fn get_project_id(
     database_connection: PoolConnection<Postgres>,
     project_name: String,
-) -> Result<PgRow, sqlx::Error> {
+) -> Result<uuid::Uuid, sqlx::Error> {
     let mut connection = database_connection.detach();
 
     let formatted_query = "SELECT id FROM PROJECTS WHERE name = ($1)";
 
-    let project_id = sqlx::query(formatted_query)
+    let project_row = sqlx::query(formatted_query)
         .bind(project_name)
         .fetch_one(&mut connection)
         .await?;
-    Ok(project_id)
+    Ok(project_row.get("id"))
 }
 
 #[cfg(test)]
@@ -513,14 +513,16 @@ mod tests {
         });
 
         let _insert_query =
-            insert_dimension_table_metadata(pool.acquire().await?, "projects", project_metadata)
+            insert_dimension_table_metadata(pool.acquire().await?, "projects", project_metadata.clone())
                 .await;
+
+        let project_id = get_project_id(pool.acquire().await?, "my_web_application".to_string()).await?;
 
         let stop_date_timestamp = Local::now().to_string();
         let update_query = update_stop_date(
             pool.acquire().await?,
             "projects",
-            "my_web_application".to_string(),
+            project_id,
             stop_date_timestamp.as_str(),
         )
         .await;
@@ -580,10 +582,6 @@ mod tests {
         let project_id_query = get_project_id(db_connection, project_name.to_string()).await;
 
         assert!(project_id_query.is_ok());
-
-        let project_row = project_id_query.unwrap();
-
-        assert_eq!(project_row.len(), 1);
 
         Ok(())
     }
