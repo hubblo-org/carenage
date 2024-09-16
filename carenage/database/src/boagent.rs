@@ -1,11 +1,10 @@
-use chrono::Local;
 use crate::timestamp::Timestamp;
+use chrono::Local;
 use dotenv::{from_path, var};
 use reqwest::{Client, Response};
 use serde_json::{Error, Value};
 use std::fmt::{Display, Formatter};
 use std::path::Path;
-
 
 #[derive(Clone, Copy)]
 pub enum HardwareData {
@@ -98,6 +97,34 @@ pub async fn deserialize_boagent_json(boagent_response: Response) -> Result<Valu
     let deserialized_boagent_json = serde_json::from_value(boagent_response.json().await.unwrap())?;
 
     Ok(deserialized_boagent_json)
+}
+
+pub fn get_processes_ids(deseriliazed_boagent_response: Value) -> Result<Vec<u64>, Error> {
+    // Need to get last measured processes by Scaphandre: processes during the execution of
+    // carenaged and the associated Scaphandre measurements might change, depending on the
+    // configuration set for Scaphandre (ten most energy intensive processes, or something else).
+    // By getting the last item in raw_data from Scaphandre, those processes will be the last
+    // measured by Scaphandre.
+    let last_timestamp = deseriliazed_boagent_response["raw_data"]["power_data"]["raw_data"]
+        .as_array()
+        .expect("Data from Scaphandre should be parsable.")
+        .last()
+        .unwrap();
+    let processes = last_timestamp["consumers"]
+        .as_array()
+        .expect("Processes should be parsable from Scaphandre.")
+        .iter();
+
+    let processes_ids = processes
+        .map(|process| {
+            process
+                .get("pid")
+                .expect("Consumer should have a pid key.")
+                .as_u64()
+                .expect("Process ID returned from Scaphandre should be parsable.")
+        })
+        .collect();
+    Ok(processes_ids)
 }
 
 #[cfg(test)]
@@ -298,4 +325,51 @@ mod tests {
         assert!(deserialized_json_result.as_ref().unwrap()["raw_data"]["power_data"].is_object());
     }
 
+    #[sqlx::test]
+    async fn it_gets_all_process_ids_for_processes_available_from_boagent_response() {
+        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
+        let now_timestamp_minus_one_minute =
+            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
+
+        let mut boagent_server = Server::new_async().await;
+
+        let url = boagent_server.url();
+
+        let _mock = boagent_server
+            .mock("GET", "/query")
+            .match_query(Matcher::AllOf(vec![
+                Matcher::UrlEncoded(
+                    "start_time".to_string(),
+                    now_timestamp_minus_one_minute.to_string(),
+                ),
+                Matcher::UrlEncoded("end_time".to_string(), now_timestamp.to_string()),
+                Matcher::UrlEncoded("verbose".to_string(), "true".to_string()),
+                Matcher::UrlEncoded("location".to_string(), "FRA".to_string()),
+                Matcher::UrlEncoded("measure_power".to_string(), "true".to_string()),
+                Matcher::UrlEncoded("lifetime".to_string(), "5".to_string()),
+                Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
+            ]))
+            .with_status(200)
+            .with_body_from_file("../mocks/boagent_response.json")
+            .create_async()
+            .await;
+
+        let response = query_boagent(
+            url,
+            now_timestamp_minus_one_minute,
+            now_timestamp,
+            HardwareData::Inspect,
+            "FRA".to_string(),
+            5,
+        )
+        .await
+        .unwrap();
+
+        let deserialized_json_result = deserialize_boagent_json(response).await.unwrap();
+
+        let processes_ids = get_processes_ids(deserialized_json_result);
+
+        assert!(processes_ids.is_ok());
+        assert_eq!(processes_ids.unwrap().len(), 10);
+    }
 }
