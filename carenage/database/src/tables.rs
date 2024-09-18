@@ -1,11 +1,12 @@
-use crate::timestamp::Timestamp;
-use crate::ci::GitlabVariables;
 use crate::boagent::Config;
-use crate::database::{get_db_connection_pool, insert_dimension_table_metadata};
+use crate::ci::GitlabVariables;
+use crate::database::{get_db_connection_pool, get_project_id, insert_dimension_table_metadata};
+use crate::timestamp::Timestamp;
+use serde_json::{json, Value};
+use sqlx::error::ErrorKind;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
-use serde_json::{json, Value};
-
+use std::process;
 
 pub trait Create {
     fn set_name(&self) -> String;
@@ -14,11 +15,15 @@ pub trait Create {
 }
 
 pub trait Insert {
-     async fn insert(
+    async fn insert(
         &self,
         start_timestamp: Timestamp,
-    ) -> Result<Vec<PgRow>, Box<dyn std::error::Error>>;
-    fn get_id(&self, rows: Vec<PgRow>) -> uuid::Uuid;
+    ) -> Result<InsertAttempt, Box<dyn std::error::Error>>;
+    async fn get_id(
+        &self,
+        insert_attempt: InsertAttempt,
+        project_name: Option<String>,
+    ) -> Result<uuid::Uuid, Box<dyn std::error::Error>>;
 }
 
 pub enum CarenageRow {
@@ -28,6 +33,11 @@ pub enum CarenageRow {
     Job,
     Run,
     Task,
+}
+
+pub enum InsertAttempt {
+    Success(Vec<PgRow>),
+    Pending(Result<Vec<PgRow>, sqlx::Error>),
 }
 
 impl CarenageRow {
@@ -87,29 +97,70 @@ impl Insert for CarenageRow {
     async fn insert(
         &self,
         start_timestamp: Timestamp,
-    ) -> Result<Vec<PgRow>, Box<dyn std::error::Error>> {
+    ) -> Result<InsertAttempt, Box<dyn std::error::Error>> {
         let project_root_path = std::env::current_dir().unwrap().join("..");
         let config = Config::check_configuration(&project_root_path)?;
         let db_pool = get_db_connection_pool(config.database_url).await?;
-        let rows: Vec<PgRow> = match self {
-            CarenageRow::Project
-            | CarenageRow::Workflow
-            | CarenageRow::Pipeline
-            | CarenageRow::Job
-            | CarenageRow::Run
-            | CarenageRow::Task => {
+        let rows: InsertAttempt = match self {
+            CarenageRow::Project => InsertAttempt::Pending(
                 insert_dimension_table_metadata(
                     db_pool.acquire().await?,
                     self.table_name(),
                     self.serialize(start_timestamp),
                 )
-                .await?
-            }
+                .await,
+            ),
+            CarenageRow::Workflow
+            | CarenageRow::Pipeline
+            | CarenageRow::Job
+            | CarenageRow::Run
+            | CarenageRow::Task => InsertAttempt::Success(
+                insert_dimension_table_metadata(
+                    db_pool.acquire().await?,
+                    self.table_name(),
+                    self.serialize(start_timestamp),
+                )
+                .await?,
+            ),
         };
         Ok(rows)
     }
 
-    fn get_id(&self, rows: Vec<PgRow>) -> uuid::Uuid {
-        rows[0].get("id")
+    async fn get_id(
+        &self,
+        insert_attempt: InsertAttempt,
+        row_name: Option<String>,
+    ) -> Result<uuid::Uuid, Box<dyn std::error::Error>> {
+        let id: uuid::Uuid = match insert_attempt {
+            InsertAttempt::Pending(Ok(rows)) => {
+                println!("Inserted {} metadata into database.", self.table_name());
+                rows[0].get("id")
+            }
+            InsertAttempt::Pending(Err(err)) => match err
+                .as_database_error()
+                .expect("It should be a DatabaseError")
+                .kind()
+            {
+                ErrorKind::UniqueViolation => {
+                    println!(
+                        "Metadata already present in database, not a project initialization: {}",
+                        err
+                    );
+                    let project_root_path = std::env::current_dir().unwrap().join("..");
+                    let config = Config::check_configuration(&project_root_path)?;
+                    let db_pool = get_db_connection_pool(config.database_url).await?;
+                    get_project_id(db_pool.acquire().await?, row_name.unwrap()).await?
+                }
+                _ => {
+                    eprintln!("Error while processing metadata insertion: {}", err);
+                    process::exit(0x0100)
+                }
+            },
+            InsertAttempt::Success(rows) => {
+                println!("Inserted {} metadata into database.", self.table_name());
+                rows[0].get("id")
+            }
+        };
+        Ok(id)
     }
 }

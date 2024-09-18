@@ -40,36 +40,24 @@ pub async fn insert_project_metadata(
     gitlab_vars: GitlabVariables,
     start_timestamp: Timestamp,
 ) -> Result<Vec<uuid::Uuid>, Box<dyn std::error::Error>> {
-    let project_root_path = std::env::current_dir().unwrap().join("..");
-    let config = Config::check_configuration(&project_root_path)?;
-    let db_pool = get_db_connection_pool(config.database_url).await?;
 
-    let insert_project_metadata_query = insert_dimension_table_metadata(
-        db_pool.acquire().await?,
-        CarenageRow::Project.table_name(),
-        CarenageRow::Project.serialize(start_timestamp),
-    )
-    .await;
-    let project_id = get_project_id(
-        insert_project_metadata_query,
-        gitlab_vars.project_path.clone(),
-    )
-    .await?;
+    let project_rows = CarenageRow::Project.insert(start_timestamp).await?;
+    let project_id = CarenageRow::Project.get_id(project_rows, Some(gitlab_vars.project_path.clone())).await?;
 
     let workflow_rows = CarenageRow::Workflow.insert(start_timestamp).await?;
-    let workflow_id = CarenageRow::Workflow.get_id(workflow_rows);
+    let workflow_id = CarenageRow::Workflow.get_id(workflow_rows, None).await?;
 
     let pipeline_rows = CarenageRow::Pipeline.insert(start_timestamp).await?;
-    let pipeline_id = CarenageRow::Pipeline.get_id(pipeline_rows);
+    let pipeline_id = CarenageRow::Pipeline.get_id(pipeline_rows, None).await?;
 
     let job_rows = CarenageRow::Job.insert(start_timestamp).await?;
-    let job_id = CarenageRow::Job.get_id(job_rows);
+    let job_id = CarenageRow::Job.get_id(job_rows, None).await?;
 
     let run_rows = CarenageRow::Run.insert(start_timestamp).await?;
-    let run_id = CarenageRow::Run.get_id(run_rows);
+    let run_id = CarenageRow::Run.get_id(run_rows, None).await?;
 
     let task_rows = CarenageRow::Task.insert(start_timestamp).await?;
-    let task_id = CarenageRow::Task.get_id(task_rows);
+    let task_id = CarenageRow::Task.get_id(task_rows, None).await?;
 
     let id_vector: Vec<uuid::Uuid> = vec![
         project_id,
@@ -126,39 +114,4 @@ pub async fn query_and_insert_data(
         }
     };
     Ok(())
-}
-
-async fn get_project_id(
-    insert_attempt: Result<Vec<PgRow>, sqlx::Error>,
-    project_name: String,
-) -> Result<uuid::Uuid, Box<dyn std::error::Error>> {
-    let project_root_path = std::env::current_dir().unwrap().join("..");
-    let config = Config::check_configuration(&project_root_path)?;
-    let db_pool = get_db_connection_pool(config.database_url).await?;
-
-    let project_id: uuid::Uuid = match insert_attempt {
-        Ok(project_rows) => {
-            println!("Inserted project metadata into database.",);
-            project_rows[0].get("id")
-        }
-        Err(err) => match err
-            .as_database_error()
-            .expect("It should be a DatabaseError")
-            .kind()
-        {
-            ErrorKind::UniqueViolation => {
-                println!(
-                    "Metadata already present in database, not a project initialization: {}",
-                    err
-                );
-                database::database::get_project_id(db_pool.acquire().await?, project_name).await?
-            }
-            _ => {
-                eprintln!("Error while processing metadata insertion: {}", err);
-                process::exit(0x0100)
-            }
-        },
-    };
-
-    Ok(project_id)
 }
