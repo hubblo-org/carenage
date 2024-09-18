@@ -1,4 +1,5 @@
 use chrono::{DateTime, Local};
+use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::time::SystemTime;
 
@@ -29,7 +30,7 @@ impl Display for UnixFlag {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub enum Timestamp {
     UnixTimestamp(Option<u64>),
     ISO8601Timestamp(Option<DateTime<Local>>),
