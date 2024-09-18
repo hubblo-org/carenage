@@ -1,3 +1,4 @@
+use crate::timestamp::Timestamp;
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use serde_json::value::Number;
@@ -9,6 +10,7 @@ use sqlx::Row;
 use sqlx::{PgPool, Postgres};
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
+// https://serde.rs/enum-representations.html#untagged
 #[serde(untagged)]
 pub enum CharacteristicValue {
     StringValue(String),
@@ -34,6 +36,14 @@ struct Component {
 struct ComponentCharacteristic {
     name: String,
     value: CharacteristicValue,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Process {
+    exe: String,
+    cmdline: String,
+    state: String,
+    start_date: String,
 }
 
 pub async fn get_db_connection_pool(database_url: String) -> Result<PgPool, sqlx::Error> {
@@ -142,6 +152,31 @@ pub fn format_hardware_data(
 
     let formatted_hardware_data = json!({"device": device, "components": components});
     Ok(formatted_hardware_data)
+}
+
+pub fn format_process_metadata(
+    deserialized_boagent_response: Value,
+    pid: u64,
+    start_timestamp: Timestamp,
+) -> Result<Value, Error> {
+    let last_timestamp = deserialized_boagent_response["raw_data"]["power_data"]["raw_data"]
+        .as_array()
+        .expect("Boagent response should be parsable")
+        .last()
+        .unwrap();
+
+    let processes = last_timestamp["consumers"].as_array().unwrap().iter();
+
+    let process: Vec<Process> = processes
+        .filter(|process| process["pid"] == pid)
+        .map(|process| Process {
+            exe: process["exe"].to_string(),
+            cmdline: process["cmdline"].to_string(),
+            state: "running".to_string(),
+            start_date: start_timestamp.to_string(),
+        }).collect();
+
+    Ok(json!(process[0]))
 }
 
 pub async fn insert_dimension_table_metadata(
@@ -265,10 +300,7 @@ pub async fn update_stop_date(
     let mut connection = database_connection.detach();
 
     let stop_timestamptz = to_datetime_local(stop_date);
-    let formatted_query = format!(
-        "UPDATE {} SET stop_date = ($1) WHERE id = ($2)",
-        table_name
-    );
+    let formatted_query = format!("UPDATE {} SET stop_date = ($1) WHERE id = ($2)", table_name);
     sqlx::query(&formatted_query)
         .bind(stop_timestamptz)
         .bind(row_id)
@@ -504,6 +536,63 @@ mod tests {
     }
 
     #[sqlx::test(migrations = "../../db/")]
+    async fn it_formats_process_data_from_boagent_response_with_queried_pid(pool: PgPool) -> sqlx::Result<()> {
+        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
+        let now_timestamp_minus_one_minute =
+            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
+
+        let mut boagent_server = Server::new_async().await;
+
+        let url = boagent_server.url();
+
+        let _mock = boagent_server
+            .mock("GET", "/query")
+            .match_query(Matcher::AllOf(vec![
+                Matcher::UrlEncoded(
+                    "start_time".to_string(),
+                    now_timestamp_minus_one_minute.to_string(),
+                ),
+                Matcher::UrlEncoded("end_time".to_string(), now_timestamp.to_string()),
+                Matcher::UrlEncoded("verbose".to_string(), "true".to_string()),
+                Matcher::UrlEncoded("location".to_string(), "FRA".to_string()),
+                Matcher::UrlEncoded("measure_power".to_string(), "true".to_string()),
+                Matcher::UrlEncoded("lifetime".to_string(), "5".to_string()),
+                Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
+            ]))
+            .with_status(200)
+            .with_body_from_file(
+                "/home/repair/gitlab/carenage/carenage/mocks/boagent_response.json",
+            )
+            .create_async()
+            .await;
+
+        let response = query_boagent(
+            url,
+            now_timestamp_minus_one_minute,
+            now_timestamp,
+            HardwareData::Inspect,
+            "FRA".to_string(),
+            5,
+        )
+        .await
+        .unwrap();
+
+        let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
+        let firefox_pid: u64 = 3099;
+
+        let process_metadata =
+            format_process_metadata(deserialized_boagent_response, firefox_pid, now_timestamp);
+
+        assert!(process_metadata.is_ok());
+
+        let insert = insert_process_metadata(pool.acquire().await?, process_metadata.unwrap());
+
+        assert!(insert.await.is_ok());
+        Ok(())
+    }
+
+
+    #[sqlx::test(migrations = "../../db/")]
     async fn it_updates_stop_date_field_in_project_row(pool: PgPool) -> sqlx::Result<()> {
         let now_timestamp = Local::now();
 
@@ -512,11 +601,15 @@ mod tests {
             "start_date": now_timestamp.to_string(),
         });
 
-        let _insert_query =
-            insert_dimension_table_metadata(pool.acquire().await?, "projects", project_metadata.clone())
-                .await;
+        let _insert_query = insert_dimension_table_metadata(
+            pool.acquire().await?,
+            "projects",
+            project_metadata.clone(),
+        )
+        .await;
 
-        let project_id = get_project_id(pool.acquire().await?, "my_web_application".to_string()).await?;
+        let project_id =
+            get_project_id(pool.acquire().await?, "my_web_application".to_string()).await?;
 
         let stop_date_timestamp = Local::now().to_string();
         let update_query = update_stop_date(
