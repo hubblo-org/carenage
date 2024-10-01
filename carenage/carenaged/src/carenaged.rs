@@ -2,14 +2,10 @@ use database::boagent::{deserialize_boagent_json, query_boagent, Config, Hardwar
 use database::ci::GitlabVariables;
 use database::database::{
     format_hardware_data, get_db_connection_pool, insert_device_metadata,
-    insert_dimension_table_metadata,
 };
-use database::tables::{CarenageRow, Create, Insert};
+use database::tables::{CarenageRow, Insert};
 use database::timestamp::{Timestamp, UnixFlag};
-use sqlx::error::ErrorKind;
-use sqlx::postgres::PgRow;
 use sqlx::types::uuid;
-use sqlx::Row;
 use std::env;
 use std::process;
 
