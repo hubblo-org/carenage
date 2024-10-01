@@ -79,6 +79,32 @@ pub async fn query_boagent(
     client.get(base_url).query(&query_parameters).send().await
 }
 
+pub async fn process_embedded_impacts(
+    boagent_url: String,
+    process_id: u64,
+    start_time: Timestamp,
+    end_time: Timestamp,
+    fetch_hardware: HardwareData,
+    location: String,
+    lifetime: i16,
+) -> Result<Response, reqwest::Error> {
+    let query_parameters = vec![
+        ("process_id", process_id.to_string()),
+        ("start_time", start_time.as_query_parameter()),
+        ("end_time", end_time.as_query_parameter()),
+        ("verbose", "true".to_string()),
+        ("location", location.to_string()),
+        ("measure_power", "true".to_string()),
+        ("lifetime", lifetime.to_string()),
+        ("fetch_hardware", fetch_hardware.to_string()),
+    ];
+
+    let client = Client::new();
+    let base_url = format!("{}/process_embedded_impacts", boagent_url);
+
+    client.get(base_url).query(&query_parameters).send().await
+}
+
 pub async fn deserialize_boagent_json(boagent_response: Response) -> Result<Value, Error> {
     let deserialized_boagent_json = serde_json::from_value(boagent_response.json().await.unwrap())?;
 
@@ -95,7 +121,7 @@ pub fn get_processes_ids(deseriliazed_boagent_response: Value) -> Result<Vec<u64
         .as_array()
         .expect("Data from Scaphandre should be parsable.")
         .last()
-        .unwrap();
+        .expect("Last recorded data from Scaphandre should be parsable.");
     let processes = last_timestamp["consumers"]
         .as_array()
         .expect("Processes should be parsable from Scaphandre.")
@@ -121,7 +147,7 @@ mod tests {
     use std::time::SystemTime;
 
     #[sqlx::test]
-    async fn it_queries_boagent_with_success_with_needed_query_paramaters() {
+    async fn it_queries_boagent_with_success_with_needed_query_parameters() {
         let now_timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap()
@@ -357,5 +383,52 @@ mod tests {
 
         assert!(processes_ids.is_ok());
         assert_eq!(processes_ids.unwrap().len(), 10);
+    }
+
+    #[sqlx::test]
+    async fn it_queries_process_embedded_impacts_from_boagent_with_returned_ids() {
+        let pids = [6042, 4163, 171690, 4489, 7281, 7868, 5567, 5365, 810, 14063];
+        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
+        let now_timestamp_minus_one_minute =
+            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
+
+        let mut boagent_server = Server::new_async().await;
+
+        let url = boagent_server.url();
+
+        for pid in pids {
+            let _mock = boagent_server
+                .mock("GET", "/process_embedded_impacts")
+                .match_query(Matcher::AllOf(vec![
+                    Matcher::UrlEncoded("process_id".to_string(), pid.to_string()),
+                    Matcher::UrlEncoded(
+                        "start_time".to_string(),
+                        now_timestamp_minus_one_minute.to_string(),
+                    ),
+                    Matcher::UrlEncoded("end_time".to_string(), now_timestamp.to_string()),
+                    Matcher::UrlEncoded("verbose".to_string(), "true".to_string()),
+                    Matcher::UrlEncoded("location".to_string(), "FRA".to_string()),
+                    Matcher::UrlEncoded("measure_power".to_string(), "true".to_string()),
+                    Matcher::UrlEncoded("lifetime".to_string(), "5".to_string()),
+                    Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
+                ]))
+                .with_status(200)
+                .with_body_from_file("../mocks/process_embedded_impacts.json")
+                .create_async()
+                .await;
+
+            let response = process_embedded_impacts(
+                url.clone(),
+                pid,
+                now_timestamp_minus_one_minute,
+                now_timestamp,
+                HardwareData::Inspect,
+                "FRA".to_string(),
+                5,
+            )
+            .await;
+
+            assert!(response.is_ok())
+        }
     }
 }
