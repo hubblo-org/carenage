@@ -81,7 +81,7 @@ CREATE TABLE component_characteristic (
 CREATE TYPE event_type AS ENUM ('regular', 'custom', 'start', 'stop');
 
 CREATE TABLE events (
-  id UUID DEFAULT gen_random_uuid(),
+  id UUID DEFAULT gen_random_uuid() UNIQUE,
   timestamp TIMESTAMPTZ,
   process_id UUID REFERENCES processes(id),
   task_id UUID REFERENCES tasks(id),
@@ -99,5 +99,5 @@ CREATE TABLE events (
 CREATE TABLE metrics (
   event_id UUID REFERENCES events(id),
   metric VARCHAR(255),
-  value NUMERIC,  
+  value NUMERIC  
 );
