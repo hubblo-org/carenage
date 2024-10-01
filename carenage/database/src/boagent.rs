@@ -63,29 +63,15 @@ pub async fn query_boagent(
     location: String,
     lifetime: i16,
 ) -> Result<Response, reqwest::Error> {
-    let mut query_parameters = vec![];
-
-    match start_time {
-        Timestamp::UnixTimestamp(start_time) => {
-            query_parameters.push(("start_time", start_time.unwrap_or(0).to_string()))
-        }
-        Timestamp::ISO8601Timestamp(start_time) => {
-            query_parameters.push(("start_time", start_time.unwrap_or(Local::now()).to_string()))
-        }
-    }
-    match end_time {
-        Timestamp::UnixTimestamp(end_time) => {
-            query_parameters.push(("end_time", end_time.unwrap_or(0).to_string()))
-        }
-        Timestamp::ISO8601Timestamp(end_time) => {
-            query_parameters.push(("end_time", end_time.unwrap_or(Local::now()).to_string()))
-        }
-    }
-    query_parameters.push(("verbose", "true".to_string()));
-    query_parameters.push(("location", location.to_string()));
-    query_parameters.push(("measure_power", "true".to_string()));
-    query_parameters.push(("lifetime", lifetime.to_string()));
-    query_parameters.push(("fetch_hardware", fetch_hardware.to_string()));
+    let query_parameters = vec![
+        ("start_time", start_time.as_query_parameter()),
+        ("end_time", end_time.as_query_parameter()),
+        ("verbose", "true".to_string()),
+        ("location", location.to_string()),
+        ("measure_power", "true".to_string()),
+        ("lifetime", lifetime.to_string()),
+        ("fetch_hardware", fetch_hardware.to_string()),
+    ];
 
     let client = Client::new();
     let base_url = format!("{}/query", boagent_url);

@@ -13,7 +13,7 @@ impl From<bool> for UnixFlag {
     fn from(b: bool) -> Self {
         match b {
             true => Self::Set,
-            false => Self::Unset
+            false => Self::Unset,
         }
     }
 }
@@ -76,6 +76,13 @@ impl Timestamp {
             )),
         }
     }
+
+    pub fn as_query_parameter(&self) -> String {
+        match self {
+            Timestamp::UnixTimestamp(value) => value.unwrap_or(0).to_string(),
+            Timestamp::ISO8601Timestamp(value) => value.unwrap_or(Local::now()).to_string(),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -95,7 +102,10 @@ mod tests {
         let now_iso8601 = Local::now();
         let iso8601_timestamp_str = now_iso8601.to_string();
         let parsed_string = Timestamp::parse_str(iso8601_timestamp_str, UnixFlag::Unset);
-        assert_eq!(parsed_string, Timestamp::ISO8601Timestamp(Some(now_iso8601)));
+        assert_eq!(
+            parsed_string,
+            Timestamp::ISO8601Timestamp(Some(now_iso8601))
+        );
     }
 
     #[test]
