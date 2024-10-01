@@ -163,9 +163,12 @@ pub fn format_process_metadata(
         .as_array()
         .expect("Boagent response should be parsable")
         .last()
-        .unwrap();
+        .expect("Last data item from Boagent should be parsable.");
 
-    let processes = last_timestamp["consumers"].as_array().unwrap().iter();
+    let processes = last_timestamp["consumers"]
+        .as_array()
+        .expect("Last data item from Boagent should contain information on processes.")
+        .iter();
 
     let process: Vec<Process> = processes
         .filter(|process| process["pid"] == pid)
@@ -174,7 +177,8 @@ pub fn format_process_metadata(
             cmdline: process["cmdline"].to_string(),
             state: "running".to_string(),
             start_date: start_timestamp.to_string(),
-        }).collect();
+        })
+        .collect();
 
     Ok(json!(process[0]))
 }
@@ -370,7 +374,6 @@ mod tests {
 
         let dimension_tables = vec![
             "projects",
-            "repositories",
             "workflows",
             "pipelines",
             "runs",
@@ -536,7 +539,9 @@ mod tests {
     }
 
     #[sqlx::test(migrations = "../../db/")]
-    async fn it_formats_process_data_from_boagent_response_with_queried_pid(pool: PgPool) -> sqlx::Result<()> {
+    async fn it_formats_process_data_from_boagent_response_with_queried_pid(
+        pool: PgPool,
+    ) -> sqlx::Result<()> {
         let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
         let now_timestamp_minus_one_minute =
             Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
@@ -590,7 +595,6 @@ mod tests {
         assert!(insert.await.is_ok());
         Ok(())
     }
-
 
     #[sqlx::test(migrations = "../../db/")]
     async fn it_updates_stop_date_field_in_project_row(pool: PgPool) -> sqlx::Result<()> {
