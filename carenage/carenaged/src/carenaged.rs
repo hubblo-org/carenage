@@ -2,7 +2,7 @@ use database::boagent::{deserialize_boagent_json, query_boagent, Config, Hardwar
 use database::ci::GitlabVariables;
 use database::tables::{CarenageRow, Insert};
 use database::timestamp::{Timestamp, UnixFlag};
-use sqlx::types::uuid;
+use sqlx::types::{uuid, Uuid};
 use std::env;
 
 pub struct DaemonArgs {
@@ -28,10 +28,20 @@ impl DaemonArgs {
     }
 }
 
+#[derive(Copy, Clone)]
+pub struct Ids {
+    pub project_id: Uuid,
+    pub workflow_id: Uuid,
+    pub pipeline_id: Uuid,
+    pub job_id: Uuid,
+    pub run_id: Uuid,
+    pub task_id: Uuid,
+}
+
 pub async fn insert_project_metadata(
     gitlab_vars: GitlabVariables,
     start_timestamp: Timestamp,
-) -> Result<Vec<uuid::Uuid>, Box<dyn std::error::Error>> {
+) -> Result<Ids, Box<dyn std::error::Error>> {
     let project_rows = CarenageRow::Project.insert(start_timestamp, None).await?;
     let project_id = CarenageRow::Project
         .get_id(project_rows, Some(gitlab_vars.project_path.clone()))
@@ -52,6 +62,7 @@ pub async fn insert_project_metadata(
     let task_rows = CarenageRow::Task.insert(start_timestamp, None).await?;
     let task_id = CarenageRow::Task.get_id(task_rows, None).await?;
 
+    /*
     let id_vector: Vec<uuid::Uuid> = vec![
         project_id,
         workflow_id,
@@ -61,15 +72,25 @@ pub async fn insert_project_metadata(
         task_id,
     ];
     Ok(id_vector)
+    */
+    let ids = Ids {
+        project_id,
+        workflow_id,
+        pipeline_id,
+        job_id,
+        run_id,
+        task_id,
+    };
+    Ok(ids)
 }
 
 // Will return device_id on first_query, implement option for fn result
 pub async fn query_and_insert_data(
-    ids: &mut Vec<uuid::Uuid>,
+    ids: Ids,
     start_time: Timestamp,
     unix_flag: UnixFlag,
     fetch_hardware: HardwareData,
-) -> Result<&Vec<uuid::Uuid>, Box<dyn std::error::Error>> {
+) -> Result<Ids, Box<dyn std::error::Error>> {
     let project_root_path = std::env::current_dir().unwrap().join("..");
     let config = Config::check_configuration(&project_root_path)?;
 
@@ -90,8 +111,9 @@ pub async fn query_and_insert_data(
             .insert(start_time, Some(deserialized_boagent_response))
             .await?;
         let device_id = CarenageRow::Device.get_id(insert_device_data, None).await?;
-        ids
-            .push(device_id)
+        //ids.push(device_id)
+        todo!()
+        // TO IMPLEMENT : first insert into events
     } else {
         todo!()
     }
