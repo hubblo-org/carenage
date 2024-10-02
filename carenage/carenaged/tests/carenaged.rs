@@ -76,7 +76,7 @@ async fn it_adds_device_id_to_primary_keys_after_project_metadata_insertion() {
     let mut ids = insert_result.unwrap();
 
     let query = query_and_insert_data(
-        Some(&mut ids),
+        &mut ids,
         now,
         UnixFlag::Unset,
         HardwareData::Inspect,

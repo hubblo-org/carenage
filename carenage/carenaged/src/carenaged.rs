@@ -65,7 +65,7 @@ pub async fn insert_project_metadata(
 
 // Will return device_id on first_query, implement option for fn result
 pub async fn query_and_insert_data(
-    mut ids: Option<&mut Vec<uuid::Uuid>>,
+    ids: &mut Vec<uuid::Uuid>,
     start_time: Timestamp,
     unix_flag: UnixFlag,
     fetch_hardware: HardwareData,
@@ -91,11 +91,9 @@ pub async fn query_and_insert_data(
             .await?;
         let device_id = CarenageRow::Device.get_id(insert_device_data, None).await?;
         ids
-            .as_mut()
-            .expect("Device_id should be added to other primary keys.")
             .push(device_id)
     } else {
         todo!()
     }
-    Ok(ids.expect("Primary keys should be available after database insertion."))
+    Ok(ids)
 }
