@@ -1,6 +1,9 @@
 use crate::boagent::Config;
 use crate::ci::GitlabVariables;
-use crate::database::{get_db_connection_pool, get_project_id, insert_dimension_table_metadata};
+use crate::database::{
+    format_hardware_data, get_db_connection_pool, get_project_id, insert_device_metadata,
+    insert_dimension_table_metadata,
+};
 use crate::timestamp::Timestamp;
 use serde_json::{json, Value};
 use sqlx::error::ErrorKind;
@@ -11,13 +14,18 @@ use std::process;
 pub trait Create {
     fn set_name(&self) -> String;
     fn set_start_date(&self, start_timestamp: Timestamp) -> Timestamp;
-    fn serialize(&self, start_timestamp: Timestamp) -> Value;
+    fn serialize(
+        &self,
+        start_timestamp: Timestamp,
+        deserialized_boagent_response: Option<Value>,
+    ) -> Value;
 }
 
 pub trait Insert {
     async fn insert(
         &self,
         start_timestamp: Timestamp,
+        deserialized_boagent_response: Option<Value>,
     ) -> Result<InsertAttempt, Box<dyn std::error::Error>>;
     async fn get_id(
         &self,
@@ -33,6 +41,7 @@ pub enum CarenageRow {
     Job,
     Run,
     Task,
+    Device,
 }
 
 pub enum InsertAttempt {
@@ -49,12 +58,16 @@ impl CarenageRow {
             CarenageRow::Job => "jobs",
             CarenageRow::Run => "runs",
             CarenageRow::Task => "tasks",
+            CarenageRow::Device => "devices",
         }
     }
 }
 
 impl Create for CarenageRow {
     fn set_name(&self) -> String {
+        let project_root_path = std::env::current_dir().unwrap().join("..");
+        let config = Config::check_configuration(&project_root_path)
+            .expect("Configuration fields should be parsable.");
         let gitlab_vars = GitlabVariables::parse_env_variables()
             .expect("Gitlab variables should be available to parse");
         let row_name: String = match self {
@@ -64,6 +77,7 @@ impl Create for CarenageRow {
             CarenageRow::Job => gitlab_vars.job_name,
             CarenageRow::Run => format!("run_{}", gitlab_vars.job_name),
             CarenageRow::Task => gitlab_vars.job_stage,
+            CarenageRow::Device => config.device_name,
         };
         row_name
     }
@@ -71,25 +85,44 @@ impl Create for CarenageRow {
     fn set_start_date(&self, start_timestamp: Timestamp) -> Timestamp {
         let gitlab_vars = GitlabVariables::parse_env_variables()
             .expect("Gitlab variables should be available to parse");
-        let start_date: Timestamp = match self {
-            CarenageRow::Project => start_timestamp,
-            CarenageRow::Workflow => gitlab_vars.pipeline_created_at,
-            CarenageRow::Pipeline => start_timestamp,
-            CarenageRow::Job => gitlab_vars.job_started_at,
-            CarenageRow::Run => start_timestamp,
-            CarenageRow::Task => start_timestamp,
+        let start_date: Option<Timestamp> = match self {
+            CarenageRow::Project => Some(start_timestamp),
+            CarenageRow::Workflow => Some(gitlab_vars.pipeline_created_at),
+            CarenageRow::Pipeline => Some(start_timestamp),
+            CarenageRow::Job => Some(gitlab_vars.job_started_at),
+            CarenageRow::Run => Some(start_timestamp),
+            CarenageRow::Task => Some(start_timestamp),
+            CarenageRow::Device => None,
         };
 
-        start_date
+        start_date.expect("Row should receive a parsable timestamp.")
     }
 
-    fn serialize(&self, start_timestamp: Timestamp) -> Value {
-        let name = self.set_name();
-        let start_date = self.set_start_date(start_timestamp);
-        json!({
-             "name": name,
-             "start_date": start_date.to_string()
-        })
+    fn serialize(
+        &self,
+        start_timestamp: Timestamp,
+        deserialized_boagent_response: Option<Value>,
+    ) -> Value {
+        let project_root_path = std::env::current_dir().unwrap().join("..");
+        let config = Config::check_configuration(&project_root_path)
+            .expect("Configuration fields should be parsable.");
+        match self {
+            CarenageRow::Device => format_hardware_data(
+                deserialized_boagent_response.expect("Boagent response should be parsable."),
+                config.device_name,
+                config.location,
+                config.lifetime,
+            )
+            .expect("Formatting of device data should succeed."),
+            _ => {
+                let name = self.set_name();
+                let start_date = self.set_start_date(start_timestamp);
+                json!({
+                     "name": name,
+                     "start_date": start_date.to_string()
+                })
+            }
+        }
     }
 }
 
@@ -97,6 +130,7 @@ impl Insert for CarenageRow {
     async fn insert(
         &self,
         start_timestamp: Timestamp,
+        deserialized_boagent_response: Option<Value>,
     ) -> Result<InsertAttempt, Box<dyn std::error::Error>> {
         let project_root_path = std::env::current_dir().unwrap().join("..");
         let config = Config::check_configuration(&project_root_path)?;
@@ -106,7 +140,7 @@ impl Insert for CarenageRow {
                 insert_dimension_table_metadata(
                     db_pool.acquire().await?,
                     self.table_name(),
-                    self.serialize(start_timestamp),
+                    self.serialize(start_timestamp, None),
                 )
                 .await,
             ),
@@ -118,7 +152,14 @@ impl Insert for CarenageRow {
                 insert_dimension_table_metadata(
                     db_pool.acquire().await?,
                     self.table_name(),
-                    self.serialize(start_timestamp),
+                    self.serialize(start_timestamp, None),
+                )
+                .await?,
+            ),
+            CarenageRow::Device => InsertAttempt::Success(
+                insert_device_metadata(
+                    db_pool.acquire().await?,
+                    self.serialize(start_timestamp, deserialized_boagent_response),
                 )
                 .await?,
             ),
