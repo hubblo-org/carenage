@@ -471,9 +471,9 @@ mod tests {
 
     #[sqlx::test]
     async fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
-        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
+        let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
         let now_timestamp_minus_one_minute =
-            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
+            Timestamp::ISO8601(Some(Local::now() - Duration::minutes(1)));
 
         let mut boagent_server = Server::new_async().await;
 
@@ -542,9 +542,9 @@ mod tests {
     async fn it_formats_process_data_from_boagent_response_with_queried_pid(
         pool: PgPool,
     ) -> sqlx::Result<()> {
-        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
+        let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
         let now_timestamp_minus_one_minute =
-            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
+            Timestamp::ISO8601(Some(Local::now() - Duration::minutes(1)));
 
         let mut boagent_server = Server::new_async().await;
 

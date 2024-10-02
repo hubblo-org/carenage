@@ -1,5 +1,4 @@
 use crate::timestamp::Timestamp;
-use chrono::Local;
 use dotenv::{from_path, var};
 use reqwest::{Client, Response};
 use serde_json::{Error, Value};
@@ -175,8 +174,8 @@ mod tests {
 
         let response = query_boagent(
             url,
-            Timestamp::UnixTimestamp(Some(now_timestamp_minus_one_minute)),
-            Timestamp::UnixTimestamp(Some(now_timestamp)),
+            Timestamp::Unix(Some(now_timestamp_minus_one_minute)),
+            Timestamp::Unix(Some(now_timestamp)),
             HardwareData::Inspect,
             "FRA".to_string(),
             5,
@@ -212,8 +211,8 @@ mod tests {
 
         let response = query_boagent(
             url,
-            Timestamp::UnixTimestamp(None),
-            Timestamp::UnixTimestamp(None),
+            Timestamp::Unix(None),
+            Timestamp::Unix(None),
             HardwareData::Inspect,
             "FRA".to_string(),
             5,
@@ -226,9 +225,9 @@ mod tests {
 
     #[sqlx::test]
     fn it_queries_boagent_with_success_with_iso_8601_timestamps() {
-        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
+        let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
         let now_timestamp_minus_one_minute =
-            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
+            Timestamp::ISO8601(Some(Local::now() - Duration::minutes(1)));
 
         let mut boagent_server = Server::new_async().await;
 
@@ -272,8 +271,8 @@ mod tests {
 
         let response = query_boagent(
             url,
-            Timestamp::ISO8601Timestamp(None),
-            Timestamp::ISO8601Timestamp(None),
+            Timestamp::ISO8601(None),
+            Timestamp::ISO8601(None),
             HardwareData::Inspect,
             "FRA".to_string(),
             5,
@@ -285,9 +284,9 @@ mod tests {
 
     #[sqlx::test]
     async fn it_deserializes_json_from_boagent_response() {
-        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
+        let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
         let now_timestamp_minus_one_minute =
-            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
+            Timestamp::ISO8601(Some(Local::now() - Duration::minutes(1)));
 
         let mut boagent_server = Server::new_async().await;
 
@@ -339,9 +338,9 @@ mod tests {
 
     #[sqlx::test]
     async fn it_gets_all_process_ids_for_processes_available_from_boagent_response() {
-        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
+        let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
         let now_timestamp_minus_one_minute =
-            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
+            Timestamp::ISO8601(Some(Local::now() - Duration::minutes(1)));
 
         let mut boagent_server = Server::new_async().await;
 
@@ -388,9 +387,9 @@ mod tests {
     #[sqlx::test]
     async fn it_queries_process_embedded_impacts_from_boagent_with_returned_ids() {
         let pids = [6042, 4163, 171690, 4489, 7281, 7868, 5567, 5365, 810, 14063];
-        let now_timestamp = Timestamp::ISO8601Timestamp(Some(Local::now()));
+        let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
         let now_timestamp_minus_one_minute =
-            Timestamp::ISO8601Timestamp(Some(Local::now() - Duration::minutes(1)));
+            Timestamp::ISO8601(Some(Local::now() - Duration::minutes(1)));
 
         let mut boagent_server = Server::new_async().await;
 
