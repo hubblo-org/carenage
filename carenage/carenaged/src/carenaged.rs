@@ -36,11 +36,13 @@ pub struct Ids {
     pub job_id: Uuid,
     pub run_id: Uuid,
     pub task_id: Uuid,
+    pub device_id: Uuid,
 }
 
-pub async fn insert_project_metadata(
+pub async fn insert_metadata(
     gitlab_vars: GitlabVariables,
     start_timestamp: Timestamp,
+    unix_flag: UnixFlag,
 ) -> Result<Ids, Box<dyn std::error::Error>> {
     let project_rows = CarenageRow::Project.insert(start_timestamp, None).await?;
     let project_id = CarenageRow::Project
@@ -62,17 +64,25 @@ pub async fn insert_project_metadata(
     let task_rows = CarenageRow::Task.insert(start_timestamp, None).await?;
     let task_id = CarenageRow::Task.get_id(task_rows, None).await?;
 
-    /*
-    let id_vector: Vec<uuid::Uuid> = vec![
-        project_id,
-        workflow_id,
-        pipeline_id,
-        job_id,
-        run_id,
-        task_id,
-    ];
-    Ok(id_vector)
-    */
+    let project_root_path = std::env::current_dir().unwrap().join("..");
+    let config = Config::check_configuration(&project_root_path)?;
+
+    let end_time = Timestamp::new(unix_flag);
+    let response = query_boagent(
+        config.boagent_url,
+        start_timestamp,
+        end_time,
+        HardwareData::Inspect,
+        config.location.clone(),
+        config.lifetime,
+    )
+    .await?;
+    let deserialized_boagent_response = deserialize_boagent_json(response).await?;
+    let insert_device_data = CarenageRow::Device
+        .insert(start_timestamp, Some(deserialized_boagent_response))
+        .await?;
+    let device_id = CarenageRow::Device.get_id(insert_device_data, None).await?;
+
     let ids = Ids {
         project_id,
         workflow_id,
@@ -80,11 +90,13 @@ pub async fn insert_project_metadata(
         job_id,
         run_id,
         task_id,
+        device_id,
     };
     Ok(ids)
 }
 
 // Will return device_id on first_query, implement option for fn result
+
 pub async fn query_and_insert_data(
     ids: Ids,
     start_time: Timestamp,
@@ -105,17 +117,5 @@ pub async fn query_and_insert_data(
     )
     .await?;
     let deserialized_boagent_response = deserialize_boagent_json(response).await?;
-
-    if let HardwareData::Inspect = fetch_hardware {
-        let insert_device_data = CarenageRow::Device
-            .insert(start_time, Some(deserialized_boagent_response))
-            .await?;
-        let device_id = CarenageRow::Device.get_id(insert_device_data, None).await?;
-        //ids.push(device_id)
-        todo!()
-        // TO IMPLEMENT : first insert into events
-    } else {
-        todo!()
-    }
-    Ok(ids)
+    todo!()
 }

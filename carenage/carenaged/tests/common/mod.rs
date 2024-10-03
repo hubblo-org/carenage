@@ -1,8 +1,9 @@
 use std::env;
 use chrono::Local;
+use database::timestamp::Timestamp;
 
-pub fn setup() {
-    let now = Local::now();
+pub fn setup(){
+    let now = Timestamp::ISO8601(Some(Local::now()));
     env::set_var("CI_PROJECT_PATH", "hubblo/carenage");
     env::set_var("CI_PIPELINE_ID", "1234");
     env::set_var("CI_PIPELINE_CREATED_AT", now.to_string());
