@@ -1,8 +1,8 @@
 use database::boagent::{deserialize_boagent_json, query_boagent, Config, HardwareData};
 use database::ci::GitlabVariables;
+use database::database::Ids;
 use database::tables::{CarenageRow, Insert};
 use database::timestamp::{Timestamp, UnixFlag};
-use sqlx::types::{uuid, Uuid};
 use std::env;
 
 pub struct DaemonArgs {
@@ -26,17 +26,6 @@ impl DaemonArgs {
             unix_flag,
         })
     }
-}
-
-#[derive(Copy, Clone)]
-pub struct Ids {
-    pub project_id: Uuid,
-    pub workflow_id: Uuid,
-    pub pipeline_id: Uuid,
-    pub job_id: Uuid,
-    pub run_id: Uuid,
-    pub task_id: Uuid,
-    pub device_id: Uuid,
 }
 
 pub async fn insert_metadata(
