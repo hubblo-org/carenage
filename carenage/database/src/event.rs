@@ -36,6 +36,7 @@ pub struct Event {
     pub job_id: Uuid,
     pub run_id: Uuid,
     pub task_id: Uuid,
+    pub process_id: Uuid,
     pub device_id: Uuid,
     pub event_type: EventType,
 }
