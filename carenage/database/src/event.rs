@@ -1,6 +1,8 @@
-use crate::timestamp::Timestamp;
+use std::fmt::{Display, Formatter};
 use uuid::Uuid;
 
+#[derive(sqlx::Type)]
+#[sqlx(type_name = "event_type", rename_all = "lowercase")]
 pub enum EventType {
     Regular,
     Custom,
@@ -8,11 +10,27 @@ pub enum EventType {
     Stop,
 }
 
+impl Display for EventType {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        match self {
+            EventType::Regular => {
+                write!(f, "regular")
+            }
+            EventType::Custom => {
+                write!(f, "custom")
+            }
+            EventType::Start => {
+                write!(f, "start")
+            }
+            EventType::Stop => {
+                write!(f, "stop")
+            }
+        }
+    }
+}
+
 pub struct Event {
-    pub id: Uuid,
-    pub timestamp: Timestamp,
     pub project_id: Uuid,
-    pub repository_id: Uuid,
     pub workflow_id: Uuid,
     pub pipeline_id: Uuid,
     pub job_id: Uuid,
@@ -20,5 +38,4 @@ pub struct Event {
     pub task_id: Uuid,
     pub device_id: Uuid,
     pub event_type: EventType,
-    pub user_label: String,
 }
