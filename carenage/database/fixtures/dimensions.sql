@@ -11,6 +11,7 @@ DECLARE j_id UUID;
 DECLARE r_id UUID;
 DECLARE t_id UUID;
 DECLARE c_id UUID;
+DECLARE proc_id UUID;
 DECLARE d_id UUID;
 BEGIN
 	CREATE TABLE projects (
@@ -124,9 +125,11 @@ BEGIN
 	INSERT INTO JOBS (name, start_date) VALUES ('tests', nowts) RETURNING id INTO j_id;
 	INSERT INTO RUNS (name, start_date) VALUES ('run_tests_01', nowts) RETURNING id INTO r_id;
 	INSERT INTO TASKS (name, start_date) VALUES ('build_env_and_test', nowts) RETURNING id INTO t_id;
+	INSERT INTO PROCESSES (exe, cmdline, state, start_date) VALUES ('/snap/firefox/4336/usr/lib/firefox/firefox', '/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/
+    usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab', 'running', nowts) RETURNING id INTO proc_id;
 	INSERT INTO DEVICES (name, lifetime, location) VALUES ('dell r740', 5, 'FRA') RETURNING id INTO d_id;
 	INSERT INTO COMPONENTS (device_id, name, model, manufacturer) VALUES (d_id, 'cpu',  'Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz', 'Intel Corp.') RETURNING id INTO c_id;
 	INSERT INTO COMPONENT_CHARACTERISTIC (component_id, name, value) VALUES (c_id, 'core_units', 8); 
-	RETURN ARRAY[p_id, w_id, pip_id, j_id, r_id, t_id, d_id];
+	RETURN ARRAY[p_id, w_id, pip_id, j_id, r_id, t_id, proc_id, d_id];
 END
 $BODY$;
