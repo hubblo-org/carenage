@@ -2,15 +2,15 @@ use chrono::{Duration, Local};
 use database::boagent::{deserialize_boagent_json, query_boagent, HardwareData};
 use database::database::{
     format_hardware_data, format_process_metadata, get_db_connection_pool, get_project_id,
-    insert_device_metadata, insert_dimension_table_metadata, insert_process_metadata,
-    update_stop_date,
+    insert_device_metadata, insert_dimension_table_metadata, insert_event_data,
+    insert_process_metadata, update_stop_date, Ids,
 };
+use database::event::{Event, EventType};
 use database::timestamp::{Timestamp, UnixFlag};
 use dotenv::var;
 use mockito::{Matcher, Server};
 use serde_json::json;
-use sqlx::pool::PoolConnection;
-use sqlx::{PgPool, Postgres, Row};
+use sqlx::{PgPool, Row};
 
 #[sqlx::test(migrations = "../../db/")]
 async fn it_inserts_valid_data_in_projects_table_in_the_carenage_database(
@@ -349,17 +349,31 @@ async fn it_gets_project_id_from_projects_table_with_queried_project_name(
     Ok(())
 }
 #[sqlx::test(fixtures("../fixtures/dimensions.sql"))]
-async fn it_inserts_foreign_keys_and_metrics_into_events_table(
-    pool: PoolConnection<Postgres>,
-) -> sqlx::Result<()> {
-    let mut connection = pool.detach();
+async fn it_inserts_foreign_keys_events_table(pool: PgPool) -> sqlx::Result<()> {
+    let connection = pool.acquire().await?;
 
     let query = sqlx::query("SELECT * FROM project_ids()")
-        .fetch_all(&mut connection)
+        .fetch_all(&mut connection.detach())
         .await?;
 
-    let ids: Vec<uuid::Uuid> = query[0].get("project_ids");
+    let vec_ids: Vec<uuid::Uuid> = query[0].get("project_ids");
 
-    todo!();
+    let event = Event {
+        project_id: vec_ids[0],
+        workflow_id: vec_ids[1],
+        pipeline_id: vec_ids[2],
+        job_id: vec_ids[3],
+        run_id: vec_ids[4],
+        task_id: vec_ids[5],
+        device_id: vec_ids[6],
+        event_type: EventType::Regular,
+    };
+
+    let another_connection = pool.acquire().await?;
+
+    let insert_event = insert_event_data(another_connection, event).await;
+
+    assert!(insert_event.is_ok());
+
     Ok(())
 }
