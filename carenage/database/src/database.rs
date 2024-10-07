@@ -1,4 +1,5 @@
-use crate::event::{Event, EventType};
+use crate::event::Event;
+use crate::metrics::Metrics;
 use crate::timestamp::Timestamp;
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
@@ -314,8 +315,8 @@ pub async fn insert_event_data(
     let mut connection = database_connection.detach();
 
     let timestamptz = Local::now();
-    let formatted_query = "INSERT INTO events (timestamp, project_id, workflow_id, pipeline_id, job_id, run_id, task_id, device_id, event_type) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+    let formatted_query = "INSERT INTO events (timestamp, project_id, workflow_id, pipeline_id, job_id, run_id, task_id, process_id, device_id, event_type) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
     RETURNING id";
 
     let event = sqlx::query(formatted_query)
@@ -326,12 +327,27 @@ pub async fn insert_event_data(
         .bind(event.job_id)
         .bind(event.run_id)
         .bind(event.task_id)
+        .bind(event.process_id)
         .bind(event.device_id)
         .bind(event.event_type)
         .fetch_one(&mut connection)
         .await?;
 
     Ok(event)
+}
+
+pub async fn insert_metrics(
+    event_id: Uuid,
+    database_connection: PoolConnection<Postgres>,
+    metrics: Metrics,
+) -> Result<(), sqlx::Error> {
+
+    let mut connection = database_connection.detach();
+
+    let formatted_query = "INSERT INTO METRICS (event_id, metric, value) VALUES ($1, $2, $3)";
+
+
+    todo!()
 }
 
 pub async fn update_stop_date(

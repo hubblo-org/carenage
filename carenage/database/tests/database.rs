@@ -1,12 +1,16 @@
+use std::fs::File;
+use std::io::BufReader;
+
 use chrono::{Duration, Local};
 use database::boagent::{deserialize_boagent_json, query_boagent, HardwareData};
 use database::database::{
     format_hardware_data, format_process_metadata, get_db_connection_pool, get_project_id,
-    insert_device_metadata, insert_dimension_table_metadata, insert_event_data,
-    insert_process_metadata, update_stop_date, Ids,
+    insert_device_metadata, insert_dimension_table_metadata, insert_event_data, insert_metrics,
+    insert_process_metadata, update_stop_date,
 };
 use database::event::{Event, EventType};
-use database::timestamp::{Timestamp, UnixFlag};
+use database::metrics::{Metrics, ProcessCpuEmbeddedImpacts};
+use database::timestamp::Timestamp;
 use dotenv::var;
 use mockito::{Matcher, Server};
 use serde_json::json;
@@ -365,7 +369,8 @@ async fn it_inserts_foreign_keys_events_table(pool: PgPool) -> sqlx::Result<()> 
         job_id: vec_ids[3],
         run_id: vec_ids[4],
         task_id: vec_ids[5],
-        device_id: vec_ids[6],
+        process_id: vec_ids[6],
+        device_id: vec_ids[7],
         event_type: EventType::Regular,
     };
 
@@ -374,6 +379,34 @@ async fn it_inserts_foreign_keys_events_table(pool: PgPool) -> sqlx::Result<()> 
     let insert_event = insert_event_data(another_connection, event).await;
 
     assert!(insert_event.is_ok());
+
+    Ok(())
+}
+
+#[sqlx::test(fixtures("../fixtures/events.sql"))]
+async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sqlx::Result<()> {
+    let connection = pool.acquire().await?;
+
+    let query = sqlx::query("SELECT * FROM event_id()")
+        .fetch_one(&mut connection.detach())
+        .await?;
+
+    let event_id: uuid::Uuid = query.get("event_id");
+
+    let another_connection = pool.acquire().await?;
+
+    let process_file = File::open("../mocks/process6042.json").unwrap();
+    let reader = BufReader::new(process_file);
+
+    let metrics: Metrics = serde_json::from_reader(reader).unwrap();
+
+    println!("{:?}", metrics);
+
+    /*
+
+    let insert_metrics = insert_metrics(event_id, another_connection, metrics).await;
+
+    assert!(insert_metrics.is_ok()); */
 
     Ok(())
 }
