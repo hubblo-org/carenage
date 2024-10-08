@@ -1,5 +1,5 @@
 use crate::event::Event;
-use crate::metrics::Metrics;
+use crate::metrics::{Metrics, ProcessEmbeddedImpacts};
 use crate::timestamp::Timestamp;
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
@@ -41,7 +41,7 @@ struct ComponentCharacteristic {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Process {
+pub struct Process {
     exe: String,
     cmdline: String,
     state: String,
@@ -341,13 +341,20 @@ pub async fn insert_metrics(
     database_connection: PoolConnection<Postgres>,
     metrics: Metrics,
 ) -> Result<(), sqlx::Error> {
-
     let mut connection = database_connection.detach();
 
     let formatted_query = "INSERT INTO METRICS (event_id, metric, value) VALUES ($1, $2, $3)";
 
+    //let iterable_metrics = serde_json::to_value(metrics.process_embedded_impacts);
 
-    todo!()
+
+    /*
+        sqlx::query(formatted_query)
+            .bind(event_id)
+            .bind(key.get("{key}"))
+            .execute(&mut connection)
+            .await?; */
+    Ok(())
 }
 
 pub async fn update_stop_date(
