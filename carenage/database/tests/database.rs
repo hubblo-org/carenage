@@ -1,3 +1,5 @@
+use std::fs::canonicalize;
+
 use chrono::{Duration, Local};
 use database::boagent::{deserialize_boagent_json, query_boagent, HardwareData};
 use database::database::{
@@ -147,6 +149,7 @@ async fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
     let mut boagent_server = Server::new_async().await;
 
     let url = boagent_server.url();
+    let path_to_boagent_response = canonicalize("../mocks/boagent_response.json").unwrap();
 
     let _mock = boagent_server
         .mock("GET", "/query")
@@ -163,7 +166,7 @@ async fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
             Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
         ]))
         .with_status(200)
-        .with_body_from_file("../mocks/boagent_response.json")
+        .with_body_from_file(path_to_boagent_response)
         .create_async()
         .await;
 
@@ -219,6 +222,8 @@ async fn it_formats_process_data_from_boagent_response_with_queried_pid(
 
     let url = boagent_server.url();
 
+    let path_to_boagent_response = canonicalize("../mocks/boagent_response.json").unwrap();
+
     let _mock = boagent_server
         .mock("GET", "/query")
         .match_query(Matcher::AllOf(vec![
@@ -234,7 +239,7 @@ async fn it_formats_process_data_from_boagent_response_with_queried_pid(
             Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
         ]))
         .with_status(200)
-        .with_body_from_file("../mocks/boagent_response.json")
+        .with_body_from_file(path_to_boagent_response)
         .create_async()
         .await;
 
@@ -427,6 +432,8 @@ async fn it_builds_metrics_from_json_values() {
 
     let url = boagent_server.url();
 
+    let path_to_boagent_response = canonicalize("../mocks/query_boagent_response_before_process_embedded_impacts.json").unwrap();
+
     let _mock = boagent_server
         .mock("GET", "/query")
         .match_query(Matcher::AllOf(vec![
@@ -442,7 +449,7 @@ async fn it_builds_metrics_from_json_values() {
             Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
         ]))
         .with_status(200)
-        .with_body_from_file("/home/repair/gitlab/carenage/carenage/mocks/query_boagent_response_before_process_embedded_impacts.json")
+        .with_body_from_file(path_to_boagent_response)
         .create_async()
         .await;
 
