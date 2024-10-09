@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use crate::database::Process;
 
 pub trait Metric {
     fn build(&self, process_embedded_impacts: &Value) -> ProcessEmbeddedImpactValues;
@@ -32,7 +31,9 @@ impl Metric for ProcessEmbeddedImpacts {
         let components_values = &process_embedded_impacts["process_embedded_impacts"];
         match self {
             ProcessEmbeddedImpacts::Cpu => {
-                let cpu_values = &components_values["process_cpu_embedded_impact_values"];
+                let cpu_values = &components_values
+                    .get("process_cpu_embedded_impact_values")
+                    .expect("CPU embedded impact values should be available.");
                 ProcessEmbeddedImpactValues {
                     gwp_average_impact: cpu_values["gwp_cpu_average_impact"].as_f64().unwrap(),
                     gwp_max_impact: cpu_values["gwp_cpu_max_impact"].as_f64().unwrap(),
@@ -46,7 +47,9 @@ impl Metric for ProcessEmbeddedImpacts {
                 }
             }
             ProcessEmbeddedImpacts::Ram => {
-                let ram_values = &components_values["process_ram_embedded_impact_values"];
+                let ram_values = &components_values
+                    .get("process_ram_embedded_impact_values")
+                    .expect("RAM embedded impact values should be available.");
                 ProcessEmbeddedImpactValues {
                     gwp_average_impact: ram_values["gwp_ram_average_impact"].as_f64().unwrap(),
                     gwp_max_impact: ram_values["gwp_ram_max_impact"].as_f64().unwrap(),
@@ -60,7 +63,9 @@ impl Metric for ProcessEmbeddedImpacts {
                 }
             }
             ProcessEmbeddedImpacts::Ssd => {
-                let ssd_values = &components_values["process_ssd_embedded_impact_values"];
+                let ssd_values = &components_values
+                    .get("process_ssd_embedded_impact_values")
+                    .expect("SSD embedded impact values should be available.");
                 ProcessEmbeddedImpactValues {
                     gwp_average_impact: ssd_values["gwp_ssd_average_impact"].as_f64().unwrap(),
                     gwp_max_impact: ssd_values["gwp_ssd_max_impact"].as_f64().unwrap(),
@@ -74,8 +79,9 @@ impl Metric for ProcessEmbeddedImpacts {
                 }
             }
             ProcessEmbeddedImpacts::Hdd => {
-                let hdd_values = &components_values["process_hdd_embedded_impact_values"];
-
+                let hdd_values = &components_values
+                    .get("process_hdd_embedded_impact_values")
+                    .expect("HDD embedded impact values should be available.");
                 ProcessEmbeddedImpactValues {
                     gwp_average_impact: hdd_values["gwp_hdd_average_impact"].as_f64().unwrap(),
                     gwp_max_impact: hdd_values["gwp_hdd_max_impact"].as_f64().unwrap(),
@@ -92,10 +98,10 @@ impl Metric for ProcessEmbeddedImpacts {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Metrics {
-    pub process_cpu_embedded_impacts: ProcessEmbeddedImpactValues,
-    pub process_ram_embedded_impacts: ProcessEmbeddedImpactValues,
+    pub process_cpu_embedded_impacts: Option<ProcessEmbeddedImpactValues>,
+    pub process_ram_embedded_impacts: Option<ProcessEmbeddedImpactValues>,
     pub process_ssd_embedded_impacts: Option<ProcessEmbeddedImpactValues>,
     pub process_hdd_embedded_impacts: Option<ProcessEmbeddedImpactValues>,
     pub cpu_usage_percentage: f64,
@@ -131,47 +137,87 @@ impl Metrics {
             .as_array()
             .expect("Processes should be parsable from Scaphandre")
             .iter();
-        let queried_process: Process = processes.filter(|process| process["pid"] == *pid).collect();
-        // let process = serde_json::from_slice(queried_process);
+        let queried_process: Vec<&Value> = processes
+            .filter(|&process| process["pid"] == *pid)
+            .collect();
+        let resources = queried_process[0]["resources_usage"].as_object().unwrap();
+
+        let process_ssd_embedded_impacts =
+            match process_embedded_impacts["process_embedded_impacts"].get("process_ssd_embedded_impact_values") {
+                Some(value) => Some(ProcessEmbeddedImpacts::Ssd.build(&process_embedded_impacts)),
+                None => None,
+            };
+
+        let process_hdd_embedded_impacts =
+            match process_embedded_impacts["process_embedded_impacts"].get("process_hdd_embedded_impact_values") {
+                Some(value) => Some(ProcessEmbeddedImpacts::Hdd.build(&process_embedded_impacts)),
+                None => None,
+            };
 
         Ok(Metrics {
-            process_cpu_embedded_impacts: ProcessEmbeddedImpacts::Cpu
-                .build(&process_embedded_impacts),
-            process_ram_embedded_impacts: ProcessEmbeddedImpacts::Ram
-                .build(&process_embedded_impacts),
-            process_ssd_embedded_impacts: Some(
-                ProcessEmbeddedImpacts::Ssd.build(&process_embedded_impacts),
+            process_cpu_embedded_impacts: Some(
+                ProcessEmbeddedImpacts::Cpu.build(&process_embedded_impacts),
             ),
-            process_hdd_embedded_impacts: Some(
-                ProcessEmbeddedImpacts::Hdd.build(&process_embedded_impacts),
+            process_ram_embedded_impacts: Some(
+                ProcessEmbeddedImpacts::Ram.build(&process_embedded_impacts),
             ),
-            cpu_usage_percentage: queried_process["cpu_usage"].as_f64().unwrap(),
-            memory_usage_bytes: queried_process["memory_usage"].as_u64().unwrap(),
-            memory_virtual_usage_bytes: queried_process["memory_virtual_usage_unit"]
-                .as_u64()
-                .unwrap(),
-            disk_usage_write_bytes: queried_process["disk_usage_write"].as_u64().unwrap(),
-            disk_usage_read_bytes: queried_process["disk_usage_read"].as_u64().unwrap(),
+            process_ssd_embedded_impacts,
+            process_hdd_embedded_impacts,
+            cpu_usage_percentage: resources
+                .get("cpu_usage")
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .parse::<f64>()?,
+            memory_usage_bytes: resources
+                .get("memory_usage")
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .parse::<u64>()?,
+            memory_virtual_usage_bytes: resources
+                .get("memory_virtual_usage")
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .parse::<u64>()?,
+            disk_usage_write_bytes: resources
+                .get("disk_usage_write")
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .parse::<u64>()?,
+            disk_usage_read_bytes: resources
+                .get("disk_usage_read")
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .parse::<u64>()?,
             total_operational_emission_kgc02eq: boagent_response["total_operational_emissions"]
+                ["value"]["value"]
                 .as_f64()
                 .unwrap(),
             total_operational_abiotic_resources_depletion_kgsbeq: boagent_response
-                ["total_operational_abiotic_resources_depltion"]
+                ["total_operational_abiotic_resources_depletion"]["value"]["value"]
                 .as_f64()
                 .unwrap(),
             total_primary_energy_consumed_mj: boagent_response
-                ["total_operational_primary_energy_consumed"]
+                ["total_operational_primary_energy_consumed"]["value"]["value"]
                 .as_f64()
                 .unwrap(),
-            embedded_emissions_kgc02eq: boagent_response["embedded_emissions"].as_f64().unwrap(),
+            embedded_emissions_kgc02eq: boagent_response["embedded_emissions"]["value"]
+                .as_f64()
+                .unwrap(),
             embedded_abiotic_resources_depletion_kgsbeq: boagent_response
-                ["embedded_abiotic_resources_depletion"]
+                ["embedded_abiotic_resources_depletion"]["value"]
                 .as_f64()
                 .unwrap(),
-            embedded_primary_energy_mj: boagent_response["embedded_primary_energy"]
+            embedded_primary_energy_mj: boagent_response["embedded_primary_energy"]["value"]
                 .as_f64()
                 .unwrap(),
-            average_power_measured_w: boagent_response["average_power_measured"].as_f64().unwrap(),
+            average_power_measured_w: boagent_response["average_power_measured"]["value"]
+                .as_f64()
+                .unwrap(),
         })
     }
 }

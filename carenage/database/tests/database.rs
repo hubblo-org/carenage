@@ -1,6 +1,3 @@
-use std::fs::File;
-use std::io::BufReader;
-
 use chrono::{Duration, Local};
 use database::boagent::{deserialize_boagent_json, query_boagent, HardwareData};
 use database::database::{
@@ -419,17 +416,6 @@ async fn it_builds_metrics_from_json_values() {
                 "gwp_ssd_min_impact": 0,
                 "adp_ssd_min_impact": 0,
                 "pe_ssd_min_impact": 0
-            },
-            "process_hdd_embedded_impact_values": {
-                "gwp_hdd_average_impact": 0.0000021533829645868956,
-                "adp_hdd_average_impact": 7.321502079595447e-11,
-                "pe_hdd_average_impact": 0.00002584059557504275,
-                "gwp_hdd_max_impact": 0.0003843788591787609,
-                "adp_hdd_max_impact": 1.3068881212077872e-8,
-                "pe_hdd_max_impact": 0.004612546310145131,
-                "gwp_hdd_min_impact": 0,
-                "adp_hdd_min_impact": 0,
-                "pe_hdd_min_impact": 0
             }
         }
     });
@@ -476,6 +462,21 @@ async fn it_builds_metrics_from_json_values() {
     let metrics = Metrics::build(process_data, deserialized_boagent_response);
 
     assert!(metrics.is_ok());
+    let result = metrics.unwrap();
+    println!("{:?}", result);
+    assert_eq!(result.cpu_usage_percentage, 1.1115274);
+    assert_eq!(result.memory_usage_bytes, 212635648);
+    assert_eq!(result.memory_virtual_usage_bytes, 2866921472);
+    assert_eq!(result.disk_usage_read_bytes, 0);
+    assert_eq!(result.disk_usage_write_bytes, 0);
+    assert_eq!(result.average_power_measured_w, 14.94261724369748);
+    assert_eq!(result.embedded_emissions_kgc02eq, 900_f64);
+    assert_eq!(result.embedded_abiotic_resources_depletion_kgsbeq, 0.14);
+    assert_eq!(result.embedded_primary_energy_mj, 13000_f64);
+    assert_eq!(result.process_cpu_embedded_impacts.unwrap().gwp_average_impact, 0.38336191697478994);
+    assert_eq!(result.process_ram_embedded_impacts.unwrap().gwp_average_impact, 6.628147200042126);
+    assert_eq!(result.process_ssd_embedded_impacts.unwrap().gwp_average_impact, 0.0000021533829645868956);
+    assert!(result.process_hdd_embedded_impacts.is_none());
 }
 
 /*
