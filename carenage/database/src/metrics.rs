@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_with::with_prefix;
 use serde_json::Value;
 
 pub trait Metric {
@@ -77,11 +78,20 @@ impl Metric for ProcessEmbeddedImpacts {
     }
 }
 
+with_prefix!(prefix_cpu "cpu_");
+with_prefix!(prefix_ram "ram_");
+with_prefix!(prefix_ssd "ssd_");
+with_prefix!(prefix_hdd "hdd_");
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Metrics {
+    #[serde(flatten, with = "prefix_cpu")]
     pub process_cpu_embedded_impacts: Option<ProcessEmbeddedImpactValues>,
+    #[serde(flatten, with = "prefix_ram")]
     pub process_ram_embedded_impacts: Option<ProcessEmbeddedImpactValues>,
+    #[serde(flatten, with = "prefix_ssd")]
     pub process_ssd_embedded_impacts: Option<ProcessEmbeddedImpactValues>,
+    #[serde(flatten, with = "prefix_hdd")]
     pub process_hdd_embedded_impacts: Option<ProcessEmbeddedImpactValues>,
     pub cpu_usage_percentage: f64,
     pub memory_usage_bytes: u64,
