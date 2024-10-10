@@ -27,73 +27,52 @@ pub struct ProcessEmbeddedImpactValues {
 }
 
 impl Metric for ProcessEmbeddedImpacts {
-    fn build(&self, process_embedded_impacts: &Value) -> ProcessEmbeddedImpactValues {
-        let components_values = &process_embedded_impacts["process_embedded_impacts"];
+    fn build(&self, component_values: &Value) -> ProcessEmbeddedImpactValues {
         match self {
-            ProcessEmbeddedImpacts::Cpu => {
-                let cpu_values = &components_values
-                    .get("process_cpu_embedded_impact_values")
-                    .expect("CPU embedded impact values should be available.");
-                ProcessEmbeddedImpactValues {
-                    gwp_average_impact: cpu_values["gwp_cpu_average_impact"].as_f64().unwrap(),
-                    gwp_max_impact: cpu_values["gwp_cpu_max_impact"].as_f64().unwrap(),
-                    gwp_min_impact: cpu_values["gwp_cpu_min_impact"].as_f64().unwrap(),
-                    adp_average_impact: cpu_values["adp_cpu_average_impact"].as_f64().unwrap(),
-                    adp_max_impact: cpu_values["adp_cpu_max_impact"].as_f64().unwrap(),
-                    adp_min_impact: cpu_values["adp_cpu_min_impact"].as_f64().unwrap(),
-                    pe_average_impact: cpu_values["pe_cpu_average_impact"].as_f64().unwrap(),
-                    pe_max_impact: cpu_values["pe_cpu_max_impact"].as_f64().unwrap(),
-                    pe_min_impact: cpu_values["pe_cpu_min_impact"].as_f64().unwrap(),
-                }
-            }
-            ProcessEmbeddedImpacts::Ram => {
-                let ram_values = &components_values
-                    .get("process_ram_embedded_impact_values")
-                    .expect("RAM embedded impact values should be available.");
-                ProcessEmbeddedImpactValues {
-                    gwp_average_impact: ram_values["gwp_ram_average_impact"].as_f64().unwrap(),
-                    gwp_max_impact: ram_values["gwp_ram_max_impact"].as_f64().unwrap(),
-                    gwp_min_impact: ram_values["gwp_ram_min_impact"].as_f64().unwrap(),
-                    adp_average_impact: ram_values["adp_ram_average_impact"].as_f64().unwrap(),
-                    adp_max_impact: ram_values["adp_ram_max_impact"].as_f64().unwrap(),
-                    adp_min_impact: ram_values["adp_ram_min_impact"].as_f64().unwrap(),
-                    pe_average_impact: ram_values["pe_ram_average_impact"].as_f64().unwrap(),
-                    pe_max_impact: ram_values["pe_ram_max_impact"].as_f64().unwrap(),
-                    pe_min_impact: ram_values["pe_ram_min_impact"].as_f64().unwrap(),
-                }
-            }
-            ProcessEmbeddedImpacts::Ssd => {
-                let ssd_values = &components_values
-                    .get("process_ssd_embedded_impact_values")
-                    .expect("SSD embedded impact values should be available.");
-                ProcessEmbeddedImpactValues {
-                    gwp_average_impact: ssd_values["gwp_ssd_average_impact"].as_f64().unwrap(),
-                    gwp_max_impact: ssd_values["gwp_ssd_max_impact"].as_f64().unwrap(),
-                    gwp_min_impact: ssd_values["gwp_ssd_min_impact"].as_f64().unwrap(),
-                    adp_average_impact: ssd_values["adp_ssd_average_impact"].as_f64().unwrap(),
-                    adp_max_impact: ssd_values["adp_ssd_max_impact"].as_f64().unwrap(),
-                    adp_min_impact: ssd_values["adp_ssd_min_impact"].as_f64().unwrap(),
-                    pe_average_impact: ssd_values["pe_ssd_average_impact"].as_f64().unwrap(),
-                    pe_max_impact: ssd_values["pe_ssd_max_impact"].as_f64().unwrap(),
-                    pe_min_impact: ssd_values["pe_ssd_min_impact"].as_f64().unwrap(),
-                }
-            }
-            ProcessEmbeddedImpacts::Hdd => {
-                let hdd_values = &components_values
-                    .get("process_hdd_embedded_impact_values")
-                    .expect("HDD embedded impact values should be available.");
-                ProcessEmbeddedImpactValues {
-                    gwp_average_impact: hdd_values["gwp_hdd_average_impact"].as_f64().unwrap(),
-                    gwp_max_impact: hdd_values["gwp_hdd_max_impact"].as_f64().unwrap(),
-                    gwp_min_impact: hdd_values["gwp_hdd_min_impact"].as_f64().unwrap(),
-                    adp_average_impact: hdd_values["adp_hdd_average_impact"].as_f64().unwrap(),
-                    adp_max_impact: hdd_values["adp_hdd_max_impact"].as_f64().unwrap(),
-                    adp_min_impact: hdd_values["adp_hdd_min_impact"].as_f64().unwrap(),
-                    pe_average_impact: hdd_values["pe_hdd_average_impact"].as_f64().unwrap(),
-                    pe_max_impact: hdd_values["pe_hdd_max_impact"].as_f64().unwrap(),
-                    pe_min_impact: hdd_values["pe_hdd_min_impact"].as_f64().unwrap(),
-                }
-            }
+            ProcessEmbeddedImpacts::Cpu => ProcessEmbeddedImpactValues {
+                gwp_average_impact: component_values["gwp_cpu_average_impact"].as_f64().unwrap(),
+                gwp_max_impact: component_values["gwp_cpu_max_impact"].as_f64().unwrap(),
+                gwp_min_impact: component_values["gwp_cpu_min_impact"].as_f64().unwrap(),
+                adp_average_impact: component_values["adp_cpu_average_impact"].as_f64().unwrap(),
+                adp_max_impact: component_values["adp_cpu_max_impact"].as_f64().unwrap(),
+                adp_min_impact: component_values["adp_cpu_min_impact"].as_f64().unwrap(),
+                pe_average_impact: component_values["pe_cpu_average_impact"].as_f64().unwrap(),
+                pe_max_impact: component_values["pe_cpu_max_impact"].as_f64().unwrap(),
+                pe_min_impact: component_values["pe_cpu_min_impact"].as_f64().unwrap(),
+            },
+            ProcessEmbeddedImpacts::Ram => ProcessEmbeddedImpactValues {
+                gwp_average_impact: component_values["gwp_ram_average_impact"].as_f64().unwrap(),
+                gwp_max_impact: component_values["gwp_ram_max_impact"].as_f64().unwrap(),
+                gwp_min_impact: component_values["gwp_ram_min_impact"].as_f64().unwrap(),
+                adp_average_impact: component_values["adp_ram_average_impact"].as_f64().unwrap(),
+                adp_max_impact: component_values["adp_ram_max_impact"].as_f64().unwrap(),
+                adp_min_impact: component_values["adp_ram_min_impact"].as_f64().unwrap(),
+                pe_average_impact: component_values["pe_ram_average_impact"].as_f64().unwrap(),
+                pe_max_impact: component_values["pe_ram_max_impact"].as_f64().unwrap(),
+                pe_min_impact: component_values["pe_ram_min_impact"].as_f64().unwrap(),
+            },
+            ProcessEmbeddedImpacts::Ssd => ProcessEmbeddedImpactValues {
+                gwp_average_impact: component_values["gwp_ssd_average_impact"].as_f64().unwrap(),
+                gwp_max_impact: component_values["gwp_ssd_max_impact"].as_f64().unwrap(),
+                gwp_min_impact: component_values["gwp_ssd_min_impact"].as_f64().unwrap(),
+                adp_average_impact: component_values["adp_ssd_average_impact"].as_f64().unwrap(),
+                adp_max_impact: component_values["adp_ssd_max_impact"].as_f64().unwrap(),
+                adp_min_impact: component_values["adp_ssd_min_impact"].as_f64().unwrap(),
+                pe_average_impact: component_values["pe_ssd_average_impact"].as_f64().unwrap(),
+                pe_max_impact: component_values["pe_ssd_max_impact"].as_f64().unwrap(),
+                pe_min_impact: component_values["pe_ssd_min_impact"].as_f64().unwrap(),
+            },
+            ProcessEmbeddedImpacts::Hdd => ProcessEmbeddedImpactValues {
+                gwp_average_impact: component_values["gwp_hdd_average_impact"].as_f64().unwrap(),
+                gwp_max_impact: component_values["gwp_hdd_max_impact"].as_f64().unwrap(),
+                gwp_min_impact: component_values["gwp_hdd_min_impact"].as_f64().unwrap(),
+                adp_average_impact: component_values["adp_hdd_average_impact"].as_f64().unwrap(),
+                adp_max_impact: component_values["adp_hdd_max_impact"].as_f64().unwrap(),
+                adp_min_impact: component_values["adp_hdd_min_impact"].as_f64().unwrap(),
+                pe_average_impact: component_values["pe_hdd_average_impact"].as_f64().unwrap(),
+                pe_max_impact: component_values["pe_hdd_max_impact"].as_f64().unwrap(),
+                pe_min_impact: component_values["pe_hdd_min_impact"].as_f64().unwrap(),
+            },
         }
     }
 }
@@ -120,46 +99,53 @@ pub struct Metrics {
 
 impl Metrics {
     pub fn build(
-        process_embedded_impacts: Value,
+        process_data: Value,
         boagent_response: Value,
     ) -> Result<Metrics, Box<dyn std::error::Error>> {
-        let pid = process_embedded_impacts
-            .get("pid")
-            .expect("PID should be present.");
+        let pid = process_data.get("pid").expect("PID should be present.");
 
-        let last_timestamp = boagent_response["raw_data"]["power_data"]["raw_data"]
+        let queried_process: Vec<&Value> = boagent_response["raw_data"]["power_data"]["raw_data"]
             .as_array()
             .expect("Data from Scaphandre should be parsable.")
             .last()
-            .expect("Last timestamp from Scaphandre should be parsable.");
-
-        let processes = last_timestamp["consumers"]
+            .expect("Last timestamp from Scaphandre should be parsable.")
+            .get("consumers")
+            .expect("Data on processes should be present from Scaphandre.")
             .as_array()
-            .expect("Processes should be parsable from Scaphandre")
-            .iter();
-        let queried_process: Vec<&Value> = processes
+            .expect("Data on processes should be parsable.")
+            .iter()
             .filter(|&process| process["pid"] == *pid)
             .collect();
-        let resources = queried_process[0]["resources_usage"].as_object().unwrap();
 
-        let process_ssd_embedded_impacts =
-            match process_embedded_impacts["process_embedded_impacts"].get("process_ssd_embedded_impact_values") {
-                Some(value) => Some(ProcessEmbeddedImpacts::Ssd.build(&process_embedded_impacts)),
-                None => None,
-            };
+        let resources = queried_process[0]["resources_usage"]
+            .as_object()
+            .expect("Data on ressources usage by process should be present.");
 
-        let process_hdd_embedded_impacts =
-            match process_embedded_impacts["process_embedded_impacts"].get("process_hdd_embedded_impact_values") {
-                Some(value) => Some(ProcessEmbeddedImpacts::Hdd.build(&process_embedded_impacts)),
-                None => None,
-            };
+        let process_embedded_impacts = process_data
+            .get("process_embedded_impacts")
+            .expect("Process embedded impacts should be present.");
+
+        let process_ssd_embedded_impacts = process_embedded_impacts
+            .get("process_ssd_embedded_impact_values")
+            .map(|component_values| ProcessEmbeddedImpacts::Ssd.build(component_values));
+        let process_hdd_embedded_impacts = process_embedded_impacts
+            .get("process_hdd_embedded_impact_values")
+            .map(|component_values| ProcessEmbeddedImpacts::Hdd.build(component_values));
 
         Ok(Metrics {
             process_cpu_embedded_impacts: Some(
-                ProcessEmbeddedImpacts::Cpu.build(&process_embedded_impacts),
+                ProcessEmbeddedImpacts::Cpu.build(
+                    process_embedded_impacts
+                        .get("process_cpu_embedded_impact_values")
+                        .expect("CPU embedded impacts for process should be present"),
+                ),
             ),
             process_ram_embedded_impacts: Some(
-                ProcessEmbeddedImpacts::Ram.build(&process_embedded_impacts),
+                ProcessEmbeddedImpacts::Ram.build(
+                    process_embedded_impacts
+                        .get("process_ram_embedded_impact_values")
+                        .expect("RAM embedded impacts for process should be present"),
+                ),
             ),
             process_ssd_embedded_impacts,
             process_hdd_embedded_impacts,
