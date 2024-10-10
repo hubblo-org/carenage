@@ -1,5 +1,5 @@
 use crate::event::Event;
-use crate::metrics::{Metrics, ProcessEmbeddedImpacts};
+use crate::metrics::Metrics;
 use crate::timestamp::Timestamp;
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
@@ -343,17 +343,22 @@ pub async fn insert_metrics(
 ) -> Result<(), sqlx::Error> {
     let mut connection = database_connection.detach();
 
-    let formatted_query = "INSERT INTO METRICS (event_id, metric, value) VALUES ($1, $2, $3)";
+    let metrics_value = serde_json::to_value(metrics).expect("Metrics should be deserializable.");
+    let iterable_metrics = metrics_value
+        .as_object()
+        .expect("Metrics should be parsable")
+        .iter();
 
-    //let iterable_metrics = serde_json::to_value(metrics.process_embedded_impacts);
-
-
-    /*
+    for metric in iterable_metrics {
+        let formatted_query = "INSERT INTO METRICS (event_id, metric, value) VALUES ($1, $2, $3)";
         sqlx::query(formatted_query)
             .bind(event_id)
-            .bind(key.get("{key}"))
+            .bind(metric.0)
+            .bind(metric.1.as_f64())
             .execute(&mut connection)
-            .await?; */
+            .await?;
+        println!("Inserted metric.");
+    }
     Ok(())
 }
 

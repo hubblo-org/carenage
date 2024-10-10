@@ -14,6 +14,7 @@ use dotenv::var;
 use mockito::{Matcher, Server};
 use serde_json::json;
 use sqlx::{PgPool, Row};
+mod common;
 
 #[sqlx::test(migrations = "../../db/")]
 async fn it_inserts_valid_data_in_projects_table_in_the_carenage_database(
@@ -386,44 +387,7 @@ async fn it_inserts_foreign_keys_events_table(pool: PgPool) -> sqlx::Result<()> 
 }
 #[sqlx::test]
 async fn it_builds_metrics_from_json_values() {
-    let process_data = json!({
-        "pid": 6042,
-        "process_embedded_impacts": {
-            "process_cpu_embedded_impact_values": {
-                "gwp_cpu_average_impact": 0.38336191697478994,
-                "adp_cpu_average_impact": 0.00039112499579352936,
-                "pe_cpu_average_impact": 5.750428754621844,
-                "gwp_cpu_max_impact": 0.9255784800000001,
-                "adp_cpu_max_impact": 0.00094432144422,
-                "pe_cpu_max_impact": 13.883677200000001,
-                "gwp_cpu_min_impact": 0.0049683272,
-                "adp_cpu_min_impact": 0.0000050689358258,
-                "pe_cpu_min_impact": 0.074524908
-            },
-            "process_ram_embedded_impact_values": {
-                "gwp_ram_average_impact": 6.628147200042126,
-                "adp_ram_average_impact": 0.0003516976065328474,
-                "pe_ram_average_impact": 81.16098612296481,
-                "gwp_ram_max_impact": 13.492131233215332,
-                "adp_ram_max_impact": 0.0007159090042114257,
-                "pe_ram_max_impact": 165.20977020263672,
-                "gwp_ram_min_impact": 0,
-                "adp_ram_min_impact": 0,
-                "pe_ram_min_impact": 0
-            },
-            "process_ssd_embedded_impact_values": {
-                "gwp_ssd_average_impact": 0.0000021533829645868956,
-                "adp_ssd_average_impact": 7.321502079595447e-11,
-                "pe_ssd_average_impact": 0.00002584059557504275,
-                "gwp_ssd_max_impact": 0.0003843788591787609,
-                "adp_ssd_max_impact": 1.3068881212077872e-8,
-                "pe_ssd_max_impact": 0.004612546310145131,
-                "gwp_ssd_min_impact": 0,
-                "adp_ssd_min_impact": 0,
-                "pe_ssd_min_impact": 0
-            }
-        }
-    });
+    let process_data = common::process_data();
     let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
     let now_timestamp_minus_one_minute =
         Timestamp::ISO8601(Some(Local::now() - Duration::minutes(1)));
@@ -432,7 +396,9 @@ async fn it_builds_metrics_from_json_values() {
 
     let url = boagent_server.url();
 
-    let path_to_boagent_response = canonicalize("../mocks/query_boagent_response_before_process_embedded_impacts.json").unwrap();
+    let path_to_boagent_response =
+        canonicalize("../mocks/query_boagent_response_before_process_embedded_impacts.json")
+            .unwrap();
 
     let _mock = boagent_server
         .mock("GET", "/query")
@@ -480,13 +446,30 @@ async fn it_builds_metrics_from_json_values() {
     assert_eq!(result.embedded_emissions_kgc02eq, 900_f64);
     assert_eq!(result.embedded_abiotic_resources_depletion_kgsbeq, 0.14);
     assert_eq!(result.embedded_primary_energy_mj, 13000_f64);
-    assert_eq!(result.process_cpu_embedded_impacts.unwrap().gwp_average_impact, 0.38336191697478994);
-    assert_eq!(result.process_ram_embedded_impacts.unwrap().gwp_average_impact, 6.628147200042126);
-    assert_eq!(result.process_ssd_embedded_impacts.unwrap().gwp_average_impact, 0.0000021533829645868956);
+    assert_eq!(
+        result
+            .process_cpu_embedded_impacts
+            .unwrap()
+            .gwp_average_impact,
+        0.38336191697478994
+    );
+    assert_eq!(
+        result
+            .process_ram_embedded_impacts
+            .unwrap()
+            .gwp_average_impact,
+        6.628147200042126
+    );
+    assert_eq!(
+        result
+            .process_ssd_embedded_impacts
+            .unwrap()
+            .gwp_average_impact,
+        0.0000021533829645868956
+    );
     assert!(result.process_hdd_embedded_impacts.is_none());
 }
 
-/*
 #[sqlx::test(fixtures("../fixtures/events.sql"))]
 async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sqlx::Result<()> {
     let connection = pool.acquire().await?;
@@ -499,19 +482,51 @@ async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sql
 
     let another_connection = pool.acquire().await?;
 
-    let process_file = File::open("../mocks/process6042.json").unwrap();
-    let reader = BufReader::new(process_file);
+    let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
+    let now_timestamp_minus_one_minute =
+        Timestamp::ISO8601(Some(Local::now() - Duration::minutes(1)));
 
-    // let metrics = Metrics {}
+    let mut boagent_server = Server::new_async().await;
 
-    // println!("{:?}", metrics);
+    let url = boagent_server.url();
 
-    /*
-        let insert_metrics = insert_metrics(event_id, another_connection, metrics).await;
+    let path_to_boagent_response =
+        canonicalize("../mocks/query_boagent_response_before_process_embedded_impacts.json")
+            .unwrap();
 
-        assert!(insert_metrics.is_ok());
+    let _mock = boagent_server
+        .mock("GET", "/query")
+        .match_query(Matcher::AllOf(vec![
+            Matcher::UrlEncoded(
+                "start_time".to_string(),
+                now_timestamp_minus_one_minute.to_string(),
+            ),
+            Matcher::UrlEncoded("end_time".to_string(), now_timestamp.to_string()),
+            Matcher::UrlEncoded("verbose".to_string(), "true".to_string()),
+            Matcher::UrlEncoded("location".to_string(), "FRA".to_string()),
+            Matcher::UrlEncoded("measure_power".to_string(), "true".to_string()),
+            Matcher::UrlEncoded("lifetime".to_string(), "5".to_string()),
+            Matcher::UrlEncoded("fetch_hardware".to_string(), "true".to_string()),
+        ]))
+        .with_status(200)
+        .with_body_from_file(path_to_boagent_response)
+        .create_async()
+        .await;
 
-    */
+    let response = query_boagent(
+        url,
+        now_timestamp_minus_one_minute,
+        now_timestamp,
+        HardwareData::Inspect,
+        "FRA".to_string(),
+        5,
+    )
+    .await
+    .unwrap();
+
+    let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
+    let metrics = Metrics::build(common::process_data(), deserialized_boagent_response).unwrap();
+    let insert_metrics = insert_metrics(event_id, another_connection, metrics).await;
+    assert!(insert_metrics.is_ok());
     Ok(())
 }
-*/
