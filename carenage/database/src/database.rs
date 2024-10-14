@@ -346,19 +346,28 @@ pub async fn insert_metrics(
     let metrics_value = serde_json::to_value(metrics).expect("Metrics should be deserializable.");
     let iterable_metrics = metrics_value
         .as_object()
-        .expect("Metrics should be parsable")
-        .iter();
+        .expect("Metrics should be parsable.");
 
-    for metric in iterable_metrics {
-        let formatted_query = "INSERT INTO METRICS (event_id, metric, value) VALUES ($1, $2, $3)";
-        sqlx::query(formatted_query)
-            .bind(event_id)
-            .bind(metric.0)
-            .bind(metric.1.as_f64())
-            .execute(&mut connection)
-            .await?;
-        println!("Inserted metric.");
-    }
+    let metric_fields: Vec<String> = iterable_metrics
+        .iter()
+        .map(|metric| metric.0.clone())
+        .collect();
+
+    let metric_values: Vec<f64> = iterable_metrics
+        .iter()
+        .map(|metric| metric.1.as_f64().unwrap())
+        .collect();
+
+    let query = "INSERT INTO METRICS (event_id, metric, value) VALUES ($1, UNNEST($2::VARCHAR(255)[]), UNNEST($3::NUMERIC[]))";
+
+    sqlx::query(query)
+        .bind(event_id)
+        .bind(metric_fields)
+        .bind(metric_values)
+        .execute(&mut connection)
+        .await?;
+
+    println!("Inserted metrics.");
     Ok(())
 }
 

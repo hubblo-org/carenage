@@ -436,7 +436,6 @@ async fn it_builds_metrics_from_json_values() {
 
     assert!(metrics.is_ok());
     let result = metrics.unwrap();
-    println!("{:?}", result);
     assert_eq!(result.cpu_usage_percentage, 1.1115274);
     assert_eq!(result.memory_usage_bytes, 212635648);
     assert_eq!(result.memory_virtual_usage_bytes, 2866921472);
