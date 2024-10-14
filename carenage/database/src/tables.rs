@@ -5,13 +5,14 @@ use crate::database::{
     insert_dimension_table_metadata,
 };
 use crate::timestamp::Timestamp;
+use serde::{Serialize, Deserialize};
 use serde_json::{json, Value};
 use sqlx::error::ErrorKind;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 use std::process;
 
-pub trait Create {
+pub trait Metadata {
     fn set_name(&self) -> String;
     fn set_start_date(&self, start_timestamp: Timestamp) -> Timestamp;
     fn serialize(
@@ -19,9 +20,6 @@ pub trait Create {
         start_timestamp: Timestamp,
         deserialized_boagent_response: Option<Value>,
     ) -> Value;
-}
-
-pub trait Insert {
     async fn insert(
         &self,
         start_timestamp: Timestamp,
@@ -63,7 +61,7 @@ impl CarenageRow {
     }
 }
 
-impl Create for CarenageRow {
+impl Metadata for CarenageRow {
     fn set_name(&self) -> String {
         let project_root_path = std::env::current_dir().unwrap().join("..");
         let config = Config::check_configuration(&project_root_path)
@@ -124,9 +122,6 @@ impl Create for CarenageRow {
             }
         }
     }
-}
-
-impl Insert for CarenageRow {
     async fn insert(
         &self,
         start_timestamp: Timestamp,
