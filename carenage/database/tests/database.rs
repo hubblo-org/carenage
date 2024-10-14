@@ -10,6 +10,7 @@ use database::database::{
 use database::event::{Event, EventType};
 use database::metrics::Metrics;
 use database::timestamp::Timestamp;
+use database::tables::Process;
 use dotenv::var;
 use mockito::{Matcher, Server};
 use serde_json::json;
@@ -80,24 +81,24 @@ async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage
 ) -> sqlx::Result<()> {
     let now_timestamp = Local::now();
 
-    let process_metadata = json!({
-        "exe": "/snap/firefox/4336/usr/lib/firefox/firefox",
-        "cmdline": "/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/
-    usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab",
-        "state": "running",
-        "start_date": now_timestamp.to_string(),
-    });
+    let process_metadata = Process {
+        exe: "/snap/firefox/4336/usr/lib/firefox/firefox".to_string(),
+        cmdline: "/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/
+    usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab".to_string(),
+        state: "running".to_string(),
+        start_date: now_timestamp.to_string(), 
+    };
 
     let db_connection = pool.acquire().await?;
 
-    let insert_query = insert_process_metadata(db_connection, process_metadata.clone()).await;
+    let insert_query = insert_process_metadata(db_connection, &process_metadata).await;
 
     assert!(insert_query.is_ok());
 
     let rows = insert_query.unwrap();
     let process_exe: String = rows[0].get("exe");
     assert_eq!(rows.len(), 1);
-    assert_eq!(process_exe, process_metadata["exe"]);
+    assert_eq!(&process_exe, &process_metadata.exe);
     Ok(())
 }
 
@@ -210,7 +211,6 @@ async fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
     assert_eq!(disk["name"], "disk");
     assert_eq!(disk["characteristics"][0]["value"], 238);
 }
-
 #[sqlx::test(migrations = "../../db/")]
 async fn it_formats_process_data_from_boagent_response_with_queried_pid(
     pool: PgPool,
@@ -263,7 +263,9 @@ async fn it_formats_process_data_from_boagent_response_with_queried_pid(
 
     assert!(process_metadata.is_ok());
 
-    let insert = insert_process_metadata(pool.acquire().await?, process_metadata.unwrap());
+    let process = process_metadata.unwrap();
+
+    let insert = insert_process_metadata(pool.acquire().await?, &process);
 
     assert!(insert.await.is_ok());
     Ok(())

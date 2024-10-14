@@ -1,4 +1,5 @@
 use crate::event::Event;
+use crate::tables::Process;
 use crate::metrics::Metrics;
 use crate::timestamp::Timestamp;
 use chrono::{DateTime, Local};
@@ -40,14 +41,6 @@ struct ComponentCharacteristic {
     value: CharacteristicValue,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Process {
-    exe: String,
-    cmdline: String,
-    state: String,
-    start_date: String,
-}
-
 #[derive(Copy, Clone)]
 pub struct Ids {
     pub project_id: Uuid,
@@ -57,6 +50,7 @@ pub struct Ids {
     pub run_id: Uuid,
     pub task_id: Uuid,
     pub device_id: Uuid,
+    pub process_id: Uuid,
 }
 
 pub async fn get_db_connection_pool(database_url: String) -> Result<PgPool, sqlx::Error> {
@@ -171,7 +165,7 @@ pub fn format_process_metadata(
     deserialized_boagent_response: Value,
     pid: u64,
     start_timestamp: Timestamp,
-) -> Result<Value, Error> {
+) -> Result<Process, Error> {
     let last_timestamp = deserialized_boagent_response["raw_data"]["power_data"]["raw_data"]
         .as_array()
         .expect("Boagent response should be parsable")
@@ -193,7 +187,7 @@ pub fn format_process_metadata(
         })
         .collect();
 
-    Ok(json!(process[0]))
+    Ok(process[0].clone())
 }
 
 pub async fn insert_dimension_table_metadata(
@@ -226,27 +220,18 @@ pub async fn insert_dimension_table_metadata(
 
 pub async fn insert_process_metadata(
     database_connection: PoolConnection<Postgres>,
-    process_data: Value,
+    process: &Process,
 ) -> Result<Vec<PgRow>, sqlx::Error> {
-    let process_exe = process_data["exe"].as_str();
-    let process_cmdline = process_data["cmdline"].as_str();
-    let process_state = process_data["state"].as_str();
-    let process_start_date = process_data
-        .get("start_date")
-        .expect("Unable to read timestamp.")
-        .as_str()
-        .expect("Unable to read string");
-
-    let start_timestamptz = to_datetime_local(process_start_date);
+    let start_timestamptz = to_datetime_local(&process.start_date);
 
     let mut connection = database_connection.detach();
 
     let insert_query = "INSERT INTO processes (exe, cmdline, state, start_date) VALUES ($1, $2, $3, $4) RETURNING *";
 
     let process_rows = sqlx::query(insert_query)
-        .bind(process_exe)
-        .bind(process_cmdline)
-        .bind(process_state)
+        .bind(&process.exe)
+        .bind(&process.cmdline)
+        .bind(&process.state)
         .bind(start_timestamptz)
         .fetch_all(&mut connection)
         .await?;
