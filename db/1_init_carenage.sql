@@ -94,7 +94,7 @@ CREATE TABLE events (
   device_id UUID REFERENCES devices(id),
   event_type event_type,
   user_label TEXT,
-  CONSTRAINT primary_keys PRIMARY KEY (id, task_id, job_id, run_id, pipeline_id, workflow_id, project_id, device_id)
+  CONSTRAINT primary_keys PRIMARY KEY (id, task_id, job_id, run_id, pipeline_id, workflow_id, project_id, device_id, process_id)
 );
 
 CREATE TABLE metrics (

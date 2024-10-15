@@ -66,6 +66,7 @@ BEGIN
 	CREATE TABLE processes (
 	  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	  container_id UUID REFERENCES containers(id),
+	  pid INTEGER,
 	  exe VARCHAR(255),
 	  cmdline TEXT,
 	  state VARCHAR(255),
@@ -99,17 +100,17 @@ BEGIN
 	CREATE TABLE events (
 	  id UUID DEFAULT gen_random_uuid() UNIQUE,
 	  timestamp TIMESTAMPTZ,
-	  process_id UUID REFERENCES processes(id),
-	  task_id UUID REFERENCES tasks(id),
+	  project_id UUID REFERENCES projects(id),
+	  workflow_id UUID REFERENCES workflows(id),
+	  pipeline_id UUID REFERENCES pipelines(id),
 	  job_id UUID REFERENCES jobs(id),
 	  run_id UUID REFERENCES runs(id),
-	  pipeline_id UUID REFERENCES pipelines(id),
-	  workflow_id UUID REFERENCES workflows(id),
-	  project_id UUID REFERENCES projects(id),
+	  task_id UUID REFERENCES tasks(id),
+	  process_id UUID REFERENCES processes(id),
 	  device_id UUID REFERENCES devices(id),
 	  event_type event_type,
 	  user_label TEXT,
-	  CONSTRAINT primary_keys PRIMARY KEY (id, task_id, job_id, run_id, pipeline_id, workflow_id, project_id, device_id)
+	  CONSTRAINT primary_keys PRIMARY KEY (id, project_id, workflow_id, pipeline_id, job_id, run_id, task_id, process_id, device_id)
 	);
 
 	CREATE TABLE metrics (
@@ -125,11 +126,10 @@ BEGIN
 	INSERT INTO JOBS (name, start_date) VALUES ('tests', nowts) RETURNING id INTO j_id;
 	INSERT INTO RUNS (name, start_date) VALUES ('run_tests_01', nowts) RETURNING id INTO r_id;
 	INSERT INTO TASKS (name, start_date) VALUES ('build_env_and_test', nowts) RETURNING id INTO t_id;
-	INSERT INTO PROCESSES (exe, cmdline, state, start_date) VALUES ('/snap/firefox/4336/usr/lib/firefox/firefox', '/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/
-    usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab', 'running', nowts) RETURNING id INTO proc_id;
 	INSERT INTO DEVICES (name, lifetime, location) VALUES ('dell r740', 5, 'FRA') RETURNING id INTO d_id;
 	INSERT INTO COMPONENTS (device_id, name, model, manufacturer) VALUES (d_id, 'cpu',  'Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz', 'Intel Corp.') RETURNING id INTO c_id;
 	INSERT INTO COMPONENT_CHARACTERISTIC (component_id, name, value) VALUES (c_id, 'core_units', 8); 
+	INSERT INTO PROCESSES (pid, exe, cmdline, state, start_date) VALUES (4336, '/snap/firefox/4336/usr/lib/firefox/firefox', '/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab', 'running', nowts) RETURNING id INTO proc_id;
 	RETURN ARRAY[p_id, w_id, pip_id, j_id, r_id, t_id, proc_id, d_id];
 END
 $BODY$;
