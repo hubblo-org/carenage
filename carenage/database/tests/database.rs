@@ -82,6 +82,7 @@ async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage
     let now_timestamp = Local::now();
 
     let process = Process {
+        pid: 4336,
         exe: "/snap/firefox/4336/usr/lib/firefox/firefox".to_string(),
         cmdline: "/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/
     usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab".to_string(),
@@ -252,7 +253,7 @@ async fn it_formats_process_data_from_boagent_response_with_queried_pid(
     .unwrap();
 
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
-    let firefox_pid: u64 = 3099;
+    let firefox_pid: i32 = 3099;
 
     let process_metadata =
         format_process_metadata(deserialized_boagent_response, firefox_pid, now_timestamp);

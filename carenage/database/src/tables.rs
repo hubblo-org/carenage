@@ -204,6 +204,7 @@ impl Metadata for CarenageRow {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Process {
+    pub pid: i32,
     pub exe: String,
     pub cmdline: String,
     pub state: String,
@@ -218,9 +219,10 @@ impl Process {
         let config = Config::check_configuration(&project_root_path)?;
         let mut db_connection = get_db_connection_pool(config.database_url).await?.acquire().await?.detach();
 
-        let insert_query = "INSERT INTO processes (exe, cmdline, state, start_date) VALUES ($1, $2, $3, $4) RETURNING id";
+        let insert_query = "INSERT INTO processes (pid, exe, cmdline, state, start_date) VALUES ($1, $2, $3, $4, $5) RETURNING id";
 
         let process_row = sqlx::query(insert_query)
+            .bind(&self.pid)
             .bind(&self.exe)
             .bind(&self.cmdline)
             .bind(&self.state)

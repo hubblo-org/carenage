@@ -163,7 +163,7 @@ pub fn format_hardware_data(
 
 pub fn format_process_metadata(
     deserialized_boagent_response: Value,
-    pid: u64,
+    pid: i32,
     start_timestamp: Timestamp,
 ) -> Result<Process, Error> {
     let last_timestamp = deserialized_boagent_response["raw_data"]["power_data"]["raw_data"]
@@ -180,6 +180,7 @@ pub fn format_process_metadata(
     let process: Vec<Process> = processes
         .filter(|process| process["pid"] == pid)
         .map(|process| Process {
+            pid,
             exe: process["exe"].to_string(),
             cmdline: process["cmdline"].to_string(),
             state: "running".to_string(),

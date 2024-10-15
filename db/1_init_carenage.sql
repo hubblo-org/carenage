@@ -50,6 +50,7 @@ CREATE TABLE containers (
 CREATE TABLE processes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   container_id UUID REFERENCES containers(id),
+  pid INTEGER,
   exe VARCHAR(255),
   cmdline TEXT,
   state VARCHAR(255),

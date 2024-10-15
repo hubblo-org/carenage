@@ -1,9 +1,11 @@
 use database::boagent::{deserialize_boagent_json, query_boagent, Config, HardwareData};
 use database::ci::GitlabVariables;
-use database::database::Ids;
-use database::tables::{CarenageRow, Insert};
+use database::database::{insert_event_data, Ids};
+use database::tables::Process;
+use database::tables::{CarenageRow, Metadata};
 use database::timestamp::{Timestamp, UnixFlag};
 use std::env;
+use std::process;
 
 pub struct DaemonArgs {
     pub time_step: u64,
@@ -72,6 +74,17 @@ pub async fn insert_metadata(
         .await?;
     let device_id = CarenageRow::Device.get_id(insert_device_data, None).await?;
 
+    let start_process = Process {
+        pid: process::id() as i32,
+        exe: "carenage".to_string(),
+        cmdline: "carenage start".to_string(),
+        state: "running".to_string(),
+        start_date: start_timestamp.to_string(),
+    };
+
+    let process_row = Process::insert(&start_process).await?;
+    let process_id = Process::get_id(process_row);
+
     let ids = Ids {
         project_id,
         workflow_id,
@@ -80,11 +93,10 @@ pub async fn insert_metadata(
         run_id,
         task_id,
         device_id,
+        process_id,
     };
     Ok(ids)
 }
-
-// Will return device_id on first_query, implement option for fn result
 
 pub async fn query_and_insert_data(
     ids: Ids,
@@ -106,5 +118,8 @@ pub async fn query_and_insert_data(
     )
     .await?;
     let deserialized_boagent_response = deserialize_boagent_json(response).await?;
+
+    //let event_query = insert_event_data(database_connection, event)
+
     todo!()
 }
