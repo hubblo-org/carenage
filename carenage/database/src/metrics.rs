@@ -109,8 +109,8 @@ pub struct Metrics {
 
 impl Metrics {
     pub fn build(
-        process_data: Value,
-        boagent_response: Value,
+        process_data: &Value,
+        boagent_response: &Value,
     ) -> Result<Metrics, Box<dyn std::error::Error>> {
         let pid = process_data.get("pid").expect("PID should be present.");
 
