@@ -55,7 +55,7 @@ impl Config {
 }
 
 pub async fn query_boagent(
-    boagent_url: String,
+    boagent_url: &String,
     start_time: Timestamp,
     end_time: Timestamp,
     fetch_hardware: HardwareData,
@@ -79,8 +79,8 @@ pub async fn query_boagent(
 }
 
 pub async fn process_embedded_impacts(
-    boagent_url: String,
-    process_id: u64,
+    boagent_url: &String,
+    process_id: i32,
     start_time: Timestamp,
     end_time: Timestamp,
     fetch_hardware: HardwareData,

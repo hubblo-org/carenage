@@ -35,7 +35,7 @@ async fn it_queries_boagent_with_success_with_needed_query_parameters() {
         .await;
 
     let response = query_boagent(
-        url,
+        &url,
         Timestamp::Unix(Some(now_timestamp_minus_one_minute)),
         Timestamp::Unix(Some(now_timestamp)),
         HardwareData::Inspect,
@@ -72,7 +72,7 @@ fn it_queries_boagent_with_success_with_unspecified_timestamps() {
         .await;
 
     let response = query_boagent(
-        url,
+        &url,
         Timestamp::Unix(None),
         Timestamp::Unix(None),
         HardwareData::Inspect,
@@ -114,7 +114,7 @@ fn it_queries_boagent_with_success_with_iso_8601_timestamps() {
         .await;
 
     let response = query_boagent(
-        url,
+        &url,
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
@@ -132,7 +132,7 @@ async fn it_sends_an_error_when_it_fails_to_send_a_request_to_boagent() {
     let url = "http://url.will.fail".to_string();
 
     let response = query_boagent(
-        url,
+        &url,
         Timestamp::ISO8601(None),
         Timestamp::ISO8601(None),
         HardwareData::Inspect,
@@ -174,7 +174,7 @@ async fn it_deserializes_json_from_boagent_response() {
         .await;
 
     let response = query_boagent(
-        url,
+        &url,
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
@@ -224,7 +224,7 @@ async fn it_gets_all_process_ids_for_processes_available_from_boagent_response()
         .await;
 
     let response = query_boagent(
-        url,
+        &url,
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
@@ -275,7 +275,7 @@ async fn it_queries_process_embedded_impacts_from_boagent_with_returned_ids() {
             .await;
 
         let response = process_embedded_impacts(
-            url.clone(),
+            &url,
             pid,
             now_timestamp_minus_one_minute,
             now_timestamp,

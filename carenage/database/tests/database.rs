@@ -171,7 +171,7 @@ async fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
         .await;
 
     let response = query_boagent(
-        url,
+        &url,
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
@@ -244,7 +244,7 @@ async fn it_collects_all_processes_from_boagent_response_and_inserts_them_into_d
         .await;
 
     let response = query_boagent(
-        url,
+        &url,
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
@@ -257,7 +257,7 @@ async fn it_collects_all_processes_from_boagent_response_and_inserts_them_into_d
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
 
     let processes_collection =
-        collect_processes(deserialized_boagent_response, now_timestamp);
+        collect_processes(&deserialized_boagent_response, now_timestamp);
 
     assert!(processes_collection.is_ok());
 
@@ -303,7 +303,7 @@ async fn it_updates_stop_date_field_in_project_row(pool: PgPool) -> sqlx::Result
 async fn it_acquires_a_connection_to_the_database() {
     let database_url = var("DATABASE_URL").expect("Failed to get DATABASE_URL");
 
-    let db_connect = get_db_connection_pool(database_url)
+    let db_connect = get_db_connection_pool(&database_url)
         .await
         .unwrap()
         .acquire()
@@ -417,7 +417,7 @@ async fn it_builds_metrics_from_json_values() {
         .await;
 
     let response = query_boagent(
-        url,
+        &url,
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
@@ -429,7 +429,7 @@ async fn it_builds_metrics_from_json_values() {
 
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
 
-    let metrics = Metrics::build(process_data, deserialized_boagent_response);
+    let metrics = Metrics::build(&process_data, &deserialized_boagent_response);
 
     assert!(metrics.is_ok());
     let result = metrics.unwrap();
@@ -510,7 +510,7 @@ async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sql
         .await;
 
     let response = query_boagent(
-        url,
+        &url,
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
@@ -521,7 +521,7 @@ async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sql
     .unwrap();
 
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
-    let metrics = Metrics::build(common::process_data(), deserialized_boagent_response).unwrap();
+    let metrics = Metrics::build(&common::process_data(), &deserialized_boagent_response).unwrap();
     let insert_metrics = insert_metrics(event_id, another_connection, metrics).await;
     assert!(insert_metrics.is_ok());
     Ok(())

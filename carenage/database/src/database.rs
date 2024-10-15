@@ -52,7 +52,7 @@ pub struct Ids {
     pub process_id: Uuid,
 }
 
-pub async fn get_db_connection_pool(database_url: String) -> Result<PgPool, sqlx::Error> {
+pub async fn get_db_connection_pool(database_url: &String) -> Result<PgPool, sqlx::Error> {
     let connection_pool = PgPool::connect(database_url.as_str());
 
     connection_pool.await
@@ -161,7 +161,7 @@ pub fn format_hardware_data(
 }
 
 pub fn collect_processes(
-    deserialized_boagent_response: Value,
+    deserialized_boagent_response: &Value,
     start_timestamp: Timestamp,
 ) -> Result<Vec<Process>, Error> {
     let processes: Vec<Process> = deserialized_boagent_response["raw_data"]["power_data"]["raw_data"]
