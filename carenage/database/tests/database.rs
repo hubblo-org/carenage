@@ -3,7 +3,8 @@ use std::fs::canonicalize;
 use chrono::{Duration, Local};
 use database::boagent::{deserialize_boagent_json, query_boagent, HardwareData};
 use database::database::{
-    format_hardware_data, format_process_metadata, get_db_connection_pool, get_project_id,
+    collect_processes,
+    format_hardware_data, get_db_connection_pool, get_project_id,
     insert_device_metadata, insert_dimension_table_metadata, insert_metrics,
     update_stop_date,
 };
@@ -208,8 +209,9 @@ async fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
     assert_eq!(disk["name"], "disk");
     assert_eq!(disk["characteristics"][0]["value"], 238);
 }
+
 #[sqlx::test(migrations = "../../db/")]
-async fn it_formats_process_data_from_boagent_response_with_queried_pid(
+async fn it_collects_all_processes_from_boagent_response_and_inserts_them_into_database(
     pool: PgPool,
 ) -> sqlx::Result<()> {
     let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
@@ -253,18 +255,16 @@ async fn it_formats_process_data_from_boagent_response_with_queried_pid(
     .unwrap();
 
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
-    let firefox_pid: i32 = 3099;
 
-    let process_metadata =
-        format_process_metadata(deserialized_boagent_response, firefox_pid, now_timestamp);
+    let processes_collection =
+        collect_processes(deserialized_boagent_response, now_timestamp);
 
-    assert!(process_metadata.is_ok());
+    assert!(processes_collection.is_ok());
 
-    let process = process_metadata.unwrap();
-
+    for process in processes_collection.unwrap() {
     let process_row = Process::insert(&process, pool.acquire().await?);
 
-    assert!(process_row.await.is_ok());
+    assert!(process_row.await.is_ok());}
     Ok(())
 }
 

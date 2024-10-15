@@ -1,6 +1,5 @@
-use crate::event::Event;
-use crate::tables::Process;
 use crate::metrics::Metrics;
+use crate::tables::Process;
 use crate::timestamp::Timestamp;
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
@@ -161,26 +160,24 @@ pub fn format_hardware_data(
     Ok(formatted_hardware_data)
 }
 
-pub fn format_process_metadata(
+pub fn collect_processes(
     deserialized_boagent_response: Value,
-    pid: i32,
     start_timestamp: Timestamp,
-) -> Result<Process, Error> {
-    let last_timestamp = deserialized_boagent_response["raw_data"]["power_data"]["raw_data"]
+) -> Result<Vec<Process>, Error> {
+    let processes: Vec<Process> = deserialized_boagent_response["raw_data"]["power_data"]["raw_data"]
         .as_array()
         .expect("Boagent response should be parsable")
         .last()
-        .expect("Last data item from Boagent should be parsable.");
-
-    let processes = last_timestamp["consumers"]
+        .expect("Last data item from Boagent should be parsable.")
+        .get("consumers")
+        .expect("Consumers should be available from Scaphandre.")
         .as_array()
-        .expect("Last data item from Boagent should contain information on processes.")
-        .iter();
-
-    let process: Vec<Process> = processes
-        .filter(|process| process["pid"] == pid)
+        .expect("Consumers should contain information on processes.")
+        .iter()
         .map(|process| Process {
-            pid,
+            pid: process["pid"]
+                .as_i64()
+                .expect("Process ID should be an integer.") as i32,
             exe: process["exe"].to_string(),
             cmdline: process["cmdline"].to_string(),
             state: "running".to_string(),
@@ -188,7 +185,7 @@ pub fn format_process_metadata(
         })
         .collect();
 
-    Ok(process[0].clone())
+    Ok(processes)
 }
 
 pub async fn insert_dimension_table_metadata(
