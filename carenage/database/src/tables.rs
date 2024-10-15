@@ -131,7 +131,7 @@ impl Metadata for CarenageRow {
     ) -> Result<InsertAttempt, Box<dyn std::error::Error>> {
         let project_root_path = std::env::current_dir().unwrap().join("..");
         let config = Config::check_configuration(&project_root_path)?;
-        let db_pool = get_db_connection_pool(config.database_url).await?;
+        let db_pool = get_db_connection_pool(&config.database_url).await?;
         let rows: InsertAttempt = match self {
             CarenageRow::Project => InsertAttempt::Pending(
                 insert_dimension_table_metadata(
@@ -186,7 +186,7 @@ impl Metadata for CarenageRow {
                     );
                     let project_root_path = std::env::current_dir().unwrap().join("..");
                     let config = Config::check_configuration(&project_root_path)?;
-                    let db_pool = get_db_connection_pool(config.database_url).await?;
+                    let db_pool = get_db_connection_pool(&config.database_url).await?;
                     get_project_id(db_pool.acquire().await?, row_name.unwrap()).await?
                 }
                 _ => {
