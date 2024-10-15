@@ -1,9 +1,15 @@
-use database::boagent::{deserialize_boagent_json, query_boagent, Config, HardwareData};
+use database::boagent::{
+    deserialize_boagent_json, process_embedded_impacts, query_boagent, Config, HardwareData,
+};
 use database::ci::GitlabVariables;
-use database::database::{insert_event_data, Ids};
+use database::database::{collect_processes, get_db_connection_pool, Ids};
+use database::event::{Event, EventType};
+use database::metrics::Metrics;
 use database::tables::Process;
 use database::tables::{CarenageRow, Metadata};
 use database::timestamp::{Timestamp, UnixFlag};
+use sqlx::postgres::Postgres;
+use sqlx::{Acquire, PgPool};
 use std::env;
 use std::process;
 
@@ -60,7 +66,7 @@ pub async fn insert_metadata(
 
     let end_time = Timestamp::new(unix_flag);
     let response = query_boagent(
-        config.boagent_url,
+        &config.boagent_url,
         start_timestamp,
         end_time,
         HardwareData::Inspect,
@@ -82,7 +88,12 @@ pub async fn insert_metadata(
         start_date: start_timestamp.to_string(),
     };
 
-    let process_row = Process::insert(&start_process).await?;
+    let db_pool = get_db_connection_pool(&config.database_url)
+        .await?
+        .acquire()
+        .await?;
+
+    let process_row = Process::insert(&start_process, db_pool).await?;
     let process_id = Process::get_id(process_row);
 
     let ids = Ids {
@@ -98,18 +109,30 @@ pub async fn insert_metadata(
     Ok(ids)
 }
 
-pub async fn query_and_insert_data(
-    ids: Ids,
+pub async fn insert_event(event: &Event) -> Result<(), Box<dyn std::error::Error>> {
+    let project_root_path = std::env::current_dir().unwrap().join("..");
+    let config = Config::check_configuration(&project_root_path)?;
+    let db_pool = get_db_connection_pool(&config.database_url)
+        .await?
+        .acquire();
+
+    Event::insert(event, db_pool.await?).await?;
+    Ok(println!("Inserted event data into database."))
+}
+
+pub async fn query_and_insert_event(
+    mut ids: Ids,
     start_time: Timestamp,
     unix_flag: UnixFlag,
     fetch_hardware: HardwareData,
-) -> Result<Ids, Box<dyn std::error::Error>> {
+    event_type: EventType,
+) -> Result<(), Box<dyn std::error::Error>> {
     let project_root_path = std::env::current_dir().unwrap().join("..");
     let config = Config::check_configuration(&project_root_path)?;
 
     let end_time = Timestamp::new(unix_flag);
     let response = query_boagent(
-        config.boagent_url,
+        &config.boagent_url,
         start_time,
         end_time,
         fetch_hardware,
@@ -119,7 +142,34 @@ pub async fn query_and_insert_data(
     .await?;
     let deserialized_boagent_response = deserialize_boagent_json(response).await?;
 
-    //let event_query = insert_event_data(database_connection, event)
+    let processes = collect_processes(&deserialized_boagent_response, start_time)
+        .expect("Processes date should be collected from Scaphandre.");
+
+    for process in processes {
+        let db_pool = get_db_connection_pool(&config.database_url).await?;
+        let process_row = Process::insert(&process, db_pool.acquire().await?).await?;
+        let process_id = Process::get_id(process_row);
+        ids.process_id = process_id;
+
+        let event = Event::build(ids, EventType::Regular);
+        let event_row = Event::insert(&event, db_pool.acquire().await?).await?;
+        let event_id = Event::get_id(event_row);
+
+        let process_response = process_embedded_impacts(
+            &config.boagent_url,
+            process.pid,
+            start_time,
+            end_time,
+            fetch_hardware,
+            config.location.clone(),
+            config.lifetime,
+        )
+        .await?;
+
+        let process_data = deserialize_boagent_json(process_response).await?;
+
+        let metrics = Metrics::build(&process_data, &deserialized_boagent_response);
+    }
 
     todo!()
 }
