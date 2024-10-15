@@ -5,7 +5,7 @@ use database::boagent::{deserialize_boagent_json, query_boagent, HardwareData};
 use database::database::{
     format_hardware_data, format_process_metadata, get_db_connection_pool, get_project_id,
     insert_device_metadata, insert_dimension_table_metadata, insert_event_data, insert_metrics,
-    insert_process_metadata, update_stop_date,
+    update_stop_date,
 };
 use database::event::{Event, EventType};
 use database::metrics::Metrics;
@@ -81,7 +81,7 @@ async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage
 ) -> sqlx::Result<()> {
     let now_timestamp = Local::now();
 
-    let process_metadata = Process {
+    let process = Process {
         exe: "/snap/firefox/4336/usr/lib/firefox/firefox".to_string(),
         cmdline: "/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/
     usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab".to_string(),
@@ -89,16 +89,12 @@ async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage
         start_date: now_timestamp.to_string(), 
     };
 
-    let db_connection = pool.acquire().await?;
-
-    let insert_query = insert_process_metadata(db_connection, &process_metadata).await;
+    let insert_query = Process::insert(&process).await;
 
     assert!(insert_query.is_ok());
 
-    let rows = insert_query.unwrap();
-    let process_exe: String = rows[0].get("exe");
-    assert_eq!(rows.len(), 1);
-    assert_eq!(&process_exe, &process_metadata.exe);
+    let row = insert_query.unwrap();
+    assert_eq!(row.len(), 1);
     Ok(())
 }
 
@@ -265,9 +261,9 @@ async fn it_formats_process_data_from_boagent_response_with_queried_pid(
 
     let process = process_metadata.unwrap();
 
-    let insert = insert_process_metadata(pool.acquire().await?, &process);
+    let process_row = Process::insert(&process);
 
-    assert!(insert.await.is_ok());
+    assert!(process_row.await.is_ok());
     Ok(())
 }
 

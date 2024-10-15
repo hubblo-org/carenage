@@ -2,14 +2,15 @@ use crate::boagent::Config;
 use crate::ci::GitlabVariables;
 use crate::database::{
     format_hardware_data, get_db_connection_pool, get_project_id, insert_device_metadata,
-    insert_dimension_table_metadata,
+    insert_dimension_table_metadata, to_datetime_local
 };
 use crate::timestamp::Timestamp;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sqlx::error::ErrorKind;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
+use uuid::Uuid;
 use std::process;
 
 pub trait Metadata {
@@ -198,5 +199,41 @@ impl Metadata for CarenageRow {
             }
         };
         Ok(id)
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Process {
+    pub exe: String,
+    pub cmdline: String,
+    pub state: String,
+    pub start_date: String,
+}
+
+impl Process {
+    pub async fn insert(&self) -> Result<PgRow, Box<dyn std::error::Error>> {
+        let start_timestamptz = to_datetime_local(&self.start_date);
+
+        let project_root_path = std::env::current_dir().unwrap().join("..");
+        let config = Config::check_configuration(&project_root_path)?;
+        let mut db_connection = get_db_connection_pool(config.database_url).await?.acquire().await?.detach();
+
+        let insert_query = "INSERT INTO processes (exe, cmdline, state, start_date) VALUES ($1, $2, $3, $4) RETURNING id";
+
+        let process_row = sqlx::query(insert_query)
+            .bind(&self.exe)
+            .bind(&self.cmdline)
+            .bind(&self.state)
+            .bind(start_timestamptz)
+            .fetch_one(&mut db_connection)
+            .await?;
+
+        println!("Inserted process metadata into database.");
+
+        Ok(process_row)
+    }
+    pub fn get_id(process_row: PgRow) -> Uuid {
+        let process_id: Uuid = process_row.get("id");
+        process_id
     }
 }

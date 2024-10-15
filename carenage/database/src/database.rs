@@ -218,27 +218,6 @@ pub async fn insert_dimension_table_metadata(
     Ok(rows)
 }
 
-pub async fn insert_process_metadata(
-    database_connection: PoolConnection<Postgres>,
-    process: &Process,
-) -> Result<Vec<PgRow>, sqlx::Error> {
-    let start_timestamptz = to_datetime_local(&process.start_date);
-
-    let mut connection = database_connection.detach();
-
-    let insert_query = "INSERT INTO processes (exe, cmdline, state, start_date) VALUES ($1, $2, $3, $4) RETURNING *";
-
-    let process_rows = sqlx::query(insert_query)
-        .bind(&process.exe)
-        .bind(&process.cmdline)
-        .bind(&process.state)
-        .bind(start_timestamptz)
-        .fetch_all(&mut connection)
-        .await?;
-
-    Ok(process_rows)
-}
-
 pub async fn insert_device_metadata(
     database_connection: PoolConnection<Postgres>,
     device_data: Value,
