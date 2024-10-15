@@ -8,7 +8,8 @@ use crate::timestamp::Timestamp;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sqlx::error::ErrorKind;
-use sqlx::postgres::PgRow;
+use sqlx::pool::PoolConnection;
+use sqlx::postgres::{PgRow, Postgres};
 use sqlx::Row;
 use uuid::Uuid;
 use std::process;
@@ -212,22 +213,18 @@ pub struct Process {
 }
 
 impl Process {
-    pub async fn insert(&self) -> Result<PgRow, Box<dyn std::error::Error>> {
+    pub async fn insert(&self, db_connection: PoolConnection<Postgres>) -> Result<PgRow, Box<dyn std::error::Error>> {
         let start_timestamptz = to_datetime_local(&self.start_date);
-
-        let project_root_path = std::env::current_dir().unwrap().join("..");
-        let config = Config::check_configuration(&project_root_path)?;
-        let mut db_connection = get_db_connection_pool(config.database_url).await?.acquire().await?.detach();
 
         let insert_query = "INSERT INTO processes (pid, exe, cmdline, state, start_date) VALUES ($1, $2, $3, $4, $5) RETURNING id";
 
         let process_row = sqlx::query(insert_query)
-            .bind(&self.pid)
+            .bind(self.pid)
             .bind(&self.exe)
             .bind(&self.cmdline)
             .bind(&self.state)
             .bind(start_timestamptz)
-            .fetch_one(&mut db_connection)
+            .fetch_one(&mut db_connection.detach())
             .await?;
 
         println!("Inserted process metadata into database.");

@@ -4,7 +4,7 @@ use chrono::{Duration, Local};
 use database::boagent::{deserialize_boagent_json, query_boagent, HardwareData};
 use database::database::{
     format_hardware_data, format_process_metadata, get_db_connection_pool, get_project_id,
-    insert_device_metadata, insert_dimension_table_metadata, insert_event_data, insert_metrics,
+    insert_device_metadata, insert_dimension_table_metadata, insert_metrics,
     update_stop_date,
 };
 use database::event::{Event, EventType};
@@ -90,7 +90,7 @@ async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage
         start_date: now_timestamp.to_string(), 
     };
 
-    let insert_query = Process::insert(&process).await;
+    let insert_query = Process::insert(&process, pool.acquire().await?).await;
 
     assert!(insert_query.is_ok());
 
@@ -262,7 +262,7 @@ async fn it_formats_process_data_from_boagent_response_with_queried_pid(
 
     let process = process_metadata.unwrap();
 
-    let process_row = Process::insert(&process);
+    let process_row = Process::insert(&process, pool.acquire().await?);
 
     assert!(process_row.await.is_ok());
     Ok(())
@@ -355,7 +355,7 @@ async fn it_gets_project_id_from_projects_table_with_queried_project_name(
     Ok(())
 }
 #[sqlx::test(fixtures("../fixtures/dimensions.sql"))]
-async fn it_inserts_foreign_keys_events_table(pool: PgPool) -> sqlx::Result<()> {
+async fn it_inserts_foreign_keys_into_events_table(pool: PgPool) -> sqlx::Result<()> {
     let connection = pool.acquire().await?;
 
     let query = sqlx::query("SELECT * FROM project_ids()")
@@ -376,9 +376,7 @@ async fn it_inserts_foreign_keys_events_table(pool: PgPool) -> sqlx::Result<()> 
         event_type: EventType::Regular,
     };
 
-    let another_connection = pool.acquire().await?;
-
-    let insert_event = insert_event_data(another_connection, event).await;
+    let insert_event = Event::insert(&event, pool.acquire().await?).await;
 
     assert!(insert_event.is_ok());
 
