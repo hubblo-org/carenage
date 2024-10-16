@@ -1,7 +1,8 @@
-use crate::carenaged::{insert_metadata, query_and_insert_data};
+use crate::carenaged::{insert_metadata, insert_event, query_and_insert_event};
 use carenaged::DaemonArgs;
 use database::boagent::HardwareData;
 use database::ci::GitlabVariables;
+use database::event::{Event, EventType};
 use std::process;
 use tokio::signal::unix::{signal, SignalKind};
 use tokio::time::{self, Duration};
@@ -23,14 +24,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let project_ids = insert_metadata(gitlab_vars, args.start_timestamp, args.unix_flag).await?;
 
+    let start_event = Event::build(project_ids, EventType::Start);
+    insert_event(&start_event).await?;
+
     let _query_insert_loop = tokio::spawn(async move {
         let mut interval = time::interval(Duration::from_secs(args.time_step));
         loop {
-            let _ = query_and_insert_data(
+            let _ = query_and_insert_event(
                 project_ids,
                 args.start_timestamp,
                 args.unix_flag,
                 HardwareData::Ignore,
+                EventType::Regular,
             )
             .await;
             interval.tick().await;
