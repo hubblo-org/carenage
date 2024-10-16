@@ -1,1 +1,362 @@
-{"pid": 6042, "process_cpu_embedded_impact_values": {"gwp_cpu_average_impact": 0.38336191697478994, "adp_cpu_average_impact": 0.00039112499579352936, "pe_cpu_average_impact": 5.750428754621844, "gwp_cpu_max_impact": 0.9255784800000001, "adp_cpu_max_impact": 0.00094432144422, "pe_cpu_max_impact": 13.883677200000001, "gwp_cpu_min_impact": 0.0049683272, "adp_cpu_min_impact": 5.0689358258e-06, "pe_cpu_min_impact": 0.074524908}, "process_ram_embedded_impact_values": {"gwp_ram_average_impact": 6.628147200042126, "adp_ram_average_impact": 0.0003516976065328474, "pe_ram_average_impact": 81.16098612296481, "gwp_ram_max_impact": 13.492131233215332, "adp_ram_max_impact": 0.0007159090042114257, "pe_ram_max_impact": 165.20977020263672, "gwp_ram_min_impact": 0.0, "adp_ram_min_impact": 0.0, "pe_ram_min_impact": 0.0}, "process_ssd_embedded_impact_values": {"gwp_ssd_average_impact": 2.1533829645868956e-06, "adp_ssd_average_impact": 7.321502079595447e-11, "pe_ssd_average_impact": 2.584059557504275e-05, "gwp_ssd_max_impact": 0.0003843788591787609, "adp_ssd_max_impact": 1.3068881212077872e-08, "pe_ssd_max_impact": 0.004612546310145131, "gwp_ssd_min_impact": 0.0, "adp_ssd_min_impact": 0.0, "pe_ssd_min_impact": 0.0}}{"pid": 4163, "process_cpu_embedded_impact_values": {"gwp_cpu_average_impact": 0.15487251434173663, "adp_cpu_average_impact": 0.00015800868275715684, "pe_cpu_average_impact": 2.32308771512605, "gwp_cpu_max_impact": 0.19975030400000002, "adp_cpu_max_impact": 0.000203795247656, "pe_cpu_max_impact": 2.9962545599999997, "gwp_cpu_min_impact": 0.064532144, "adp_cpu_min_impact": 6.5838919916e-05, "pe_cpu_min_impact": 0.9679821599999999}, "process_ram_embedded_impact_values": {"gwp_ram_average_impact": 0.5982858994427849, "adp_ram_average_impact": 3.174578241941307e-05, "pe_ram_average_impact": 7.325949789095326, "gwp_ram_max_impact": 1.2383460998535156, "adp_ram_max_impact": 6.570816040039063e-05, "pe_ram_max_impact": 15.163421630859375, "gwp_ram_min_impact": 0.0, "adp_ram_min_impact": 0.0, "pe_ram_min_impact": 0.0}, "process_ssd_embedded_impact_values": {"gwp_ssd_average_impact": 0.0, "adp_ssd_average_impact": 0.0, "pe_ssd_average_impact": 0.0, "gwp_ssd_max_impact": 0.0, "adp_ssd_max_impact": 0.0, "pe_ssd_max_impact": 0.0, "gwp_ssd_min_impact": 0.0, "adp_ssd_min_impact": 0.0, "pe_ssd_min_impact": 0.0}}{"pid": 171690, "process_cpu_embedded_impact_values": {"gwp_cpu_average_impact": 0.1516298749915965, "adp_cpu_average_impact": 0.00015470037996017646, "pe_cpu_average_impact": 2.274448124873949, "gwp_cpu_max_impact": 0.18458468800000002, "adp_cpu_max_impact": 0.000188322527932, "pe_cpu_max_impact": 2.76877032, "gwp_cpu_min_impact": 0.0697298, "adp_cpu_min_impact": 7.114182845e-05, "pe_cpu_min_impact": 1.045947}, "process_ram_embedded_impact_values": {"gwp_ram_average_impact": 0.7068763059728286, "adp_ram_average_impact": 3.750772235774175e-05, "pe_ram_average_impact": 8.655628236401983, "gwp_ram_max_impact": 1.4257335662841797, "adp_ram_max_impact": 7.565116882324218e-05, "pe_ram_max_impact": 17.457962036132812, "gwp_ram_min_impact": 0.0, "adp_ram_min_impact": 0.0, "pe_ram_min_impact": 0.0}, "process_ssd_embedded_impact_values": {"gwp_ssd_average_impact": 4.632016481116605e-06, "adp_ssd_average_impact": 1.5748856035796454e-10, "pe_ssd_average_impact": 5.5584197773399256e-05, "gwp_ssd_max_impact": 0.001649625937308849, "adp_ssd_max_impact": 5.608728186850086e-08, "pe_ssd_max_impact": 0.019795511247706187, "gwp_ssd_min_impact": 0.0, "adp_ssd_min_impact": 0.0, "pe_ssd_min_impact": 0.0}}{"pid": 4489, "process_cpu_embedded_impact_values": {"gwp_cpu_average_impact": 0.04560103692207791, "adp_cpu_average_impact": 4.652445791975e-05, "pe_cpu_average_impact": 0.684015553831169, "gwp_cpu_max_impact": 0.195146348, "adp_cpu_max_impact": 0.00019909806154699998, "pe_cpu_max_impact": 2.9271952199999998, "gwp_cpu_min_impact": 0.0049652432, "adp_cpu_min_impact": 5.0657893748e-06, "pe_cpu_min_impact": 0.07447864800000001}, "process_ram_embedded_impact_values": {"gwp_ram_average_impact": 0.26032881303267047, "adp_ram_average_impact": 1.3813365589488605e-05, "pe_ram_average_impact": 3.1876997514204546, "gwp_ram_max_impact": 0.5369281768798828, "adp_ram_max_impact": 2.8490066528320308e-05, "pe_ram_max_impact": 6.5746307373046875, "gwp_ram_min_impact": 0.0, "adp_ram_min_impact": 0.0, "pe_ram_min_impact": 0.0}, "process_ssd_embedded_impact_values": {"gwp_ssd_average_impact": 0.0, "adp_ssd_average_impact": 0.0, "pe_ssd_average_impact": 0.0, "gwp_ssd_max_impact": 0.0, "adp_ssd_max_impact": 0.0, "pe_ssd_max_impact": 0.0, "gwp_ssd_min_impact": 0.0, "adp_ssd_min_impact": 0.0, "pe_ssd_min_impact": 0.0}}{"pid": 7281, "process_cpu_embedded_impact_values": {"gwp_cpu_average_impact": 0.017487180748207175, "adp_cpu_average_impact": 1.7841296158358363e-05, "pe_cpu_average_impact": 0.26230771122310764, "gwp_cpu_max_impact": 0.20572002, "adp_cpu_max_impact": 0.000209885850405, "pe_cpu_max_impact": 3.0858003000000003, "gwp_cpu_min_impact": 0.0049541738, "adp_cpu_min_impact": 5.0544958194500005e-06, "pe_cpu_min_impact": 0.074312607}, "process_ram_embedded_impact_values": {"gwp_ram_average_impact": 12.922818765222313, "adp_ram_average_impact": 0.0006857005875424088, "pe_ram_average_impact": 158.2385971251712, "gwp_ram_max_impact": 25.168566703796387, "adp_ram_max_impact": 0.0013354749679565427, "pe_ram_max_impact": 308.18653106689453, "gwp_ram_min_impact": 0.0, "adp_ram_min_impact": 0.0, "pe_ram_min_impact": 0.0}, "process_ssd_embedded_impact_values": {"gwp_ssd_average_impact": 0.0, "adp_ssd_average_impact": 0.0, "pe_ssd_average_impact": 0.0, "gwp_ssd_max_impact": 0.0, "adp_ssd_max_impact": 0.0, "pe_ssd_max_impact": 0.0, "gwp_ssd_min_impact": 0.0, "adp_ssd_min_impact": 0.0, "pe_ssd_min_impact": 0.0}}{"pid": 7868, "process_cpu_embedded_impact_values": {"gwp_cpu_average_impact": 0.041035478813483114, "adp_cpu_average_impact": 4.1866447259456185e-05, "pe_cpu_average_impact": 0.615532182202247, "gwp_cpu_max_impact": 0.305534696, "adp_cpu_max_impact": 0.000311721773594, "pe_cpu_max_impact": 4.58302044, "gwp_cpu_min_impact": 0.009942828800000001, "adp_cpu_min_impact": 1.01441710832e-05, "pe_cpu_min_impact": 0.14914243200000002}, "process_ram_embedded_impact_values": {"gwp_ram_average_impact": 0.44948327407408295, "adp_ram_average_impact": 2.385013291005336e-05, "pe_ram_average_impact": 5.503876825396934, "gwp_ram_max_impact": 1.7607879638671875, "adp_ram_max_impact": 9.342956542968749e-05, "pe_ram_max_impact": 21.5606689453125, "gwp_ram_min_impact": 0.0, "adp_ram_min_impact": 0.0, "pe_ram_min_impact": 0.0}, "process_ssd_embedded_impact_values": {"gwp_ssd_average_impact": 0.0, "adp_ssd_average_impact": 0.0, "pe_ssd_average_impact": 0.0, "gwp_ssd_max_impact": 0.0, "adp_ssd_max_impact": 0.0, "pe_ssd_max_impact": 0.0, "gwp_ssd_min_impact": 0.0, "adp_ssd_min_impact": 0.0, "pe_ssd_min_impact": 0.0}}{"pid": 5567, "process_cpu_embedded_impact_values": {"gwp_cpu_average_impact": 0.030037359798181815, "adp_cpu_average_impact": 3.0645616334095e-05, "pe_cpu_average_impact": 0.45056039697272726, "gwp_cpu_max_impact": 0.7377866799999999, "adp_cpu_max_impact": 0.0007527268602699999, "pe_cpu_max_impact": 11.0668002, "gwp_cpu_min_impact": 0.0049664762, "adp_cpu_min_impact": 5.06704734305e-06, "pe_cpu_min_impact": 0.074497143}, "process_ram_embedded_impact_values": {"gwp_ram_average_impact": 9.672109647230668, "adp_ram_average_impact": 0.0005132139812816275, "pe_ram_average_impact": 118.43399568037553, "gwp_ram_max_impact": 22.96921730041504, "adp_ram_max_impact": 0.0012187747955322264, "pe_ram_max_impact": 281.25572204589844, "gwp_ram_min_impact": 0.0, "adp_ram_min_impact": 0.0, "pe_ram_min_impact": 0.0}, "process_ssd_embedded_impact_values": {"gwp_ssd_average_impact": 0.0, "adp_ssd_average_impact": 0.0, "pe_ssd_average_impact": 0.0, "gwp_ssd_max_impact": 0.0, "adp_ssd_max_impact": 0.0, "pe_ssd_max_impact": 0.0, "gwp_ssd_min_impact": 0.0, "adp_ssd_min_impact": 0.0, "pe_ssd_min_impact": 0.0}}{"pid": 5365, "process_cpu_embedded_impact_values": {"gwp_cpu_average_impact": 0.2594825014421486, "adp_cpu_average_impact": 0.0002647370220963523, "pe_cpu_average_impact": 3.892237521632231, "gwp_cpu_max_impact": 2.35352896, "adp_cpu_max_impact": 0.0024011879214399998, "pe_cpu_max_impact": 35.3029344, "gwp_cpu_min_impact": 0.0049714144000000005, "adp_cpu_min_impact": 5.0720855416e-06, "pe_cpu_min_impact": 0.07457121600000001}, "process_ram_embedded_impact_values": {"gwp_ram_average_impact": 8.547201688624611, "adp_ram_average_impact": 0.0004535249875596733, "pe_ram_average_impact": 104.65961251377074, "gwp_ram_max_impact": 29.954891204833984, "adp_ram_max_impact": 0.0015894432067871092, "pe_ram_max_impact": 366.7945861816406, "gwp_ram_min_impact": 0.0, "adp_ram_min_impact": 0.0, "pe_ram_min_impact": 0.0}, "process_ssd_embedded_impact_values": {"gwp_ssd_average_impact": 0.0, "adp_ssd_average_impact": 0.0, "pe_ssd_average_impact": 0.0, "gwp_ssd_max_impact": 0.0, "adp_ssd_max_impact": 0.0, "pe_ssd_max_impact": 0.0, "gwp_ssd_min_impact": 0.0, "adp_ssd_min_impact": 0.0, "pe_ssd_min_impact": 0.0}}{"pid": 810, "process_cpu_embedded_impact_values": {"gwp_cpu_average_impact": 0.013027300188338194, "adp_cpu_average_impact": 1.3291103017152033e-05, "pe_cpu_average_impact": 0.19540950282507305, "gwp_cpu_max_impact": 0.025157232, "adp_cpu_max_impact": 2.5666665948e-05, "pe_cpu_max_impact": 0.37735848000000005, "gwp_cpu_min_impact": 0.0049683272, "adp_cpu_min_impact": 5.0689358258e-06, "pe_cpu_min_impact": 0.074524908}, "process_ram_embedded_impact_values": {"gwp_ram_average_impact": 0.6121608189174107, "adp_ram_average_impact": 3.248200263643392e-05, "pe_ram_average_impact": 7.495846762254009, "gwp_ram_max_impact": 1.3252639770507812, "adp_ram_max_impact": 7.032012939453124e-05, "pe_ram_max_impact": 16.22772216796875, "gwp_ram_min_impact": 0.0, "adp_ram_min_impact": 0.0, "pe_ram_min_impact": 0.0}, "process_ssd_embedded_impact_values": {"gwp_ssd_average_impact": 0.0, "adp_ssd_average_impact": 0.0, "pe_ssd_average_impact": 0.0, "gwp_ssd_max_impact": 0.0, "adp_ssd_max_impact": 0.0, "pe_ssd_max_impact": 0.0, "gwp_ssd_min_impact": 0.0, "adp_ssd_min_impact": 0.0, "pe_ssd_min_impact": 0.0}}{"pid": 14063, "process_cpu_embedded_impact_values": {"gwp_cpu_average_impact": 0.00499358505, "adp_cpu_average_impact": 5.0947051472624996e-06, "pe_cpu_average_impact": 0.07490377575, "gwp_cpu_max_impact": 0.0050112756, "adp_cpu_max_impact": 5.1127539308999996e-06, "pe_cpu_max_impact": 0.075169134, "gwp_cpu_min_impact": 0.0049689442, "adp_cpu_min_impact": 5.06956532005e-06, "pe_cpu_min_impact": 0.074534163}, "process_ram_embedded_impact_values": {"gwp_ram_average_impact": 3.0000686645507812, "adp_ram_average_impact": 0.00015918731689453124, "pe_ram_average_impact": 36.73553466796875, "gwp_ram_max_impact": 4.518795013427734, "adp_ram_max_impact": 0.00023977279663085936, "pe_ram_max_impact": 55.332183837890625, "gwp_ram_min_impact": 0.0, "adp_ram_min_impact": 0.0, "pe_ram_min_impact": 0.0}, "process_ssd_embedded_impact_values": {"gwp_ssd_average_impact": 0.0, "adp_ssd_average_impact": 0.0, "pe_ssd_average_impact": 0.0, "gwp_ssd_max_impact": 0.0, "adp_ssd_max_impact": 0.0, "pe_ssd_max_impact": 0.0, "gwp_ssd_min_impact": 0.0, "adp_ssd_min_impact": 0.0, "pe_ssd_min_impact": 0.0}}
+[
+    {
+        "pid": 6042,
+        "process_cpu_embedded_impact_values": {
+            "gwp_cpu_average_impact": 0.38336191697478994,
+            "adp_cpu_average_impact": 0.00039112499579352936,
+            "pe_cpu_average_impact": 5.750428754621844,
+            "gwp_cpu_max_impact": 0.9255784800000001,
+            "adp_cpu_max_impact": 0.00094432144422,
+            "pe_cpu_max_impact": 13.883677200000001,
+            "gwp_cpu_min_impact": 0.0049683272,
+            "adp_cpu_min_impact": 0.0000050689358258,
+            "pe_cpu_min_impact": 0.074524908
+        },
+        "process_ram_embedded_impact_values": {
+            "gwp_ram_average_impact": 6.628147200042126,
+            "adp_ram_average_impact": 0.0003516976065328474,
+            "pe_ram_average_impact": 81.16098612296481,
+            "gwp_ram_max_impact": 13.492131233215332,
+            "adp_ram_max_impact": 0.0007159090042114257,
+            "pe_ram_max_impact": 165.20977020263672,
+            "gwp_ram_min_impact": 0,
+            "adp_ram_min_impact": 0,
+            "pe_ram_min_impact": 0
+        },
+        "process_ssd_embedded_impact_values": {
+            "gwp_ssd_average_impact": 0.0000021533829645868956,
+            "adp_ssd_average_impact": 7.321502079595447e-11,
+            "pe_ssd_average_impact": 0.00002584059557504275,
+            "gwp_ssd_max_impact": 0.0003843788591787609,
+            "adp_ssd_max_impact": 1.3068881212077872e-8,
+            "pe_ssd_max_impact": 0.004612546310145131,
+            "gwp_ssd_min_impact": 0,
+            "adp_ssd_min_impact": 0,
+            "pe_ssd_min_impact": 0
+        }
+    },
+    {
+        "pid": 4163,
+        "process_cpu_embedded_impact_values": {
+            "gwp_cpu_average_impact": 0.15487251434173663,
+            "adp_cpu_average_impact": 0.00015800868275715684,
+            "pe_cpu_average_impact": 2.32308771512605,
+            "gwp_cpu_max_impact": 0.19975030400000002,
+            "adp_cpu_max_impact": 0.000203795247656,
+            "pe_cpu_max_impact": 2.9962545599999997,
+            "gwp_cpu_min_impact": 0.064532144,
+            "adp_cpu_min_impact": 0.000065838919916,
+            "pe_cpu_min_impact": 0.9679821599999999
+        },
+        "process_ram_embedded_impact_values": {
+            "gwp_ram_average_impact": 0.5982858994427849,
+            "adp_ram_average_impact": 0.00003174578241941307,
+            "pe_ram_average_impact": 7.325949789095326,
+            "gwp_ram_max_impact": 1.2383460998535156,
+            "adp_ram_max_impact": 0.00006570816040039063,
+            "pe_ram_max_impact": 15.163421630859375,
+            "gwp_ram_min_impact": 0,
+            "adp_ram_min_impact": 0,
+            "pe_ram_min_impact": 0
+        },
+        "process_ssd_embedded_impact_values": {
+            "gwp_ssd_average_impact": 0,
+            "adp_ssd_average_impact": 0,
+            "pe_ssd_average_impact": 0,
+            "gwp_ssd_max_impact": 0,
+            "adp_ssd_max_impact": 0,
+            "pe_ssd_max_impact": 0,
+            "gwp_ssd_min_impact": 0,
+            "adp_ssd_min_impact": 0,
+            "pe_ssd_min_impact": 0
+        }
+    },
+    {
+        "pid": 171690,
+        "process_cpu_embedded_impact_values": {
+            "gwp_cpu_average_impact": 0.1516298749915965,
+            "adp_cpu_average_impact": 0.00015470037996017646,
+            "pe_cpu_average_impact": 2.274448124873949,
+            "gwp_cpu_max_impact": 0.18458468800000002,
+            "adp_cpu_max_impact": 0.000188322527932,
+            "pe_cpu_max_impact": 2.76877032,
+            "gwp_cpu_min_impact": 0.0697298,
+            "adp_cpu_min_impact": 0.00007114182845,
+            "pe_cpu_min_impact": 1.045947
+        },
+        "process_ram_embedded_impact_values": {
+            "gwp_ram_average_impact": 0.7068763059728286,
+            "adp_ram_average_impact": 0.00003750772235774175,
+            "pe_ram_average_impact": 8.655628236401983,
+            "gwp_ram_max_impact": 1.4257335662841797,
+            "adp_ram_max_impact": 0.00007565116882324218,
+            "pe_ram_max_impact": 17.457962036132812,
+            "gwp_ram_min_impact": 0,
+            "adp_ram_min_impact": 0,
+            "pe_ram_min_impact": 0
+        },
+        "process_ssd_embedded_impact_values": {
+            "gwp_ssd_average_impact": 0.000004632016481116605,
+            "adp_ssd_average_impact": 1.5748856035796454e-10,
+            "pe_ssd_average_impact": 0.000055584197773399256,
+            "gwp_ssd_max_impact": 0.001649625937308849,
+            "adp_ssd_max_impact": 5.608728186850086e-8,
+            "pe_ssd_max_impact": 0.019795511247706187,
+            "gwp_ssd_min_impact": 0,
+            "adp_ssd_min_impact": 0,
+            "pe_ssd_min_impact": 0
+        }
+    },
+    {
+        "pid": 4489,
+        "process_cpu_embedded_impact_values": {
+            "gwp_cpu_average_impact": 0.04560103692207791,
+            "adp_cpu_average_impact": 0.00004652445791975,
+            "pe_cpu_average_impact": 0.684015553831169,
+            "gwp_cpu_max_impact": 0.195146348,
+            "adp_cpu_max_impact": 0.00019909806154699998,
+            "pe_cpu_max_impact": 2.9271952199999998,
+            "gwp_cpu_min_impact": 0.0049652432,
+            "adp_cpu_min_impact": 0.0000050657893748,
+            "pe_cpu_min_impact": 0.07447864800000001
+        },
+        "process_ram_embedded_impact_values": {
+            "gwp_ram_average_impact": 0.26032881303267047,
+            "adp_ram_average_impact": 0.000013813365589488605,
+            "pe_ram_average_impact": 3.1876997514204546,
+            "gwp_ram_max_impact": 0.5369281768798828,
+            "adp_ram_max_impact": 0.000028490066528320308,
+            "pe_ram_max_impact": 6.5746307373046875,
+            "gwp_ram_min_impact": 0,
+            "adp_ram_min_impact": 0,
+            "pe_ram_min_impact": 0
+        },
+        "process_ssd_embedded_impact_values": {
+            "gwp_ssd_average_impact": 0,
+            "adp_ssd_average_impact": 0,
+            "pe_ssd_average_impact": 0,
+            "gwp_ssd_max_impact": 0,
+            "adp_ssd_max_impact": 0,
+            "pe_ssd_max_impact": 0,
+            "gwp_ssd_min_impact": 0,
+            "adp_ssd_min_impact": 0,
+            "pe_ssd_min_impact": 0
+        }
+    },
+    {
+        "pid": 7281,
+        "process_cpu_embedded_impact_values": {
+            "gwp_cpu_average_impact": 0.017487180748207175,
+            "adp_cpu_average_impact": 0.000017841296158358363,
+            "pe_cpu_average_impact": 0.26230771122310764,
+            "gwp_cpu_max_impact": 0.20572002,
+            "adp_cpu_max_impact": 0.000209885850405,
+            "pe_cpu_max_impact": 3.0858003000000003,
+            "gwp_cpu_min_impact": 0.0049541738,
+            "adp_cpu_min_impact": 0.0000050544958194500005,
+            "pe_cpu_min_impact": 0.074312607
+        },
+        "process_ram_embedded_impact_values": {
+            "gwp_ram_average_impact": 12.922818765222313,
+            "adp_ram_average_impact": 0.0006857005875424088,
+            "pe_ram_average_impact": 158.2385971251712,
+            "gwp_ram_max_impact": 25.168566703796387,
+            "adp_ram_max_impact": 0.0013354749679565427,
+            "pe_ram_max_impact": 308.18653106689453,
+            "gwp_ram_min_impact": 0,
+            "adp_ram_min_impact": 0,
+            "pe_ram_min_impact": 0
+        },
+        "process_ssd_embedded_impact_values": {
+            "gwp_ssd_average_impact": 0,
+            "adp_ssd_average_impact": 0,
+            "pe_ssd_average_impact": 0,
+            "gwp_ssd_max_impact": 0,
+            "adp_ssd_max_impact": 0,
+            "pe_ssd_max_impact": 0,
+            "gwp_ssd_min_impact": 0,
+            "adp_ssd_min_impact": 0,
+            "pe_ssd_min_impact": 0
+        }
+    },
+    {
+        "pid": 7868,
+        "process_cpu_embedded_impact_values": {
+            "gwp_cpu_average_impact": 0.041035478813483114,
+            "adp_cpu_average_impact": 0.000041866447259456185,
+            "pe_cpu_average_impact": 0.615532182202247,
+            "gwp_cpu_max_impact": 0.305534696,
+            "adp_cpu_max_impact": 0.000311721773594,
+            "pe_cpu_max_impact": 4.58302044,
+            "gwp_cpu_min_impact": 0.009942828800000001,
+            "adp_cpu_min_impact": 0.0000101441710832,
+            "pe_cpu_min_impact": 0.14914243200000002
+        },
+        "process_ram_embedded_impact_values": {
+            "gwp_ram_average_impact": 0.44948327407408295,
+            "adp_ram_average_impact": 0.00002385013291005336,
+            "pe_ram_average_impact": 5.503876825396934,
+            "gwp_ram_max_impact": 1.7607879638671875,
+            "adp_ram_max_impact": 0.00009342956542968749,
+            "pe_ram_max_impact": 21.5606689453125,
+            "gwp_ram_min_impact": 0,
+            "adp_ram_min_impact": 0,
+            "pe_ram_min_impact": 0
+        },
+        "process_ssd_embedded_impact_values": {
+            "gwp_ssd_average_impact": 0,
+            "adp_ssd_average_impact": 0,
+            "pe_ssd_average_impact": 0,
+            "gwp_ssd_max_impact": 0,
+            "adp_ssd_max_impact": 0,
+            "pe_ssd_max_impact": 0,
+            "gwp_ssd_min_impact": 0,
+            "adp_ssd_min_impact": 0,
+            "pe_ssd_min_impact": 0
+        }
+    },
+    {
+        "pid": 5567,
+        "process_cpu_embedded_impact_values": {
+            "gwp_cpu_average_impact": 0.030037359798181815,
+            "adp_cpu_average_impact": 0.000030645616334095,
+            "pe_cpu_average_impact": 0.45056039697272726,
+            "gwp_cpu_max_impact": 0.7377866799999999,
+            "adp_cpu_max_impact": 0.0007527268602699999,
+            "pe_cpu_max_impact": 11.0668002,
+            "gwp_cpu_min_impact": 0.0049664762,
+            "adp_cpu_min_impact": 0.00000506704734305,
+            "pe_cpu_min_impact": 0.074497143
+        },
+        "process_ram_embedded_impact_values": {
+            "gwp_ram_average_impact": 9.672109647230668,
+            "adp_ram_average_impact": 0.0005132139812816275,
+            "pe_ram_average_impact": 118.43399568037553,
+            "gwp_ram_max_impact": 22.96921730041504,
+            "adp_ram_max_impact": 0.0012187747955322264,
+            "pe_ram_max_impact": 281.25572204589844,
+            "gwp_ram_min_impact": 0,
+            "adp_ram_min_impact": 0,
+            "pe_ram_min_impact": 0
+        },
+        "process_ssd_embedded_impact_values": {
+            "gwp_ssd_average_impact": 0,
+            "adp_ssd_average_impact": 0,
+            "pe_ssd_average_impact": 0,
+            "gwp_ssd_max_impact": 0,
+            "adp_ssd_max_impact": 0,
+            "pe_ssd_max_impact": 0,
+            "gwp_ssd_min_impact": 0,
+            "adp_ssd_min_impact": 0,
+            "pe_ssd_min_impact": 0
+        }
+    },
+    {
+        "pid": 5365,
+        "process_cpu_embedded_impact_values": {
+            "gwp_cpu_average_impact": 0.2594825014421486,
+            "adp_cpu_average_impact": 0.0002647370220963523,
+            "pe_cpu_average_impact": 3.892237521632231,
+            "gwp_cpu_max_impact": 2.35352896,
+            "adp_cpu_max_impact": 0.0024011879214399998,
+            "pe_cpu_max_impact": 35.3029344,
+            "gwp_cpu_min_impact": 0.0049714144000000005,
+            "adp_cpu_min_impact": 0.0000050720855416,
+            "pe_cpu_min_impact": 0.07457121600000001
+        },
+        "process_ram_embedded_impact_values": {
+            "gwp_ram_average_impact": 8.547201688624611,
+            "adp_ram_average_impact": 0.0004535249875596733,
+            "pe_ram_average_impact": 104.65961251377074,
+            "gwp_ram_max_impact": 29.954891204833984,
+            "adp_ram_max_impact": 0.0015894432067871092,
+            "pe_ram_max_impact": 366.7945861816406,
+            "gwp_ram_min_impact": 0,
+            "adp_ram_min_impact": 0,
+            "pe_ram_min_impact": 0
+        },
+        "process_ssd_embedded_impact_values": {
+            "gwp_ssd_average_impact": 0,
+            "adp_ssd_average_impact": 0,
+            "pe_ssd_average_impact": 0,
+            "gwp_ssd_max_impact": 0,
+            "adp_ssd_max_impact": 0,
+            "pe_ssd_max_impact": 0,
+            "gwp_ssd_min_impact": 0,
+            "adp_ssd_min_impact": 0,
+            "pe_ssd_min_impact": 0
+        }
+    },
+    {
+        "pid": 810,
+        "process_cpu_embedded_impact_values": {
+            "gwp_cpu_average_impact": 0.013027300188338194,
+            "adp_cpu_average_impact": 0.000013291103017152033,
+            "pe_cpu_average_impact": 0.19540950282507305,
+            "gwp_cpu_max_impact": 0.025157232,
+            "adp_cpu_max_impact": 0.000025666665948,
+            "pe_cpu_max_impact": 0.37735848000000005,
+            "gwp_cpu_min_impact": 0.0049683272,
+            "adp_cpu_min_impact": 0.0000050689358258,
+            "pe_cpu_min_impact": 0.074524908
+        },
+        "process_ram_embedded_impact_values": {
+            "gwp_ram_average_impact": 0.6121608189174107,
+            "adp_ram_average_impact": 0.00003248200263643392,
+            "pe_ram_average_impact": 7.495846762254009,
+            "gwp_ram_max_impact": 1.3252639770507812,
+            "adp_ram_max_impact": 0.00007032012939453124,
+            "pe_ram_max_impact": 16.22772216796875,
+            "gwp_ram_min_impact": 0,
+            "adp_ram_min_impact": 0,
+            "pe_ram_min_impact": 0
+        },
+        "process_ssd_embedded_impact_values": {
+            "gwp_ssd_average_impact": 0,
+            "adp_ssd_average_impact": 0,
+            "pe_ssd_average_impact": 0,
+            "gwp_ssd_max_impact": 0,
+            "adp_ssd_max_impact": 0,
+            "pe_ssd_max_impact": 0,
+            "gwp_ssd_min_impact": 0,
+            "adp_ssd_min_impact": 0,
+            "pe_ssd_min_impact": 0
+        }
+    },
+    {
+        "pid": 14063,
+        "process_cpu_embedded_impact_values": {
+            "gwp_cpu_average_impact": 0.00499358505,
+            "adp_cpu_average_impact": 0.0000050947051472624996,
+            "pe_cpu_average_impact": 0.07490377575,
+            "gwp_cpu_max_impact": 0.0050112756,
+            "adp_cpu_max_impact": 0.0000051127539308999996,
+            "pe_cpu_max_impact": 0.075169134,
+            "gwp_cpu_min_impact": 0.0049689442,
+            "adp_cpu_min_impact": 0.00000506956532005,
+            "pe_cpu_min_impact": 0.074534163
+        },
+        "process_ram_embedded_impact_values": {
+            "gwp_ram_average_impact": 3.0000686645507812,
+            "adp_ram_average_impact": 0.00015918731689453124,
+            "pe_ram_average_impact": 36.73553466796875,
+            "gwp_ram_max_impact": 4.518795013427734,
+            "adp_ram_max_impact": 0.00023977279663085936,
+            "pe_ram_max_impact": 55.332183837890625,
+            "gwp_ram_min_impact": 0,
+            "adp_ram_min_impact": 0,
+            "pe_ram_min_impact": 0
+        },
+        "process_ssd_embedded_impact_values": {
+            "gwp_ssd_average_impact": 0,
+            "adp_ssd_average_impact": 0,
+            "pe_ssd_average_impact": 0,
+            "gwp_ssd_max_impact": 0,
+            "adp_ssd_max_impact": 0,
+            "pe_ssd_max_impact": 0,
+            "gwp_ssd_min_impact": 0,
+            "adp_ssd_min_impact": 0,
+            "pe_ssd_min_impact": 0
+        }
+    }
+]
