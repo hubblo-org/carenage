@@ -30,7 +30,7 @@ pub trait Metadata {
     async fn get_id(
         &self,
         insert_attempt: InsertAttempt,
-        project_name: Option<String>,
+        project_name: Option<&String>,
     ) -> Result<uuid::Uuid, Box<dyn std::error::Error>>;
 }
 
@@ -167,7 +167,7 @@ impl Metadata for CarenageRow {
     async fn get_id(
         &self,
         insert_attempt: InsertAttempt,
-        row_name: Option<String>,
+        row_name: Option<&String>,
     ) -> Result<uuid::Uuid, Box<dyn std::error::Error>> {
         let id: uuid::Uuid = match insert_attempt {
             InsertAttempt::Pending(Ok(rows)) => {

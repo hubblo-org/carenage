@@ -59,7 +59,7 @@ pub async fn query_boagent(
     start_time: Timestamp,
     end_time: Timestamp,
     fetch_hardware: HardwareData,
-    location: String,
+    location: &String,
     lifetime: i16,
 ) -> Result<Response, reqwest::Error> {
     let query_parameters = vec![
@@ -84,7 +84,7 @@ pub async fn process_embedded_impacts(
     start_time: Timestamp,
     end_time: Timestamp,
     fetch_hardware: HardwareData,
-    location: String,
+    location: &String,
     lifetime: i16,
 ) -> Result<Response, reqwest::Error> {
     let query_parameters = vec![

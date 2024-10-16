@@ -326,7 +326,7 @@ pub async fn update_stop_date(
 
 pub async fn get_project_id(
     database_connection: PoolConnection<Postgres>,
-    project_name: String,
+    project_name: &String,
 ) -> Result<uuid::Uuid, sqlx::Error> {
     let mut connection = database_connection.detach();
 

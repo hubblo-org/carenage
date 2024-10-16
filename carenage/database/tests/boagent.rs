@@ -39,7 +39,7 @@ async fn it_queries_boagent_with_success_with_needed_query_parameters() {
         Timestamp::Unix(Some(now_timestamp_minus_one_minute)),
         Timestamp::Unix(Some(now_timestamp)),
         HardwareData::Inspect,
-        "FRA".to_string(),
+        &"FRA".to_string(),
         5,
     )
     .await
@@ -76,7 +76,7 @@ fn it_queries_boagent_with_success_with_unspecified_timestamps() {
         Timestamp::Unix(None),
         Timestamp::Unix(None),
         HardwareData::Inspect,
-        "FRA".to_string(),
+        &"FRA".to_string(),
         5,
     )
     .await
@@ -118,7 +118,7 @@ fn it_queries_boagent_with_success_with_iso_8601_timestamps() {
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
-        "FRA".to_string(),
+        &"FRA".to_string(),
         5,
     )
     .await
@@ -136,7 +136,7 @@ async fn it_sends_an_error_when_it_fails_to_send_a_request_to_boagent() {
         Timestamp::ISO8601(None),
         Timestamp::ISO8601(None),
         HardwareData::Inspect,
-        "FRA".to_string(),
+        &"FRA".to_string(),
         5,
     )
     .await;
@@ -178,7 +178,7 @@ async fn it_deserializes_json_from_boagent_response() {
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
-        "FRA".to_string(),
+        &"FRA".to_string(),
         5,
     )
     .await
@@ -228,7 +228,7 @@ async fn it_gets_all_process_ids_for_processes_available_from_boagent_response()
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
-        "FRA".to_string(),
+        &"FRA".to_string(),
         5,
     )
     .await
@@ -280,7 +280,7 @@ async fn it_queries_process_embedded_impacts_from_boagent_with_returned_ids() {
             now_timestamp_minus_one_minute,
             now_timestamp,
             HardwareData::Inspect,
-            "FRA".to_string(),
+            &"FRA".to_string(),
             5,
         )
         .await;

@@ -175,7 +175,7 @@ async fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
-        "FRA".to_string(),
+        &"FRA".to_string(),
         5,
     )
     .await
@@ -248,7 +248,7 @@ async fn it_collects_all_processes_from_boagent_response_and_inserts_them_into_d
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
-        "FRA".to_string(),
+        &"FRA".to_string(),
         5,
     )
     .await
@@ -285,7 +285,7 @@ async fn it_updates_stop_date_field_in_project_row(pool: PgPool) -> sqlx::Result
     .await;
 
     let project_id =
-        get_project_id(pool.acquire().await?, "my_web_application".to_string()).await?;
+        get_project_id(pool.acquire().await?, &"my_web_application".to_string()).await?;
 
     let stop_date_timestamp = Local::now().to_string();
     let update_query = update_stop_date(
@@ -348,7 +348,7 @@ async fn it_gets_project_id_from_projects_table_with_queried_project_name(
 
     let db_connection = pool.acquire().await?;
 
-    let project_id_query = get_project_id(db_connection, project_name.to_string()).await;
+    let project_id_query = get_project_id(db_connection, &project_name.to_string()).await;
 
     assert!(project_id_query.is_ok());
 
@@ -421,7 +421,7 @@ async fn it_builds_metrics_from_json_values() {
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
-        "FRA".to_string(),
+        &"FRA".to_string(),
         5,
     )
     .await
@@ -514,7 +514,7 @@ async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sql
         now_timestamp_minus_one_minute,
         now_timestamp,
         HardwareData::Inspect,
-        "FRA".to_string(),
+        &"FRA".to_string(),
         5,
     )
     .await
