@@ -23,6 +23,55 @@ services:
     networks:
       - carenage
 
+  boagent:
+    image: ghcr.io/boavizta/boagent:0.1.0 
+    environment:
+      BOAVIZTAPI_ENDPOINT: "http://boaviztapi:5000"
+      DEFAULT_LIFETIME: 5.0
+      HARDWARE_FILE_PATH: "/home/boagent/hardware_data.json"
+      POWER_FILE_PATH: "/app/data/power_data.json"
+    privileged: true
+    depends_on:
+      - database
+      - boaviztapi
+      - scaphandre
+    ports:
+      - "8000:8000"
+    networks:
+      - carenage 
+    volumes:
+      - "/proc:/proc"
+      - "/sys:/sys:ro"
+      - "powerdata:/app/data:ro"
+      - "./db:/app/db"
+      - "../boaviztapi/boaviztapi:/app/boaviztapi"
+      - "/etc/crontab:/etc/crontab"
+
+  scaphandre:
+    image: hubblo/scaphandre:dev
+    privileged: true
+    volumes:
+      - type: bind
+        source: /proc
+        target: /proc
+      - type: bind
+        source: /sys/class/powercap
+        target: /sys/class/powercap
+      - "powerdata:/app/data:rw"
+    command: [ "--no-header", "json", "-s", "10", "--resources", "-f", "/app/data/power_data.json" ]
+    networks:
+      - carenage
+
+  boaviztapi:
+    image: ghcr.io/boavizta/boaviztapi:1.2.2
+    ports:
+      - "5000:5000"
+    networks:
+      - carenage 
+
+volumes:
+  powerdata: {}
+
 networks:
   carenage:
     driver: bridge
