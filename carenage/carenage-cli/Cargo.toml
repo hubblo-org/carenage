@@ -1,0 +1,10 @@
+[package]
+name = "carenage-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.11", features = ["derive"] }
+database = { path = "../database" }
+dotenv = "0.15.0"
+sysinfo = "0.30.13"
