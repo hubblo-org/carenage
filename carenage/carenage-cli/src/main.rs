@@ -1,5 +1,6 @@
 use clap::Parser;
 use database::{timestamp::{self, UnixFlag}, boagent::Config};
+use log::{info, error};
 use std::{fs::File, io::Write, process::Command};
 use sysinfo::{Pid, Signal, System};
 
@@ -7,6 +8,7 @@ pub mod cli;
 
 fn main() {
     let cli = cli::Cli::parse();
+    env_logger::init();
 
     match &cli.event {
         Some(cli::Events::Start(args)) => {
@@ -17,13 +19,13 @@ fn main() {
             let config_check = Config::check_configuration(&project_root_path);
 
             if let Ok(_config) = config_check {
-                println!("Needed environment variables are set.");
+                info!("Needed environment variables are set.");
             }
 
             let start_timestamp: timestamp::Timestamp = timestamp::Timestamp::new(unix_flag);
 
-            println!("Carenage start event, time step of {:?} seconds", args.step);
-            println!("Start event timestamp is {:?}", start_timestamp.to_string());
+            info!("Carenage start event, time step of {:?} seconds", args.step);
+            info!("Start event timestamp is {:?}", start_timestamp.to_string());
 
             let carenaged = Command::new("./target/debug/carenaged")
                 .arg(args.step.to_string())
@@ -48,8 +50,8 @@ fn main() {
 
             let printable_stop_timestamp = stop_timestamp.to_string();
 
-            println!("Carenage stop event");
-            println!("Stop event timestamp is {:?}", printable_stop_timestamp);
+            info!("Carenage stop event");
+            info!("Stop event timestamp is {:?}", printable_stop_timestamp);
 
             let pid_file = std::fs::read_to_string("pid.txt")
                 .expect("Failed to open file with saved child process PID.");
@@ -67,7 +69,7 @@ fn main() {
                 .expect("Failed to kill with SIGTERM");
         }
         None => {
-            println!("Unknown command.")
+            error!("Unknown command.")
         }
     }
 }

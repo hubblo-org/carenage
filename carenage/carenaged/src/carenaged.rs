@@ -8,6 +8,7 @@ use database::metrics::Metrics;
 use database::tables::Process;
 use database::tables::{CarenageRow, Metadata};
 use database::timestamp::{Timestamp, UnixFlag};
+use log::info;
 use std::env;
 use std::process;
 
@@ -115,7 +116,7 @@ pub async fn insert_event(event: &Event) -> Result<(), Box<dyn std::error::Error
         .acquire();
 
     Event::insert(event, db_pool.await?).await?;
-    Ok(println!("Inserted event data into database."))
+    Ok(info!("Inserted event data into database."))
 }
 
 pub async fn query_and_insert_event(
@@ -149,7 +150,7 @@ pub async fn query_and_insert_event(
         let process_id = Process::get_id(process_row);
         ids.process_id = process_id;
 
-        let event = Event::build(ids, EventType::Regular);
+        let event = Event::build(ids, event_type);
         let event_row = Event::insert(&event, db_pool.acquire().await?).await?;
         let event_id = Event::get_id(event_row);
 
@@ -171,5 +172,5 @@ pub async fn query_and_insert_event(
         insert_metrics(event_id, db_pool.acquire().await?, metrics).await?;
     }
 
-    Ok(println!("Inserted all metrics for query."))
+    Ok(info!("Inserted all metrics for query."))
 }

@@ -3,6 +3,7 @@ use carenaged::DaemonArgs;
 use database::boagent::HardwareData;
 use database::ci::GitlabVariables;
 use database::event::{Event, EventType};
+use log::{error, info};
 use std::process;
 use tokio::signal::unix::{signal, SignalKind};
 use tokio::time::{self, Duration};
@@ -11,14 +12,15 @@ pub mod carenaged;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("Started carenage daemon with PID: {}", process::id());
+    env_logger::init();
+    info!("Started carenage daemon with PID: {}", process::id());
 
     let mut sigterm = signal(SignalKind::terminate())?;
     let args = DaemonArgs::parse_args()?;
 
-    println!("Time step is : {} seconds.", args.time_step);
-    println!("Start timestamp is {}.", args.start_timestamp);
-    println!("{}", args.unix_flag);
+    info!("Time step is : {} seconds.", args.time_step);
+    info!("Start timestamp is {}.", args.start_timestamp);
+    info!("{}", args.unix_flag);
 
     let gitlab_vars = GitlabVariables::parse_env_variables().expect("Gitlab variables are not available.");
 
@@ -44,12 +46,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match sigterm.recv().await {
         Some(()) => {
-            println!("Received SIGTERM signal.");
-            println!("Stopped carenage daemon.");
+            info!("Received SIGTERM signal.");
+            info!("Stopped carenage daemon.");
             process::exit(0x0100);
         }
         _ => {
-            eprintln!("Unable to listen to SIGTERM signal.")
+            error!("Unable to listen to SIGTERM signal.")
         }
     }
     Ok(())
