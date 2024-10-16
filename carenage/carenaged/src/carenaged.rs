@@ -2,14 +2,12 @@ use database::boagent::{
     deserialize_boagent_json, process_embedded_impacts, query_boagent, Config, HardwareData,
 };
 use database::ci::GitlabVariables;
-use database::database::{collect_processes, get_db_connection_pool, Ids};
+use database::database::{collect_processes, get_db_connection_pool, insert_metrics, Ids};
 use database::event::{Event, EventType};
 use database::metrics::Metrics;
 use database::tables::Process;
 use database::tables::{CarenageRow, Metadata};
 use database::timestamp::{Timestamp, UnixFlag};
-use sqlx::postgres::Postgres;
-use sqlx::{Acquire, PgPool};
 use std::env;
 use std::process;
 
@@ -43,7 +41,7 @@ pub async fn insert_metadata(
 ) -> Result<Ids, Box<dyn std::error::Error>> {
     let project_rows = CarenageRow::Project.insert(start_timestamp, None).await?;
     let project_id = CarenageRow::Project
-        .get_id(project_rows, Some(gitlab_vars.project_path.clone()))
+        .get_id(project_rows, Some(&gitlab_vars.project_path))
         .await?;
 
     let workflow_rows = CarenageRow::Workflow.insert(start_timestamp, None).await?;
@@ -70,7 +68,7 @@ pub async fn insert_metadata(
         start_timestamp,
         end_time,
         HardwareData::Inspect,
-        config.location.clone(),
+        &config.location,
         config.lifetime,
     )
     .await?;
@@ -136,14 +134,14 @@ pub async fn query_and_insert_event(
         start_time,
         end_time,
         fetch_hardware,
-        config.location.clone(),
+        &config.location,
         config.lifetime,
     )
     .await?;
     let deserialized_boagent_response = deserialize_boagent_json(response).await?;
 
     let processes = collect_processes(&deserialized_boagent_response, start_time)
-        .expect("Processes date should be collected from Scaphandre.");
+        .expect("Processes data should be collected from Scaphandre.");
 
     for process in processes {
         let db_pool = get_db_connection_pool(&config.database_url).await?;
@@ -161,15 +159,17 @@ pub async fn query_and_insert_event(
             start_time,
             end_time,
             fetch_hardware,
-            config.location.clone(),
+            &config.location,
             config.lifetime,
         )
         .await?;
 
         let process_data = deserialize_boagent_json(process_response).await?;
 
-        let metrics = Metrics::build(&process_data, &deserialized_boagent_response);
+        let metrics = Metrics::build(&process_data, &deserialized_boagent_response)?;
+
+        insert_metrics(event_id, db_pool.acquire().await?, metrics).await?;
     }
 
-    todo!()
+    Ok(println!("Inserted all metrics for query."))
 }
