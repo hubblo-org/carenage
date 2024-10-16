@@ -52,8 +52,8 @@ pub struct Ids {
     pub process_id: Uuid,
 }
 
-pub async fn get_db_connection_pool(database_url: &String) -> Result<PgPool, sqlx::Error> {
-    let connection_pool = PgPool::connect(database_url.as_str());
+pub async fn get_db_connection_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
+    let connection_pool = PgPool::connect(database_url);
 
     connection_pool.await
 }
@@ -268,34 +268,6 @@ pub async fn insert_device_metadata(
     }
 
     Ok(device_rows)
-}
-
-pub async fn insert_event_data(
-    database_connection: PoolConnection<Postgres>,
-    event: Event,
-) -> Result<PgRow, sqlx::Error> {
-    let mut connection = database_connection.detach();
-
-    let timestamptz = Local::now();
-    let formatted_query = "INSERT INTO events (timestamp, project_id, workflow_id, pipeline_id, job_id, run_id, task_id, process_id, device_id, event_type) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
-    RETURNING id";
-
-    let event = sqlx::query(formatted_query)
-        .bind(timestamptz)
-        .bind(event.project_id)
-        .bind(event.workflow_id)
-        .bind(event.pipeline_id)
-        .bind(event.job_id)
-        .bind(event.run_id)
-        .bind(event.task_id)
-        .bind(event.process_id)
-        .bind(event.device_id)
-        .bind(event.event_type)
-        .fetch_one(&mut connection)
-        .await?;
-
-    Ok(event)
 }
 
 pub async fn insert_metrics(
