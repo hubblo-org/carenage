@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Start timestamp is {}.", args.start_timestamp);
     println!("{}", args.unix_flag);
 
-    let gitlab_vars = GitlabVariables::parse_env_variables()?;
+    let gitlab_vars = GitlabVariables::parse_env_variables().expect("Gitlab variables are not available.");
 
     let project_ids = insert_metadata(gitlab_vars, args.start_timestamp, args.unix_flag).await?;
 
