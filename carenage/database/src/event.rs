@@ -7,9 +7,10 @@ use uuid::Uuid;
 
 use crate::database::Ids;
 
-#[derive(sqlx::Type, Clone, Copy, Debug)]
+#[derive(sqlx::Type, Default, Clone, Copy, Debug)]
 #[sqlx(type_name = "event_type", rename_all = "lowercase")]
 pub enum EventType {
+    #[default]
     Regular,
     Custom,
     Start,
@@ -48,9 +49,11 @@ pub struct Event {
     pub event_type: EventType,
 }
 
-impl Event {
-    pub fn build(ids: Ids, event_type: EventType) -> Event {
-        Event {
+pub struct EventBuilder(Event);
+
+impl EventBuilder {
+    pub fn new(ids: Ids, event_type: EventType) -> Self {
+        EventBuilder(Event {
             project_id: ids.project_id,
             workflow_id: ids.workflow_id,
             pipeline_id: ids.pipeline_id,
@@ -60,8 +63,14 @@ impl Event {
             process_id: ids.process_id,
             device_id: ids.device_id,
             event_type,
-        }
+        })
     }
+    pub fn build(self) -> Event {
+        self.0
+    }
+}
+
+impl Event {
     pub async fn insert(
         &self,
         db_connection: PoolConnection<Postgres>,

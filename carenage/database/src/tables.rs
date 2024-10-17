@@ -2,17 +2,17 @@ use crate::boagent::Config;
 use crate::ci::GitlabVariables;
 use crate::database::{
     format_hardware_data, get_db_connection_pool, get_project_id, insert_device_metadata,
-    insert_dimension_table_metadata, to_datetime_local
+    insert_dimension_table_metadata, to_datetime_local,
 };
 use crate::timestamp::Timestamp;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{json, Number, Value};
 use sqlx::error::ErrorKind;
 use sqlx::pool::PoolConnection;
 use sqlx::postgres::{PgRow, Postgres};
 use sqlx::Row;
-use uuid::Uuid;
 use std::process;
+use uuid::Uuid;
 
 pub trait Metadata {
     fn set_name(&self) -> String;
@@ -109,8 +109,8 @@ impl Metadata for CarenageRow {
         match self {
             CarenageRow::Device => format_hardware_data(
                 deserialized_boagent_response.expect("Boagent response should be parsable."),
-                config.device_name,
-                config.location,
+                &config.device_name,
+                &config.location,
                 config.lifetime,
             )
             .expect("Formatting of device data should succeed."),
@@ -209,12 +209,38 @@ pub struct Process {
     pub exe: String,
     pub cmdline: String,
     pub state: String,
-    pub start_date: String,
+    pub start_timestamp: String,
+}
+
+pub struct ProcessBuilder(Process);
+
+impl ProcessBuilder {
+    pub fn new(
+        pid: i32,
+        exe: &str,
+        cmdline: &str,
+        state: &str,
+        start_timestamp: Timestamp,
+    ) -> Self {
+        ProcessBuilder(Process {
+            pid,
+            exe: exe.to_owned(),
+            cmdline: cmdline.to_owned(),
+            state: state.to_owned(),
+            start_timestamp: start_timestamp.to_string(),
+        })
+    }
+    pub fn build(self) -> Process {
+        self.0
+    }
 }
 
 impl Process {
-    pub async fn insert(&self, db_connection: PoolConnection<Postgres>) -> Result<PgRow, Box<dyn std::error::Error>> {
-        let start_timestamptz = to_datetime_local(&self.start_date);
+    pub async fn insert(
+        &self,
+        db_connection: PoolConnection<Postgres>,
+    ) -> Result<PgRow, Box<dyn std::error::Error>> {
+        let start_timestamptz = to_datetime_local(&self.start_timestamp);
 
         let insert_query = "INSERT INTO processes (pid, exe, cmdline, state, start_date) VALUES ($1, $2, $3, $4, $5) RETURNING id";
 
@@ -234,5 +260,82 @@ impl Process {
     pub fn get_id(process_row: PgRow) -> Uuid {
         let process_id: Uuid = process_row.get("id");
         process_id
+    }
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+// https://serde.rs/enum-representations.html#untagged
+#[serde(untagged)]
+pub enum CharacteristicValue {
+    StringValue(String),
+    NumericValue(Number),
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Device {
+    pub name: String,
+    pub location: String,
+    pub lifetime: Number,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Component {
+    name: String,
+    model: String,
+    manufacturer: String,
+    characteristics: Vec<ComponentCharacteristic>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ComponentCharacteristic {
+    pub name: String,
+    pub value: CharacteristicValue,
+}
+
+pub struct DeviceBuilder(Device);
+pub struct ComponentBuilder(Component);
+pub struct ComponentCharacteristicBuilder(ComponentCharacteristic);
+
+impl DeviceBuilder {
+    pub fn new(name: &str, location: &str, lifetime: i16) -> Self {
+        DeviceBuilder(Device {
+            name: name.to_owned(),
+            location: location.to_owned(),
+            lifetime: lifetime.into(),
+        })
+    }
+    pub fn build(self) -> Device {
+        self.0
+    }
+}
+
+impl ComponentBuilder {
+    pub fn new(
+        name: &str,
+        model: &str,
+        manufacturer: &str,
+        characteristics: Vec<ComponentCharacteristic>,
+    ) -> Self {
+        ComponentBuilder(Component {
+            name: name.to_owned(),
+            model: model.to_owned(),
+            manufacturer: manufacturer.to_owned(),
+            characteristics,
+        })
+    }
+    pub fn build(self) -> Component {
+        self.0
+    }
+}
+
+impl ComponentCharacteristicBuilder {
+    pub fn new(name: &str, value: CharacteristicValue) -> Self {
+        ComponentCharacteristicBuilder(ComponentCharacteristic {
+            name: name.to_owned(),
+            value,
+        })
+    }
+    pub fn build(self) -> ComponentCharacteristic {
+        self.0
     }
 }

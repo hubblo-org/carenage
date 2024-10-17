@@ -3,9 +3,9 @@ use database::boagent::{
 };
 use database::ci::GitlabVariables;
 use database::database::{collect_processes, get_db_connection_pool, insert_metrics, Ids};
-use database::event::{Event, EventType};
+use database::event::{Event, EventBuilder, EventType};
 use database::metrics::Metrics;
-use database::tables::Process;
+use database::tables::{Process, ProcessBuilder};
 use database::tables::{CarenageRow, Metadata};
 use database::timestamp::{Timestamp, UnixFlag};
 use log::info;
@@ -79,13 +79,14 @@ pub async fn insert_metadata(
         .await?;
     let device_id = CarenageRow::Device.get_id(insert_device_data, None).await?;
 
-    let start_process = Process {
-        pid: process::id() as i32,
-        exe: "carenage".to_string(),
-        cmdline: "carenage start".to_string(),
-        state: "running".to_string(),
-        start_date: start_timestamp.to_string(),
-    };
+    let start_process = ProcessBuilder::new(
+        process::id() as i32,
+        "carenage",
+        "carenage start",
+        "running",
+        start_timestamp,
+    )
+    .build();
 
     let db_pool = get_db_connection_pool(&config.database_url)
         .await?
@@ -150,7 +151,7 @@ pub async fn query_and_insert_event(
         let process_id = Process::get_id(process_row);
         ids.process_id = process_id;
 
-        let event = Event::build(ids, event_type);
+        let event = EventBuilder::new(ids, event_type).build();
         let event_row = Event::insert(&event, db_pool.acquire().await?).await?;
         let event_id = Event::get_id(event_row);
 

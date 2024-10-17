@@ -2,7 +2,7 @@ use carenaged::carenaged::{insert_event, insert_metadata, query_and_insert_event
 use chrono::Local;
 use database::boagent::HardwareData;
 use database::ci::GitlabVariables;
-use database::event::{Event, EventType};
+use database::event::{EventBuilder, EventType};
 use database::timestamp::{Timestamp, UnixFlag};
 use mockito::{Matcher, Server};
 use std::env;
@@ -105,7 +105,7 @@ async fn it_inserts_start_event_to_events_table() {
     let project_ids = insert_metadata(gitlab_vars, now, UnixFlag::Unset)
         .await
         .unwrap();
-    let start_event = Event::build(project_ids, EventType::Start);
+    let start_event = EventBuilder::new(project_ids, EventType::Start).build();
     let insert_event = insert_event(&start_event).await;
     assert!(insert_event.is_ok());
 }
@@ -171,7 +171,7 @@ async fn it_inserts_all_events_and_metrics_for_processes() {
     let project_ids = insert_metadata(gitlab_vars, now, UnixFlag::Unset)
         .await
         .unwrap();
-    let start_event = Event::build(project_ids, EventType::Start);
+    let start_event = EventBuilder::new(project_ids, EventType::Start).build();
     let _ = insert_event(&start_event).await;
 
     let query_and_insert = query_and_insert_event(

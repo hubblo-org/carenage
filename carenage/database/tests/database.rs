@@ -11,7 +11,7 @@ use database::database::{
 use database::event::{Event, EventType};
 use database::metrics::Metrics;
 use database::timestamp::Timestamp;
-use database::tables::Process;
+use database::tables::{Process, ProcessBuilder};
 use dotenv::var;
 use mockito::{Matcher, Server};
 use serde_json::json;
@@ -80,16 +80,16 @@ async fn it_inserts_valid_data_for_several_dimension_tables_in_the_carenage_data
 async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage_database(
     pool: PgPool,
 ) -> sqlx::Result<()> {
-    let now_timestamp = Local::now();
+    let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
 
-    let process = Process {
-        pid: 4336,
-        exe: "/snap/firefox/4336/usr/lib/firefox/firefox".to_string(),
-        cmdline: "/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/
-    usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab".to_string(),
-        state: "running".to_string(),
-        start_date: now_timestamp.to_string(), 
-    };
+    let process = ProcessBuilder::new(
+        4336,
+        "/snap/firefox/4336/usr/lib/firefox/firefox",
+        "/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/
+    usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab",
+        "running",
+        now_timestamp, 
+    ).build();
 
     let insert_query = Process::insert(&process, pool.acquire().await?).await;
 
@@ -182,9 +182,9 @@ async fn it_formats_hardware_data_from_boagent_to_wanted_database_fields() {
     .unwrap();
 
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
-    let location = "FRA".to_string();
+    let location = "FRA";
     let lifetime = 5;
-    let device_name = "dell r740".to_string();
+    let device_name = "dell r740";
 
     let hardware_data = format_hardware_data(
         deserialized_boagent_response,

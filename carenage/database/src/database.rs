@@ -1,44 +1,16 @@
 use crate::metrics::Metrics;
-use crate::tables::Process;
+use crate::tables::{
+    CharacteristicValue, ComponentBuilder, ComponentCharacteristicBuilder,
+    DeviceBuilder, Process, ProcessBuilder,
+};
 use crate::timestamp::Timestamp;
 use chrono::{DateTime, Local};
-use serde::{Deserialize, Serialize};
-use serde_json::value::Number;
 use serde_json::{json, Error, Value};
 use sqlx::pool::PoolConnection;
 use sqlx::postgres::PgRow;
 use sqlx::types::uuid::Uuid;
 use sqlx::Row;
 use sqlx::{PgPool, Postgres};
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-// https://serde.rs/enum-representations.html#untagged
-#[serde(untagged)]
-pub enum CharacteristicValue {
-    StringValue(String),
-    NumericValue(Number),
-}
-
-#[derive(Serialize, Deserialize)]
-struct Device {
-    name: String,
-    location: String,
-    lifetime: Number,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Component {
-    name: String,
-    model: String,
-    manufacturer: String,
-    characteristics: Vec<ComponentCharacteristic>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct ComponentCharacteristic {
-    name: String,
-    value: CharacteristicValue,
-}
 
 #[derive(Copy, Clone)]
 pub struct Ids {
@@ -65,17 +37,13 @@ pub fn to_datetime_local(timestamp_str: &str) -> chrono::DateTime<Local> {
 
 pub fn format_hardware_data(
     deserialized_boagent_response: Value,
-    device_name: String,
-    location: String,
+    device_name: &str,
+    location: &str,
     lifetime: i16,
 ) -> Result<Value, Error> {
     let hardware_data = &deserialized_boagent_response["raw_data"]["hardware_data"];
 
-    let device = Device {
-        name: device_name,
-        location,
-        lifetime: lifetime.into(),
-    };
+    let device = DeviceBuilder::new(device_name, location, lifetime).build();
 
     let mut components = vec![];
 
@@ -93,65 +61,72 @@ pub fn format_hardware_data(
         .iter();
 
     let cpu_components_iter = cpus.map(|cpu| {
-        let core_units = ComponentCharacteristic {
-            name: "core_units".to_string(),
-            value: CharacteristicValue::NumericValue(
+        let core_units = ComponentCharacteristicBuilder::new(
+            "core_units",
+            CharacteristicValue::NumericValue(
                 cpu["core_units"]
                     .as_number()
                     .expect("Unable to convert CPU core_units to an integer.")
                     .clone(),
             ),
-        };
-        Component {
-            name: "cpu".to_string(),
-            model: cpu["name"].to_string(),
-            manufacturer: cpu["manufacturer"].to_string(),
-            characteristics: vec![core_units],
-        }
+        )
+        .build();
+        ComponentBuilder::new(
+            "cpu",
+            cpu["name"].as_str().unwrap(),
+            cpu["manufacturer"].as_str().unwrap(),
+            vec![core_units],
+        )
+        .build()
     });
 
     components.extend(cpu_components_iter);
 
     let ram_components_iter = rams.map(|ram| {
-        let capacity = ComponentCharacteristic {
-            name: "capacity".to_string(),
-            value: CharacteristicValue::NumericValue(
+        let capacity = ComponentCharacteristicBuilder::new(
+            "capacity",
+            CharacteristicValue::NumericValue(
                 ram["capacity"]
                     .as_number()
                     .expect("Unable to convert RAM capacity to an integer.")
                     .clone(),
             ),
-        };
-        Component {
-            name: "ram".to_string(),
-            model: "not implemented".to_string(),
-            manufacturer: ram["manufacturer"].to_string(),
-            characteristics: vec![capacity],
-        }
+        )
+        .build();
+        ComponentBuilder::new(
+            "ram",
+            "not implemented",
+            ram["manufacturer"].as_str().unwrap(),
+            vec![capacity],
+        )
+        .build()
     });
 
     components.extend(ram_components_iter);
 
     let disk_components_iter = disks.map(|disk| {
-        let capacity = ComponentCharacteristic {
-            name: "capacity".to_string(),
-            value: CharacteristicValue::NumericValue(
+        let capacity = ComponentCharacteristicBuilder::new(
+            "capacity",
+            CharacteristicValue::NumericValue(
                 disk["capacity"]
                     .as_number()
                     .expect("Unable to convert disk capacity to an integer.")
                     .clone(),
             ),
-        };
-        let disk_type = ComponentCharacteristic {
-            name: "type".to_string(),
-            value: CharacteristicValue::StringValue(disk["type"].to_string()),
-        };
-        Component {
-            name: "disk".to_string(),
-            model: "not implemented".to_string(),
-            manufacturer: disk["manufacturer"].to_string(),
-            characteristics: vec![capacity, disk_type],
-        }
+        )
+        .build();
+        let disk_type = ComponentCharacteristicBuilder::new(
+            "type",
+            CharacteristicValue::StringValue(disk["type"].to_string()),
+        )
+        .build();
+        ComponentBuilder::new(
+            "disk",
+            "not implemented",
+            disk["manufacturer"].as_str().unwrap(),
+            vec![capacity, disk_type],
+        )
+        .build()
     });
 
     components.extend(disk_components_iter);
@@ -164,7 +139,8 @@ pub fn collect_processes(
     deserialized_boagent_response: &Value,
     start_timestamp: Timestamp,
 ) -> Result<Vec<Process>, Error> {
-    let processes: Vec<Process> = deserialized_boagent_response["raw_data"]["power_data"]["raw_data"]
+    let processes: Vec<Process> = deserialized_boagent_response["raw_data"]["power_data"]
+        ["raw_data"]
         .as_array()
         .expect("Boagent response should be parsable")
         .last()
@@ -174,14 +150,19 @@ pub fn collect_processes(
         .as_array()
         .expect("Consumers should contain information on processes.")
         .iter()
-        .map(|process| Process {
-            pid: process["pid"]
-                .as_i64()
-                .expect("Process ID should be an integer.") as i32,
-            exe: process["exe"].to_string(),
-            cmdline: process["cmdline"].to_string(),
-            state: "running".to_string(),
-            start_date: start_timestamp.to_string(),
+        .map(|process| {
+            ProcessBuilder::new(
+                process["pid"]
+                    .as_i64()
+                    .expect("Process ID should be an integer.") as i32,
+                process["exe"].as_str().expect("Exe should be available."),
+                process["cmdline"]
+                    .as_str()
+                    .expect("Cmdline should be available."),
+                "running",
+                start_timestamp,
+            )
+            .build()
         })
         .collect();
 
