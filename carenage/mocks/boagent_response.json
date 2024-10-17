@@ -95,7 +95,7 @@
         {
           "units": 1,
           "name": "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
-          "vendor": "Intel Corp.",
+          "manufacturer": "Intel Corp.",
           "core_units": 4
         }
       ],
