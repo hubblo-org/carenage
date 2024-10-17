@@ -5,7 +5,7 @@ use database::boagent::{deserialize_boagent_json, query_boagent, HardwareData};
 use database::database::{
     collect_processes,
     format_hardware_data, get_db_connection_pool, get_project_id,
-    insert_device_metadata, insert_dimension_table_metadata, insert_metrics,
+    insert_device_metadata, insert_dimension_table_metadata, 
     update_stop_date,
 };
 use database::event::{Event, EventType};
@@ -431,39 +431,37 @@ async fn it_builds_metrics_from_json_values() {
 
     let metrics = Metrics::build(&process_data, &deserialized_boagent_response);
 
-    assert!(metrics.is_ok());
-    let result = metrics.unwrap();
-    assert_eq!(result.cpu_usage_percentage, 1.1115274);
-    assert_eq!(result.memory_usage_bytes, 212635648);
-    assert_eq!(result.memory_virtual_usage_bytes, 2866921472);
-    assert_eq!(result.disk_usage_read_bytes, 0);
-    assert_eq!(result.disk_usage_write_bytes, 0);
-    assert_eq!(result.average_power_measured_w, 14.94261724369748);
-    assert_eq!(result.embedded_emissions_kgc02eq, 900_f64);
-    assert_eq!(result.embedded_abiotic_resources_depletion_kgsbeq, 0.14);
-    assert_eq!(result.embedded_primary_energy_mj, 13000_f64);
+    assert_eq!(metrics.cpu_usage_percentage, 1.1115274);
+    assert_eq!(metrics.memory_usage_bytes, 212635648);
+    assert_eq!(metrics.memory_virtual_usage_bytes, 2866921472);
+    assert_eq!(metrics.disk_usage_read_bytes, 0);
+    assert_eq!(metrics.disk_usage_write_bytes, 0);
+    assert_eq!(metrics.average_power_measured_w, 14.94261724369748);
+    assert_eq!(metrics.embedded_emissions_kgc02eq, 900_f64);
+    assert_eq!(metrics.embedded_abiotic_resources_depletion_kgsbeq, 0.14);
+    assert_eq!(metrics.embedded_primary_energy_mj, 13000_f64);
     assert_eq!(
-        result
+        metrics
             .process_cpu_embedded_impacts
             .unwrap()
             .gwp_average_impact,
         0.38336191697478994
     );
     assert_eq!(
-        result
+        metrics
             .process_ram_embedded_impacts
             .unwrap()
             .gwp_average_impact,
         6.628147200042126
     );
     assert_eq!(
-        result
+        metrics
             .process_ssd_embedded_impacts
             .unwrap()
             .gwp_average_impact,
         0.0000021533829645868956
     );
-    assert!(result.process_hdd_embedded_impacts.is_none());
+    assert!(metrics.process_hdd_embedded_impacts.is_none());
 }
 
 #[sqlx::test(fixtures("../fixtures/events.sql"))]
@@ -521,8 +519,7 @@ async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sql
     .unwrap();
 
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
-    let metrics = Metrics::build(&common::process_data(), &deserialized_boagent_response).unwrap();
-    let insert_metrics = insert_metrics(event_id, another_connection, metrics).await;
-    assert!(insert_metrics.is_ok());
+    let metrics = Metrics::build(&common::process_data(), &deserialized_boagent_response).insert(event_id, another_connection).await;
+    assert!(metrics.is_ok());
     Ok(())
 }

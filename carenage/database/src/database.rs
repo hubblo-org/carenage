@@ -251,41 +251,6 @@ pub async fn insert_device_metadata(
     Ok(device_rows)
 }
 
-pub async fn insert_metrics(
-    event_id: Uuid,
-    database_connection: PoolConnection<Postgres>,
-    metrics: Metrics,
-) -> Result<(), sqlx::Error> {
-    let mut connection = database_connection.detach();
-
-    let metrics_value = serde_json::to_value(metrics).expect("Metrics should be deserializable.");
-    let iterable_metrics = metrics_value
-        .as_object()
-        .expect("Metrics should be parsable.");
-
-    let metric_fields: Vec<String> = iterable_metrics
-        .iter()
-        .map(|metric| metric.0.clone())
-        .collect();
-
-    let metric_values: Vec<f64> = iterable_metrics
-        .iter()
-        .map(|metric| metric.1.as_f64().unwrap())
-        .collect();
-
-    let query = "INSERT INTO METRICS (event_id, metric, value) VALUES ($1, UNNEST($2::VARCHAR(255)[]), UNNEST($3::NUMERIC[]))";
-
-    sqlx::query(query)
-        .bind(event_id)
-        .bind(metric_fields)
-        .bind(metric_values)
-        .execute(&mut connection)
-        .await?;
-
-    println!("Inserted metrics.");
-    Ok(())
-}
-
 pub async fn update_stop_date(
     database_connection: PoolConnection<Postgres>,
     table_name: &str,

@@ -5,10 +5,11 @@ use database::ci::GitlabVariables;
 use database::database::{collect_processes, get_db_connection_pool, insert_metrics, Ids};
 use database::event::{Event, EventBuilder, EventType};
 use database::metrics::Metrics;
-use database::tables::{Process, ProcessBuilder};
 use database::tables::{CarenageRow, Metadata};
+use database::tables::{Process, ProcessBuilder};
 use database::timestamp::{Timestamp, UnixFlag};
 use log::info;
+use sqlx::Acquire;
 use std::env;
 use std::process;
 
@@ -168,9 +169,9 @@ pub async fn query_and_insert_event(
 
         let process_data = deserialize_boagent_json(process_response).await?;
 
-        let metrics = Metrics::build(&process_data, &deserialized_boagent_response)?;
-
-        insert_metrics(event_id, db_pool.acquire().await?, metrics).await?;
+        Metrics::build(&process_data, &deserialized_boagent_response)
+            .insert(event_id, db_pool.acquire().await?)
+            .await?;
     }
 
     Ok(info!("Inserted all metrics for query."))
