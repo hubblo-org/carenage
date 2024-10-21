@@ -148,14 +148,14 @@ impl Metrics {
                 ProcessEmbeddedImpacts::Cpu.build(
                     process_embedded_impacts
                         .get("process_cpu_embedded_impact_values")
-                        .expect("CPU embedded impacts for process should be present"),
+                        .expect("CPU embedded impacts for process should be present."),
                 ),
             ),
             process_ram_embedded_impacts: Some(
                 ProcessEmbeddedImpacts::Ram.build(
                     process_embedded_impacts
                         .get("process_ram_embedded_impact_values")
-                        .expect("RAM embedded impacts for process should be present"),
+                        .expect("RAM embedded impacts for process should be present."),
                 ),
             ),
             process_ssd_embedded_impacts,

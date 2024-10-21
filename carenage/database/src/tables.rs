@@ -177,12 +177,12 @@ impl Metadata for CarenageRow {
             }
             InsertAttempt::Pending(Err(err)) => match err
                 .as_database_error()
-                .expect("It should be a DatabaseError")
+                .expect("It should be a DatabaseError.")
                 .kind()
             {
                 ErrorKind::UniqueViolation => {
                     info!(
-                        "Metadata already present in database, not a project initialization: {}",
+                        "Metadata already present in database, not a project initialization: {}.",
                         err
                     );
                     let project_root_path = std::env::current_dir().unwrap().join("..");

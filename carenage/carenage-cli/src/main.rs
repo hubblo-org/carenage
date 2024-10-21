@@ -24,8 +24,8 @@ fn main() {
 
             let start_timestamp: timestamp::Timestamp = timestamp::Timestamp::new(unix_flag);
 
-            info!("Carenage start event, time step of {:?} seconds", args.step);
-            info!("Start event timestamp is {:?}", start_timestamp.to_string());
+            info!("Carenage start event, time step of {:?} seconds.", args.step);
+            info!("Start event timestamp is {:?}.", start_timestamp.to_string());
 
             let carenaged = Command::new("./target/debug/carenaged")
                 .arg(args.step.to_string())
@@ -50,8 +50,8 @@ fn main() {
 
             let printable_stop_timestamp = stop_timestamp.to_string();
 
-            info!("Carenage stop event");
-            info!("Stop event timestamp is {:?}", printable_stop_timestamp);
+            info!("Carenage stop event.");
+            info!("Stop event timestamp is {:?}.", printable_stop_timestamp);
 
             let pid_file = std::fs::read_to_string("pid.txt")
                 .expect("Failed to open file with saved child process PID.");
@@ -62,11 +62,11 @@ fn main() {
 
             let carenaged_process = system
                 .process(Pid::from_u32(pid))
-                .expect("Failed to get process with given PID");
+                .expect("Failed to retrieve carenaged process with given PID.");
 
             carenaged_process
                 .kill_with(Signal::Term)
-                .expect("Failed to kill with SIGTERM");
+                .expect("Failed to terminate carenaged process with SIGTERM.");
         }
         None => {
             error!("Unknown command.")
