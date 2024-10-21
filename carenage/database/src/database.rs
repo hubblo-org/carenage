@@ -1,4 +1,3 @@
-use crate::metrics::Metrics;
 use crate::tables::{
     CharacteristicValue, ComponentBuilder, ComponentCharacteristicBuilder,
     DeviceBuilder, Process, ProcessBuilder,

@@ -2,14 +2,13 @@ use database::boagent::{
     deserialize_boagent_json, process_embedded_impacts, query_boagent, Config, HardwareData,
 };
 use database::ci::GitlabVariables;
-use database::database::{collect_processes, get_db_connection_pool, insert_metrics, Ids};
+use database::database::{collect_processes, get_db_connection_pool, Ids};
 use database::event::{Event, EventBuilder, EventType};
 use database::metrics::Metrics;
 use database::tables::{CarenageRow, Metadata};
 use database::tables::{Process, ProcessBuilder};
 use database::timestamp::{Timestamp, UnixFlag};
 use log::info;
-use sqlx::Acquire;
 use std::env;
 use std::process;
 
