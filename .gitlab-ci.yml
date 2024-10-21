@@ -1,0 +1,39 @@
+default:
+  services:
+    - postgres
+
+variables:
+  POSTGRES_DB: $POSTGRES_DB
+  POSTGRES_USER: $POSTGRES_USER
+  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  POSTGRES_HOST_AUTH_METHOD: trust
+
+stages:
+  - test
+  - build-and-test
+
+include:
+- template: Jobs/SAST.gitlab-ci.yml
+
+semgrep-sast:
+  stage: test
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - '**/*.rs'
+
+test-for-merge-request:
+  stage: build-and-test
+  image: rust:latest
+  script: 
+    - cd carenage
+    - printf "DATABASE_URL=postgresql://%s:%s@localhost:5432" $POSTGRES_DB $POSTGRES_PASSWORD >> .env
+    - cd database
+    - cargo test --verbose
+    - cd ../carenaged
+    - cargo test --verbose -- --test-threads=1
+
+  rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
