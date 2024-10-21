@@ -314,10 +314,14 @@ mod tests {
                 }
             }
         });
-        let process_cpu_embedded_impacts = ProcessEmbeddedImpacts::Cpu.build(&data);
-        let process_ram_embedded_impacts = ProcessEmbeddedImpacts::Ram.build(&data);
-        let process_ssd_embedded_impacts = ProcessEmbeddedImpacts::Ssd.build(&data);
-        let process_hdd_embedded_impacts = ProcessEmbeddedImpacts::Hdd.build(&data);
+        let process_cpu_embedded_impacts = ProcessEmbeddedImpacts::Cpu
+            .build(&data["process_embedded_impacts"]["process_cpu_embedded_impact_values"]);
+        let process_ram_embedded_impacts = ProcessEmbeddedImpacts::Ram
+            .build(&data["process_embedded_impacts"]["process_ram_embedded_impact_values"]);
+        let process_ssd_embedded_impacts = ProcessEmbeddedImpacts::Ssd
+            .build(&data["process_embedded_impacts"]["process_ssd_embedded_impact_values"]);
+        let process_hdd_embedded_impacts = ProcessEmbeddedImpacts::Hdd
+            .build(&data["process_embedded_impacts"]["process_hdd_embedded_impact_values"]);
 
         assert_eq!(
             process_cpu_embedded_impacts.gwp_average_impact,
