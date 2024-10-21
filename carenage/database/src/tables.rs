@@ -5,6 +5,7 @@ use crate::database::{
     insert_dimension_table_metadata, to_datetime_local,
 };
 use crate::timestamp::Timestamp;
+use log::{error, info};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Number, Value};
 use sqlx::error::ErrorKind;
@@ -171,7 +172,7 @@ impl Metadata for CarenageRow {
     ) -> Result<uuid::Uuid, Box<dyn std::error::Error>> {
         let id: uuid::Uuid = match insert_attempt {
             InsertAttempt::Pending(Ok(rows)) => {
-                println!("Inserted {} metadata into database.", self.table_name());
+                info!("Inserted {} metadata into database.", self.table_name());
                 rows[0].get("id")
             }
             InsertAttempt::Pending(Err(err)) => match err
@@ -180,7 +181,7 @@ impl Metadata for CarenageRow {
                 .kind()
             {
                 ErrorKind::UniqueViolation => {
-                    println!(
+                    info!(
                         "Metadata already present in database, not a project initialization: {}",
                         err
                     );
@@ -190,12 +191,12 @@ impl Metadata for CarenageRow {
                     get_project_id(db_pool.acquire().await?, row_name.unwrap()).await?
                 }
                 _ => {
-                    eprintln!("Error while processing metadata insertion: {}", err);
+                    error!("Error while processing metadata insertion: {}", err);
                     process::exit(0x0100)
                 }
             },
             InsertAttempt::Success(rows) => {
-                println!("Inserted {} metadata into database.", self.table_name());
+                info!("Inserted {} metadata into database.", self.table_name());
                 rows[0].get("id")
             }
         };
@@ -253,7 +254,7 @@ impl Process {
             .fetch_one(&mut db_connection.detach())
             .await?;
 
-        println!("Inserted process metadata into database.");
+        info!("Inserted process metadata into database.");
 
         Ok(process_row)
     }

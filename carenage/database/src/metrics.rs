@@ -1,3 +1,4 @@
+use log::info;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use serde_with::with_prefix;
@@ -252,7 +253,7 @@ impl Metrics {
             .execute(&mut connection)
             .await?;
 
-        println!("Inserted metrics.");
+        info!("Inserted metrics.");
         Ok(())
     }
 }
