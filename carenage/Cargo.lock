@@ -501,6 +501,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "dotenv",
+ "log",
  "mockito",
  "reqwest",
  "serde",
