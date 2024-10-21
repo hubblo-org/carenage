@@ -2,12 +2,13 @@ use database::boagent::{
     deserialize_boagent_json, process_embedded_impacts, query_boagent, Config, HardwareData,
 };
 use database::ci::GitlabVariables;
-use database::database::{collect_processes, get_db_connection_pool, insert_metrics, Ids};
-use database::event::{Event, EventType};
+use database::database::{collect_processes, get_db_connection_pool, Ids};
+use database::event::{Event, EventBuilder, EventType};
 use database::metrics::Metrics;
-use database::tables::Process;
 use database::tables::{CarenageRow, Metadata};
+use database::tables::{Process, ProcessBuilder};
 use database::timestamp::{Timestamp, UnixFlag};
+use log::info;
 use std::env;
 use std::process;
 
@@ -78,13 +79,14 @@ pub async fn insert_metadata(
         .await?;
     let device_id = CarenageRow::Device.get_id(insert_device_data, None).await?;
 
-    let start_process = Process {
-        pid: process::id() as i32,
-        exe: "carenage".to_string(),
-        cmdline: "carenage start".to_string(),
-        state: "running".to_string(),
-        start_date: start_timestamp.to_string(),
-    };
+    let start_process = ProcessBuilder::new(
+        process::id() as i32,
+        "carenage",
+        "carenage start",
+        "running",
+        start_timestamp,
+    )
+    .build();
 
     let db_pool = get_db_connection_pool(&config.database_url)
         .await?
@@ -115,7 +117,7 @@ pub async fn insert_event(event: &Event) -> Result<(), Box<dyn std::error::Error
         .acquire();
 
     Event::insert(event, db_pool.await?).await?;
-    Ok(println!("Inserted event data into database."))
+    Ok(info!("Inserted event data into database."))
 }
 
 pub async fn query_and_insert_event(
@@ -149,7 +151,7 @@ pub async fn query_and_insert_event(
         let process_id = Process::get_id(process_row);
         ids.process_id = process_id;
 
-        let event = Event::build(ids, EventType::Regular);
+        let event = EventBuilder::new(ids, event_type).build();
         let event_row = Event::insert(&event, db_pool.acquire().await?).await?;
         let event_id = Event::get_id(event_row);
 
@@ -166,10 +168,10 @@ pub async fn query_and_insert_event(
 
         let process_data = deserialize_boagent_json(process_response).await?;
 
-        let metrics = Metrics::build(&process_data, &deserialized_boagent_response)?;
-
-        insert_metrics(event_id, db_pool.acquire().await?, metrics).await?;
+        Metrics::build(&process_data, &deserialized_boagent_response)
+            .insert(event_id, db_pool.acquire().await?)
+            .await?;
     }
 
-    Ok(println!("Inserted all metrics for query."))
+    Ok(info!("Inserted all metrics for query."))
 }

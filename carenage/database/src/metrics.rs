@@ -1,6 +1,10 @@
+use log::info;
 use serde::{Deserialize, Serialize};
-use serde_with::with_prefix;
 use serde_json::Value;
+use serde_with::with_prefix;
+use sqlx::pool::PoolConnection;
+use sqlx::types::Uuid;
+use sqlx::Postgres;
 
 pub trait Metric {
     fn build(&self, process_embedded_impacts: &Value) -> ProcessEmbeddedImpactValues;
@@ -108,10 +112,7 @@ pub struct Metrics {
 }
 
 impl Metrics {
-    pub fn build(
-        process_data: &Value,
-        boagent_response: &Value,
-    ) -> Result<Metrics, Box<dyn std::error::Error>> {
+    pub fn build(process_data: &Value, boagent_response: &Value) -> Self {
         let pid = process_data.get("pid").expect("PID should be present.");
 
         let queried_process: Vec<&Value> = boagent_response["raw_data"]["power_data"]["raw_data"]
@@ -142,19 +143,19 @@ impl Metrics {
             .get("process_hdd_embedded_impact_values")
             .map(|component_values| ProcessEmbeddedImpacts::Hdd.build(component_values));
 
-        Ok(Metrics {
+        Metrics {
             process_cpu_embedded_impacts: Some(
                 ProcessEmbeddedImpacts::Cpu.build(
                     process_embedded_impacts
                         .get("process_cpu_embedded_impact_values")
-                        .expect("CPU embedded impacts for process should be present"),
+                        .expect("CPU embedded impacts for process should be present."),
                 ),
             ),
             process_ram_embedded_impacts: Some(
                 ProcessEmbeddedImpacts::Ram.build(
                     process_embedded_impacts
                         .get("process_ram_embedded_impact_values")
-                        .expect("RAM embedded impacts for process should be present"),
+                        .expect("RAM embedded impacts for process should be present."),
                 ),
             ),
             process_ssd_embedded_impacts,
@@ -164,31 +165,36 @@ impl Metrics {
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<f64>()?,
+                .parse::<f64>()
+                .unwrap(),
             memory_usage_bytes: resources
                 .get("memory_usage")
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()?,
+                .parse::<u64>()
+                .unwrap(),
             memory_virtual_usage_bytes: resources
                 .get("memory_virtual_usage")
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()?,
+                .parse::<u64>()
+                .unwrap(),
             disk_usage_write_bytes: resources
                 .get("disk_usage_write")
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()?,
+                .parse::<u64>()
+                .unwrap(),
             disk_usage_read_bytes: resources
                 .get("disk_usage_read")
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()?,
+                .parse::<u64>()
+                .unwrap(),
             total_operational_emission_kgc02eq: boagent_response["total_operational_emissions"]
                 ["value"]["value"]
                 .as_f64()
@@ -214,7 +220,41 @@ impl Metrics {
             average_power_measured_w: boagent_response["average_power_measured"]["value"]
                 .as_f64()
                 .unwrap(),
-        })
+        }
+    }
+    pub async fn insert(
+        &self,
+        event_id: Uuid,
+        db_connection: PoolConnection<Postgres>,
+    ) -> Result<(), sqlx::Error> {
+        let mut connection = db_connection.detach();
+
+        let metrics_value = serde_json::to_value(self).expect("Metrics should be deserializable.");
+        let iterable_metrics = metrics_value
+            .as_object()
+            .expect("Metrics should be parsable.");
+
+        let metric_fields: Vec<String> = iterable_metrics
+            .iter()
+            .map(|metric| metric.0.clone())
+            .collect();
+
+        let metric_values: Vec<f64> = iterable_metrics
+            .iter()
+            .map(|metric| metric.1.as_f64().unwrap())
+            .collect();
+
+        let query = "INSERT INTO METRICS (event_id, metric, value) VALUES ($1, UNNEST($2::VARCHAR(255)[]), UNNEST($3::NUMERIC[]))";
+
+        sqlx::query(query)
+            .bind(event_id)
+            .bind(metric_fields)
+            .bind(metric_values)
+            .execute(&mut connection)
+            .await?;
+
+        info!("Inserted metrics.");
+        Ok(())
     }
 }
 
@@ -274,10 +314,14 @@ mod tests {
                 }
             }
         });
-        let process_cpu_embedded_impacts = ProcessEmbeddedImpacts::Cpu.build(&data);
-        let process_ram_embedded_impacts = ProcessEmbeddedImpacts::Ram.build(&data);
-        let process_ssd_embedded_impacts = ProcessEmbeddedImpacts::Ssd.build(&data);
-        let process_hdd_embedded_impacts = ProcessEmbeddedImpacts::Hdd.build(&data);
+        let process_cpu_embedded_impacts = ProcessEmbeddedImpacts::Cpu
+            .build(&data["process_embedded_impacts"]["process_cpu_embedded_impact_values"]);
+        let process_ram_embedded_impacts = ProcessEmbeddedImpacts::Ram
+            .build(&data["process_embedded_impacts"]["process_ram_embedded_impact_values"]);
+        let process_ssd_embedded_impacts = ProcessEmbeddedImpacts::Ssd
+            .build(&data["process_embedded_impacts"]["process_ssd_embedded_impact_values"]);
+        let process_hdd_embedded_impacts = ProcessEmbeddedImpacts::Hdd
+            .build(&data["process_embedded_impacts"]["process_hdd_embedded_impact_values"]);
 
         assert_eq!(
             process_cpu_embedded_impacts.gwp_average_impact,

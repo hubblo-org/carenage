@@ -1,0 +1,36 @@
+stages:
+  - test
+  - build-and-test
+
+include:
+- template: Jobs/SAST.gitlab-ci.yml
+
+semgrep-sast:
+  stage: test
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - '**/*.rs'
+
+test-for-merge-request:
+  stage: build-and-test
+  services: 
+    - postgres
+  variables:
+    POSTGRES_DB: carenage 
+    POSTGRES_USER: carenage 
+    POSTGRES_HOST_AUTH_METHOD: trust
+  image: rust:latest
+  script: 
+    - export DATABASE_URL="postgresql://carenage@postgres:5432/carenage" 
+    - cd carenage
+    - printf "BOAGENT_URL='http://127.0.0.1/8000/'\nPROJECT_NAME=carenage_webapp\nLOCATION=FRA\nLIFETIME=5" >> .env
+    - cd database
+    - cargo test --verbose
+    - cd ../carenaged
+    - cargo test --verbose -- --test-threads=1
+
+  rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
