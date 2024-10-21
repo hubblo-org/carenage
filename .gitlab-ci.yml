@@ -5,7 +5,7 @@ default:
 variables:
   POSTGRES_DB: $POSTGRES_DB
   POSTGRES_USER: $POSTGRES_USER
-  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  POSTGRES_HOST_AUTH_METHOD: trust
 
 stages:
   - test
@@ -25,8 +25,8 @@ test-for-merge-request:
   stage: build-and-test
   image: rust:latest
   script: 
+    - export DATABASE_URL="postgresql://$POSTGRES_USER@postgres:5432/$POSTGRES_DB" 
     - cd carenage
-    - printf "DATABASE_URL=postgresql://%s:%s@postgres:5432" $POSTGRES_USER $POSTGRES_PASSWORD >> .env
     - cd database
     - cargo test --verbose
     - cd ../carenaged
