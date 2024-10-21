@@ -26,7 +26,7 @@ test-for-merge-request:
   image: rust:latest
   script: 
     - cd carenage
-    - printf "DATABASE_URL=postgresql://%s:%s@localhost:5432" $POSTGRES_DB $POSTGRES_PASSWORD >> .env
+    - printf "DATABASE_URL=postgresql://%s:%s@postgres:5432" $POSTGRES_USER $POSTGRES_PASSWORD >> .env
     - cd database
     - cargo test --verbose
     - cd ../carenaged
