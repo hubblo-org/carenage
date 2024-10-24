@@ -8,7 +8,7 @@ use database::metrics::Metrics;
 use database::tables::{CarenageRow, Metadata};
 use database::tables::{Process, ProcessBuilder};
 use database::timestamp::{Timestamp, UnixFlag};
-use log::info;
+use log::{info, warn};
 use std::env;
 use std::process;
 
@@ -142,36 +142,50 @@ pub async fn query_and_insert_event(
     .await?;
     let deserialized_boagent_response = deserialize_boagent_json(response).await?;
 
-    let processes = collect_processes(&deserialized_boagent_response, start_time)
-        .expect("Processes data should be collected from Scaphandre.");
+    let processes_collection_attempt =
+        collect_processes(&deserialized_boagent_response, start_time);
 
-    for process in processes {
-        let db_pool = get_db_connection_pool(&config.database_url).await?;
-        let process_row = Process::insert(&process, db_pool.acquire().await?).await?;
-        let process_id = Process::get_id(process_row);
-        ids.process_id = process_id;
+    /* Scaphandre, through Boagent, might not have data on processes available for the timestamps
+    * sent by Carenage (notably if all of Boagent / Scaphandre / Carenage are launched at the same
+    * time and Carenage is started right away). Handling the Result here and then the Option to
+    * cover all possibles cases: there might be some data missing at the launch of Carenage ; or
+    * there might be an error during the processing of the request. It could be relevant not to panic
+    * here. */ 
 
-        let event = EventBuilder::new(ids, event_type).build();
-        let event_row = Event::insert(&event, db_pool.acquire().await?).await?;
-        let event_id = Event::get_id(event_row);
+    match processes_collection_attempt {
+        Ok(Some(processes)) => {
+            for process in processes {
+                let db_pool = get_db_connection_pool(&config.database_url).await?;
+                let process_row = Process::insert(&process, db_pool.acquire().await?).await?;
+                let process_id = Process::get_id(process_row);
+                ids.process_id = process_id;
 
-        let process_response = process_embedded_impacts(
-            &config.boagent_url,
-            process.pid,
-            start_time,
-            end_time,
-            fetch_hardware,
-            &config.location,
-            config.lifetime,
-        )
-        .await?;
+                let event = EventBuilder::new(ids, event_type).build();
+                let event_row = Event::insert(&event, db_pool.acquire().await?).await?;
+                let event_id = Event::get_id(event_row);
 
-        let process_data = deserialize_boagent_json(process_response).await?;
+                let process_response = process_embedded_impacts(
+                    &config.boagent_url,
+                    process.pid,
+                    start_time,
+                    end_time,
+                    fetch_hardware,
+                    &config.location,
+                    config.lifetime,
+                )
+                .await?;
 
-        Metrics::build(&process_data, &deserialized_boagent_response)
-            .insert(event_id, db_pool.acquire().await?)
-            .await?;
+                let process_data = deserialize_boagent_json(process_response).await?;
+
+                Metrics::build(&process_data, &deserialized_boagent_response)
+                    .insert(event_id, db_pool.acquire().await?)
+                    .await?;
+                info!("Inserted all metrics for query.");
+            }
+        }
+        Ok(None) => info!("No processes data received yet from Scaphandre, carrying on!"),
+        Err(_) => warn!("Some error occured while recovering data from Scaphandre, some data might be missing!")
     }
 
-    Ok(info!("Inserted all metrics for query."))
+    Ok(info!("Boagent query and metrics insertion attempt over."))
 }

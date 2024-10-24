@@ -1,6 +1,6 @@
 use crate::tables::{
-    CharacteristicValue, ComponentBuilder, ComponentCharacteristicBuilder,
-    DeviceBuilder, Process, ProcessBuilder,
+    CharacteristicValue, ComponentBuilder, ComponentCharacteristicBuilder, DeviceBuilder, Process,
+    ProcessBuilder,
 };
 use crate::timestamp::Timestamp;
 use chrono::{DateTime, Local};
@@ -134,36 +134,45 @@ pub fn format_hardware_data(
     Ok(formatted_hardware_data)
 }
 
+/* Boagent might return an empty array for ["raw_data"]["power_data"]["raw_data"]
+* due to one of the first /query requests being too early
+* while Scaphandre did not yet record data on processes relevant for the timestamps sent to
+* Boagent. Instead of panicking, it might be acceptable to return None and log the absence
+* of data for processes for that request. */
+
 pub fn collect_processes(
     deserialized_boagent_response: &Value,
     start_timestamp: Timestamp,
-) -> Result<Vec<Process>, Error> {
-    let processes: Vec<Process> = deserialized_boagent_response["raw_data"]["power_data"]
+) -> Result<Option<Vec<Process>>, Error> {
+    let processes: Option<Vec<Process>> = deserialized_boagent_response["raw_data"]["power_data"]
         ["raw_data"]
         .as_array()
         .expect("Boagent response should be parsable")
         .last()
-        .expect("Last data item from Boagent should be parsable.")
-        .get("consumers")
-        .expect("Consumers should be available from Scaphandre.")
-        .as_array()
-        .expect("Consumers should contain information on processes.")
-        .iter()
-        .map(|process| {
-            ProcessBuilder::new(
-                process["pid"]
-                    .as_i64()
-                    .expect("Process ID should be an integer.") as i32,
-                process["exe"].as_str().expect("Exe should be available."),
-                process["cmdline"]
-                    .as_str()
-                    .expect("Cmdline should be available."),
-                "running",
-                start_timestamp,
-            )
-            .build()
-        })
-        .collect();
+        .map(|boagent_response| {
+            boagent_response
+                .get("consumers")
+                .expect("Consumers should be available from Scaphandre.")
+                .as_array()
+                .expect("Consumers should contain information on processes.")
+                .iter()
+                .map(|process| {
+                    ProcessBuilder::new(
+                        process["pid"]
+                            .as_i64()
+                            .expect("Process ID should be an integer.")
+                            as i32,
+                        process["exe"].as_str().expect("Exe should be available."),
+                        process["cmdline"]
+                            .as_str()
+                            .expect("Cmdline should be available."),
+                        "running",
+                        start_timestamp,
+                    )
+                    .build()
+                })
+                .collect()
+        });
 
     Ok(processes)
 }
@@ -296,8 +305,8 @@ mod tests {
         let current_dir = std::env::current_dir().unwrap();
         let config_path = current_dir.join("../mocks/").canonicalize().unwrap();
         let env_file = config_path.join(".env");
-        let mut config_file =
-            std::fs::File::create(env_file.clone()).expect("Failed to create env file for testing.");
+        let mut config_file = std::fs::File::create(env_file.clone())
+            .expect("Failed to create env file for testing.");
         config_file.write_all(
             b"DATABASE_URL='postgres://carenage:password@localhost:5432/carenage'
 PROJECT_NAME='carenage_webapp'
