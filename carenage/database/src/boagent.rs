@@ -1,5 +1,6 @@
 use crate::timestamp::Timestamp;
 use dotenv::{from_path, var};
+use log::info;
 use reqwest::{Client, Response};
 use serde_json::{Error, Value};
 use std::fmt::{Display, Formatter};
@@ -75,6 +76,7 @@ pub async fn query_boagent(
     let client = Client::new();
     let base_url = format!("{}/query", boagent_url);
 
+    info!("Queried Boagent /query endpoint!");
     client.get(base_url).query(&query_parameters).send().await
 }
 
@@ -101,6 +103,7 @@ pub async fn process_embedded_impacts(
     let client = Client::new();
     let base_url = format!("{}/process_embedded_impacts", boagent_url);
 
+    info!("Queried Boagent /process_embedded_impacts endpoint with {}!", process_id);
     client.get(base_url).query(&query_parameters).send().await
 }
 
