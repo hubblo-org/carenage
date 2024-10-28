@@ -27,6 +27,8 @@ impl DaemonArgs {
         let unix_flag: UnixFlag = is_unix_set.into();
         let start_timestamp = Timestamp::parse_str(start_time_str, unix_flag);
 
+        info!("All needed daemon arguments are available!");
+
         Ok(DaemonArgs {
             time_step,
             start_timestamp,

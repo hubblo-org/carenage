@@ -44,6 +44,8 @@ impl Config {
         let device_name = var("DEVICE").unwrap_or("unknown".to_string());
         let database_url =
             var("DATABASE_URL").expect("DATABASE_URL environment variable is absent.");
+
+        info!("All needed configuration variables are available!");
         Ok(Config {
             boagent_url,
             project_name,

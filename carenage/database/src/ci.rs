@@ -1,4 +1,6 @@
 use std::env;
+use log::info;
+
 use crate::timestamp::{Timestamp, UnixFlag};
 
 pub struct GitlabVariables {
@@ -20,6 +22,8 @@ impl GitlabVariables {
         let job_name = env::var("CI_JOB_NAME")?.to_string();
         let job_stage = env::var("CI_JOB_STAGE")?.to_string();
         let job_started_at = Timestamp::parse_str(env::var("CI_JOB_STARTED_AT")?.to_string(), UnixFlag::Unset);
+
+        info!("All needed Gitlab variables are available!");
 
         Ok(GitlabVariables {
             project_path,
