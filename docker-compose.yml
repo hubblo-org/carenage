@@ -20,6 +20,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+    profiles: [test] 
     networks:
       - carenage
 
@@ -32,7 +33,6 @@ services:
       POWER_FILE_PATH: "/app/data/power_data.json"
     privileged: true
     depends_on:
-      - database
       - boaviztapi
       - scaphandre
     ports:
