@@ -27,7 +27,7 @@ fn main() {
             info!("Carenage start event, time step of {:?} seconds.", args.step);
             info!("Start event timestamp is {:?}.", start_timestamp.to_string());
 
-            let carenaged = Command::new("./target/debug/carenaged")
+            let carenaged = Command::new("/usr/local/bin/carenaged")
                 .arg(args.step.to_string())
                 .arg(start_timestamp.to_string())
                 .arg(cli.unix.to_string())
