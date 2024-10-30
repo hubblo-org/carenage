@@ -20,11 +20,12 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+    profiles: [test] 
     networks:
       - carenage
 
   boagent:
-    image: ghcr.io/boavizta/boagent:0.1.0 
+    image: ghcr.io/boavizta/boagent:0.1.1 
     environment:
       BOAVIZTAPI_ENDPOINT: "http://boaviztapi:5000"
       DEFAULT_LIFETIME: 5.0
@@ -32,7 +33,6 @@ services:
       POWER_FILE_PATH: "/app/data/power_data.json"
     privileged: true
     depends_on:
-      - database
       - boaviztapi
       - scaphandre
     ports:

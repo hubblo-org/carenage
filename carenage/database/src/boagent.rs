@@ -1,5 +1,6 @@
 use crate::timestamp::Timestamp;
 use dotenv::{from_path, var};
+use log::info;
 use reqwest::{Client, Response};
 use serde_json::{Error, Value};
 use std::fmt::{Display, Formatter};
@@ -43,6 +44,8 @@ impl Config {
         let device_name = var("DEVICE").unwrap_or("unknown".to_string());
         let database_url =
             var("DATABASE_URL").expect("DATABASE_URL environment variable is absent.");
+
+        info!("All needed configuration variables are available!");
         Ok(Config {
             boagent_url,
             project_name,
@@ -75,6 +78,7 @@ pub async fn query_boagent(
     let client = Client::new();
     let base_url = format!("{}/query", boagent_url);
 
+    info!("Queried Boagent /query endpoint!");
     client.get(base_url).query(&query_parameters).send().await
 }
 
@@ -101,6 +105,7 @@ pub async fn process_embedded_impacts(
     let client = Client::new();
     let base_url = format!("{}/process_embedded_impacts", boagent_url);
 
+    info!("Queried Boagent /process_embedded_impacts endpoint with {}!", process_id);
     client.get(base_url).query(&query_parameters).send().await
 }
 

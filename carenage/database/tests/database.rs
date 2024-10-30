@@ -261,7 +261,9 @@ async fn it_collects_all_processes_from_boagent_response_and_inserts_them_into_d
 
     assert!(processes_collection.is_ok());
 
-    for process in processes_collection.unwrap() {
+    let processes = processes_collection.unwrap(); 
+    for process in processes.unwrap() 
+    {
     let process_row = Process::insert(&process, pool.acquire().await?);
 
     assert!(process_row.await.is_ok());}
