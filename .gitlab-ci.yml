@@ -36,7 +36,7 @@ test-for-merge-request:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
       - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-test-carenage-in-ci:
+test-carenage-e2e:
   stage: test-e2e
   image: docker:24.0.7
   variables:
@@ -58,3 +58,7 @@ test-carenage-in-ci:
     - RUST_LOG="info" ./target/debug/carenage-cli start &
     - sleep 10
     - ./target/debug/carenage-cli stop
+  rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
