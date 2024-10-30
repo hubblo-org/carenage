@@ -1,13 +1,95 @@
-version: '3.9'
-name: carenage
+version: "3.9"
 
 services:
 
-  postgres_db_test:
+  database:
     image: postgres:16-bookworm
     restart: always
-    shm_size: 128mb
+    ports: 
+      - "5432:5432"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: carenage
-    network_mode: "host"
+      POSTGRES_DB: carenage
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    profiles: [test] 
+    networks:
+      - carenage
+
+  boagent:
+    image: ghcr.io/boavizta/boagent:0.1.1 
+    environment:
+      BOAVIZTAPI_ENDPOINT: "http://boaviztapi:5000"
+      DEFAULT_LIFETIME: 5.0
+      HARDWARE_FILE_PATH: "/home/boagent/hardware_data.json"
+      POWER_FILE_PATH: "/app/data/power_data.json"
+    privileged: true
+    depends_on:
+      - boaviztapi
+      - scaphandre
+    ports:
+      - "8000:8000"
+    networks:
+      - carenage 
+    volumes:
+      - "/proc:/proc"
+      - "/sys:/sys:ro"
+      - "powerdata:/app/data:ro"
+      - "./db:/app/db"
+      - "../boaviztapi/boaviztapi:/app/boaviztapi"
+      - "/etc/crontab:/etc/crontab"
+
+  scaphandre:
+    image: hubblo/scaphandre:dev
+    privileged: true
+    volumes:
+      - type: bind
+        source: /proc
+        target: /proc
+      - type: bind
+        source: /sys/class/powercap
+        target: /sys/class/powercap
+      - "powerdata:/app/data:rw"
+    command: [ "--no-header", "json", "-s", "10", "--resources", "-f", "/app/data/power_data.json" ]
+    networks:
+      - carenage
+
+  boaviztapi:
+    image: ghcr.io/boavizta/boaviztapi:1.2.2
+    ports:
+      - "5000:5000"
+    networks:
+      - carenage 
+
+  carenage:
+    build:
+      context: .
+    environment:
+      DATABASE_URL: "postgres://carenage:password@localhost:5432/carenage"
+      PROJECT_NAME: "hubblo/carenage"
+      BOAGENT_URL: "http://localhost:8000"
+      LOCATION: "FRA"
+      LIFETIME: 5
+    depends_on:
+      - database
+      - boagent
+      - scaphandre
+      - boaviztapi
+    networks:
+      - carenage
+
+
+volumes:
+  powerdata: {}
+
+networks:
+  carenage:
+    driver: bridge
