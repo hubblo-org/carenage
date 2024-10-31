@@ -525,3 +525,17 @@ async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sql
     assert!(metrics.is_ok());
     Ok(())
 }
+
+#[sqlx::test(fixtures("../fixtures/metrics_values.sql"))]
+async fn it_selects_all_metrics_associated_with_a_given_run_id(pool: PgPool) -> sqlx::Result<()> {
+    let connection = pool.acquire().await?;
+
+    let query = sqlx::query("SELECT * FROM METRICS")
+        .fetch_all(&mut connection.detach())
+        .await?;
+    
+    let length = query.len(); 
+    println!("{}", length);
+    Ok(())
+}
+
