@@ -70,9 +70,9 @@ services:
     build:
       context: .
     environment:
-      DATABASE_URL: "postgres://carenage:password@localhost:5432/carenage"
+      DATABASE_URL: "postgres://carenage:password@database:5432/carenage"
       PROJECT_NAME: "hubblo/carenage"
-      BOAGENT_URL: "http://localhost:8000"
+      BOAGENT_URL: "http://boagent:8000"
       LOCATION: "FRA"
       LIFETIME: 5
     depends_on:
