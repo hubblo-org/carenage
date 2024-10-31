@@ -10,7 +10,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./db:/docker-entrypoint-initdb.d
+      - ../db:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: carenage
@@ -43,9 +43,6 @@ services:
       - "/proc:/proc"
       - "/sys:/sys:ro"
       - "powerdata:/app/data:ro"
-      - "./db:/app/db"
-      - "../boaviztapi/boaviztapi:/app/boaviztapi"
-      - "/etc/crontab:/etc/crontab"
 
   scaphandre:
     image: hubblo/scaphandre:dev
