@@ -3,9 +3,9 @@ use std::fs::canonicalize;
 use chrono::{Duration, Local};
 use database::boagent::{deserialize_boagent_json, query_boagent, HardwareData};
 use database::database::{
-    collect_processes,
-    format_hardware_data, get_db_connection_pool, get_project_id,
-    insert_device_metadata, insert_dimension_table_metadata, 
+    check_process_existence_for_id, collect_processes,
+    format_hardware_data, get_db_connection_pool, get_process_id, get_project_id,
+    insert_device_metadata, insert_dimension_table_metadata, select_metrics_from_dimension, 
     update_stop_date,
 };
 use database::event::{Event, EventType};
@@ -16,6 +16,7 @@ use dotenv::var;
 use mockito::{Matcher, Server};
 use serde_json::json;
 use sqlx::{PgPool, Row};
+use uuid::uuid;
 mod common;
 
 #[sqlx::test(migrations = "../../db/")]
@@ -97,6 +98,44 @@ async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage
 
     let row = insert_query.unwrap();
     assert_eq!(row.len(), 1);
+    Ok(())
+}
+
+#[sqlx::test(fixtures("../fixtures/metrics.sql"))]
+async fn it_checks_if_process_metadata_is_not_already_present_for_a_given_run(pool: PgPool,) -> sqlx::Result<()> {
+    let db_connection = pool.acquire().await?;
+
+    let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
+
+    let run_id = uuid!("780775f2-b458-41b1-8f96-8518f0525fb2");
+
+    let process = ProcessBuilder::new(
+        2376,
+        "/usr/local/bin/scaphandre",
+        "/usr/local/bin/scaphandre--no-headerjson-s10--resources-f/app/data/power_data.json",
+        "running",
+        now_timestamp, 
+    ).build();
+
+    let check_existing_process_query = check_process_existence_for_id(db_connection, &process, "run", run_id).await;
+
+    assert!(check_existing_process_query.is_ok());
+    assert!(check_existing_process_query.unwrap());
+
+    let not_existing_process = ProcessBuilder::new(
+        1234,
+        "/does/not/exist",
+        "/does/not/exist/i--do--not--exist",
+        "zombie",
+        now_timestamp, 
+    ).build();
+
+    let db_connection = pool.acquire().await?;
+
+    let check_non_existing_process_query = check_process_existence_for_id(db_connection, &not_existing_process, "run", run_id).await;
+    assert!(check_non_existing_process_query.is_ok());
+    assert!(!check_non_existing_process_query.unwrap());
+
     Ok(())
 }
 
@@ -356,6 +395,30 @@ async fn it_gets_project_id_from_projects_table_with_queried_project_name(
 
     Ok(())
 }
+
+#[sqlx::test(fixtures("../fixtures/metrics.sql"))]
+async fn it_gets_process_id_from_processes_table_for_a_given_run_with_pid_and_exe(pool: PgPool,) -> sqlx::Result<()> {
+
+    let db_connection = pool.acquire().await?;
+
+    let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
+
+    let run_id = uuid!("780775f2-b458-41b1-8f96-8518f0525fb2");
+
+    let process = ProcessBuilder::new(
+        2376,
+        "/usr/local/bin/scaphandre",
+        "/usr/local/bin/scaphandre--no-headerjson-s10--resources-f/app/data/power_data.json",
+        "running",
+        now_timestamp, 
+    ).build();
+    let process_id_query = get_process_id(db_connection, &process, "run", run_id).await;
+
+    assert!(process_id_query.is_ok());
+
+    Ok(())
+}
+
 #[sqlx::test(fixtures("../fixtures/dimensions.sql"))]
 async fn it_inserts_foreign_keys_into_events_table(pool: PgPool) -> sqlx::Result<()> {
     let connection = pool.acquire().await?;
@@ -526,16 +589,17 @@ async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sql
     Ok(())
 }
 
-#[sqlx::test(fixtures("../fixtures/metrics_values.sql"))]
+#[sqlx::test(fixtures("../fixtures/metrics.sql"))]
 async fn it_selects_all_metrics_associated_with_a_given_run_id(pool: PgPool) -> sqlx::Result<()> {
     let connection = pool.acquire().await?;
 
-    let query = sqlx::query("SELECT * FROM METRICS")
-        .fetch_all(&mut connection.detach())
-        .await?;
-    
-    let length = query.len(); 
-    println!("{}", length);
+    let run_id = "780775f2-b458-41b1-8f96-8518f0525fb2";
+    let parsed_id = str::parse::<uuid::Uuid>(run_id).unwrap(); 
+
+    let select_query = select_metrics_from_dimension(connection, parsed_id, "run").await?;
+
+    assert_eq!(select_query.len(), 4290);
+
     Ok(())
 }
 
