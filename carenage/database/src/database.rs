@@ -307,8 +307,8 @@ pub async fn get_process_id(
 
     let process_row = sqlx::query(&formatted_query)
         .bind(dimension_id)
-    .bind(process.pid)
-    .bind(&process.exe)
+        .bind(process.pid)
+        .bind(&process.exe)
         .fetch_one(&mut connection)
         .await?;
     let process_id: uuid::Uuid = process_row.get("id");

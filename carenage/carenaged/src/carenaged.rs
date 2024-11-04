@@ -2,7 +2,7 @@ use database::boagent::{
     deserialize_boagent_json, process_embedded_impacts, query_boagent, Config, HardwareData,
 };
 use database::ci::GitlabVariables;
-use database::database::{collect_processes, get_db_connection_pool, Ids};
+use database::database::{check_process_existence_for_id, collect_processes, get_db_connection_pool, get_process_id, Ids};
 use database::event::{Event, EventBuilder, EventType};
 use database::metrics::Metrics;
 use database::tables::{CarenageRow, Metadata};
@@ -148,18 +148,29 @@ pub async fn query_and_insert_event(
         collect_processes(&deserialized_boagent_response, start_time);
 
     /* Scaphandre, through Boagent, might not have data on processes available for the timestamps
-    * sent by Carenage (notably if all of Boagent / Scaphandre / Carenage are launched at the same
-    * time and Carenage is started right away). Handling the Result here and then the Option to
-    * cover all possibles cases: there might be some data missing at the launch of Carenage ; or
-    * there might be an error during the processing of the request. It could be relevant not to panic
-    * here. */ 
+     * sent by Carenage (notably if all of Boagent / Scaphandre / Carenage are launched at the same
+     * time and Carenage is started right away). Handling the Result here and then the Option to
+     * cover all possibles cases: there might be some data missing at the launch of Carenage ; or
+     * there might be an error during the processing of the request. It could be relevant not to panic
+     * here. */
 
     match processes_collection_attempt {
         Ok(Some(processes)) => {
             for process in processes {
                 let db_pool = get_db_connection_pool(&config.database_url).await?;
-                let process_row = Process::insert(&process, db_pool.acquire().await?).await?;
-                let process_id = Process::get_id(process_row);
+                let process_metadata_already_registered =
+                    check_process_existence_for_id(db_pool.acquire().await?, &process, "run", ids.run_id).await?;
+
+                let process_id = match process_metadata_already_registered {
+                    true => {
+                        get_process_id(db_pool.acquire().await?, &process, "run", ids.run_id).await?
+                    }
+                    false => {
+                        let process_row = Process::insert(&process, db_pool.acquire().await?).await?;
+                        Process::get_id(process_row)
+                    }
+                };
+
                 ids.process_id = process_id;
 
                 let event = EventBuilder::new(ids, event_type).build();
@@ -186,7 +197,9 @@ pub async fn query_and_insert_event(
             }
         }
         Ok(None) => info!("No processes data received yet from Scaphandre, carrying on!"),
-        Err(_) => warn!("Some error occured while recovering data from Scaphandre, some data might be missing!")
+        Err(_) => warn!(
+            "Some error occured while recovering data from Scaphandre, some data might be missing!"
+        ),
     }
 
     Ok(info!("Boagent query and metrics insertion attempt over."))
