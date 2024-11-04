@@ -1,9 +1,11 @@
+use crate::metrics::Metrics;
 use crate::tables::{
     CharacteristicValue, ComponentBuilder, ComponentCharacteristicBuilder, DeviceBuilder, Process,
     ProcessBuilder,
 };
 use crate::timestamp::Timestamp;
 use chrono::{DateTime, Local};
+use log::info;
 use serde_json::{json, Error, Value};
 use sqlx::pool::PoolConnection;
 use sqlx::postgres::PgRow;
@@ -291,6 +293,73 @@ pub async fn get_project_id(
         .fetch_one(&mut connection)
         .await?;
     Ok(project_row.get("id"))
+}
+
+pub async fn get_process_id(
+    database_connection: PoolConnection<Postgres>,
+    process: &Process,
+    dimension: &str,
+    dimension_id: uuid::Uuid,
+) -> Result<uuid::Uuid, sqlx::Error> {
+    let mut connection = database_connection.detach();
+
+    let formatted_query = format!("SELECT PROCESSES.id FROM PROCESSES INNER JOIN EVENTS ON EVENTS.{}_id = ($1) WHERE pid = ($2) AND exe = ($3)", dimension);
+
+    let process_row = sqlx::query(&formatted_query)
+        .bind(dimension_id)
+    .bind(process.pid)
+    .bind(&process.exe)
+        .fetch_one(&mut connection)
+        .await?;
+    let process_id: uuid::Uuid = process_row.get("id");
+    Ok(process_id)
+}
+
+pub async fn check_process_existence_for_id(
+    database_connection: PoolConnection<Postgres>,
+    process: &Process,
+    dimension: &str,
+    dimension_id: uuid::Uuid,
+) -> Result<bool, sqlx::Error> {
+    let mut connection = database_connection.detach();
+    let formatted_query = format!("SELECT EXISTS (SELECT 1 FROM PROCESSES INNER JOIN EVENTS ON EVENTS.{}_id = ($1) WHERE pid = ($2) AND exe = ($3))", dimension);
+
+    let row = sqlx::query(&formatted_query)
+        .bind(dimension_id)
+        .bind(process.pid)
+        .bind(&process.exe)
+        .fetch_one(&mut connection)
+        .await?;
+
+    let b = row.get("exists");
+
+    info!(
+        "{}",
+        match b {
+            true => "Process metadata already registered!",
+            false => "Process metadata not registered, it will be inserted!",
+        }
+    );
+
+    Ok(b)
+}
+
+pub async fn select_metrics_from_dimension(
+    database_connection: PoolConnection<Postgres>,
+    dimension_id: uuid::Uuid,
+    dimension: &str,
+) -> Result<Vec<PgRow>, sqlx::Error> {
+    let mut connection = database_connection.detach();
+
+    let formatted_query = format!(
+        "SELECT * FROM METRICS WHERE event_id IN (SELECT id FROM EVENTS WHERE {}_id=($1))",
+        dimension
+    );
+
+    sqlx::query(&formatted_query)
+        .bind(dimension_id)
+        .fetch_all(&mut connection)
+        .await
 }
 
 #[cfg(test)]
