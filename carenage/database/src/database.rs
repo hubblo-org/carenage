@@ -1,4 +1,3 @@
-use crate::metrics::Metrics;
 use crate::tables::{
     CharacteristicValue, ComponentBuilder, ComponentCharacteristicBuilder, DeviceBuilder, Process,
     ProcessBuilder,
@@ -183,7 +182,7 @@ pub async fn insert_dimension_table_metadata(
     database_connection: PoolConnection<Postgres>,
     table: &str,
     data: Value,
-) -> Result<Vec<PgRow>, sqlx::Error> {
+) -> Result<PgRow, sqlx::Error> {
     let name = data["name"].as_str();
     let start_date = data
         .get("start_date")
@@ -199,18 +198,18 @@ pub async fn insert_dimension_table_metadata(
         table
     );
 
-    let rows = sqlx::query(&insert_query)
+    let row = sqlx::query(&insert_query)
         .bind(name)
         .bind(start_timestamptz)
-        .fetch_all(&mut connection)
+        .fetch_one(&mut connection)
         .await?;
-    Ok(rows)
+    Ok(row)
 }
 
 pub async fn insert_device_metadata(
     database_connection: PoolConnection<Postgres>,
     device_data: Value,
-) -> Result<Vec<PgRow>, sqlx::Error> {
+) -> Result<PgRow, sqlx::Error> {
     let device_name = device_data["device"]["name"].as_str();
     let device_lifetime = device_data["device"]["lifetime"].as_i64();
     let device_location = device_data["device"]["location"].as_str();
@@ -222,14 +221,14 @@ pub async fn insert_device_metadata(
 
     let formatted_query =
         "INSERT INTO devices (name, lifetime, location) VALUES ($1, $2, $3) RETURNING *";
-    let device_rows = sqlx::query(formatted_query)
+    let device_row = sqlx::query(formatted_query)
         .bind(device_name)
         .bind(device_lifetime)
         .bind(device_location)
-        .fetch_all(&mut connection)
+        .fetch_one(&mut connection)
         .await?;
 
-    let device_id: uuid::Uuid = device_rows[0].get("id");
+    let device_id: Uuid = device_row.get("id");
     let formatted_query = "INSERT INTO components (device_id, name, model, manufacturer) VALUES ($1, $2, $3, $4) RETURNING id";
     for component in components {
         let insert_component_data_query = sqlx::query(formatted_query)
@@ -240,7 +239,7 @@ pub async fn insert_device_metadata(
             .fetch_one(&mut connection)
             .await?;
 
-        let component_id: uuid::Uuid = insert_component_data_query.get("id");
+        let component_id: Uuid = insert_component_data_query.get("id");
 
         let component_characteristics = component["characteristics"]
             .as_array()
@@ -258,13 +257,13 @@ pub async fn insert_device_metadata(
         }
     }
 
-    Ok(device_rows)
+    Ok(device_row)
 }
 
 pub async fn update_stop_date(
     database_connection: PoolConnection<Postgres>,
     table_name: &str,
-    row_id: uuid::Uuid,
+    row_id: Uuid,
     stop_date: &str,
 ) -> Result<(), sqlx::Error> {
     let mut connection = database_connection.detach();
@@ -283,7 +282,7 @@ pub async fn update_stop_date(
 pub async fn get_project_id(
     database_connection: PoolConnection<Postgres>,
     project_name: &String,
-) -> Result<uuid::Uuid, sqlx::Error> {
+) -> Result<Uuid, sqlx::Error> {
     let mut connection = database_connection.detach();
 
     let formatted_query = "SELECT id FROM PROJECTS WHERE name = ($1)";
@@ -299,8 +298,8 @@ pub async fn get_process_id(
     database_connection: PoolConnection<Postgres>,
     process: &Process,
     dimension: &str,
-    dimension_id: uuid::Uuid,
-) -> Result<uuid::Uuid, sqlx::Error> {
+    dimension_id: Uuid,
+) -> Result<Uuid, sqlx::Error> {
     let mut connection = database_connection.detach();
 
     let formatted_query = format!("SELECT PROCESSES.id FROM PROCESSES INNER JOIN EVENTS ON EVENTS.{}_id = ($1) WHERE pid = ($2) AND exe = ($3)", dimension);
@@ -311,7 +310,7 @@ pub async fn get_process_id(
         .bind(&process.exe)
         .fetch_one(&mut connection)
         .await?;
-    let process_id: uuid::Uuid = process_row.get("id");
+    let process_id: Uuid = process_row.get("id");
     Ok(process_id)
 }
 
@@ -319,7 +318,7 @@ pub async fn check_process_existence_for_id(
     database_connection: PoolConnection<Postgres>,
     process: &Process,
     dimension: &str,
-    dimension_id: uuid::Uuid,
+    dimension_id: Uuid,
 ) -> Result<bool, sqlx::Error> {
     let mut connection = database_connection.detach();
     let formatted_query = format!("SELECT EXISTS (SELECT 1 FROM PROCESSES INNER JOIN EVENTS ON EVENTS.{}_id = ($1) WHERE pid = ($2) AND exe = ($3))", dimension);
@@ -346,7 +345,7 @@ pub async fn check_process_existence_for_id(
 
 pub async fn select_metrics_from_dimension(
     database_connection: PoolConnection<Postgres>,
-    dimension_id: uuid::Uuid,
+    dimension_id: Uuid,
     dimension: &str,
 ) -> Result<Vec<PgRow>, sqlx::Error> {
     let mut connection = database_connection.detach();

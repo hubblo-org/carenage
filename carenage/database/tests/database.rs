@@ -37,10 +37,10 @@ async fn it_inserts_valid_data_in_projects_table_in_the_carenage_database(
 
     assert!(insert_query.is_ok());
 
-    let rows = insert_query.unwrap();
-    let project_name: String = rows[0].get("name");
+    let row = insert_query.unwrap();
+    let project_name: String = row.get("name");
     assert_eq!(project_name, project_metadata["name"]);
-    assert_eq!(rows.len(), 1);
+    assert_eq!(row.len(), 4);
     Ok(())
 }
 
@@ -71,8 +71,10 @@ async fn it_inserts_valid_data_for_several_dimension_tables_in_the_carenage_data
             insert_dimension_table_metadata(db_connection, table, dimension_table_metadata.clone())
                 .await;
         assert!(insert_query.is_ok());
-        let rows = insert_query.unwrap();
-        assert_eq!(rows.len(), 1);
+        let row = insert_query.unwrap();
+        let project_name: String = row.get("name");
+        assert_eq!(row.len(), 4);
+        assert_eq!(project_name, dimension_table_metadata["name"]);
     }
 
     Ok(())

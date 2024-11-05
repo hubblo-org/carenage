@@ -46,8 +46,8 @@ pub enum CarenageRow {
 }
 
 pub enum InsertAttempt {
-    Success(Vec<PgRow>),
-    Pending(Result<Vec<PgRow>, sqlx::Error>),
+    Success(PgRow),
+    Pending(Result<PgRow, sqlx::Error>),
 }
 
 impl CarenageRow {
@@ -171,9 +171,9 @@ impl Metadata for CarenageRow {
         row_name: Option<&String>,
     ) -> Result<uuid::Uuid, Box<dyn std::error::Error>> {
         let id: uuid::Uuid = match insert_attempt {
-            InsertAttempt::Pending(Ok(rows)) => {
+            InsertAttempt::Pending(Ok(row)) => {
                 info!("Inserted {} metadata into database.", self.table_name());
-                rows[0].get("id")
+                row.get("id")
             }
             InsertAttempt::Pending(Err(err)) => match err
                 .as_database_error()
@@ -195,9 +195,9 @@ impl Metadata for CarenageRow {
                     process::exit(0x0100)
                 }
             },
-            InsertAttempt::Success(rows) => {
+            InsertAttempt::Success(row) => {
                 info!("Inserted {} metadata into database.", self.table_name());
-                rows[0].get("id")
+                row.get("id")
             }
         };
         Ok(id)
