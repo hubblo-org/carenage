@@ -345,13 +345,13 @@ pub async fn check_process_existence_for_id(
 
 pub async fn select_metrics_from_dimension(
     database_connection: PoolConnection<Postgres>,
-    dimension_id: Uuid,
     dimension: &str,
+    dimension_id: Uuid,
 ) -> Result<Vec<PgRow>, sqlx::Error> {
     let mut connection = database_connection.detach();
 
     let formatted_query = format!(
-        "SELECT * FROM METRICS WHERE event_id IN (SELECT id FROM EVENTS WHERE {}_id=($1))",
+        "SELECT DISTINCT events.timestamp, processes.pid, processes.cmdline, processes.id, metrics.metric, metrics.value FROM PROCESSES INNER JOIN EVENTS ON events.process_id = processes.id INNER JOIN METRICS ON metrics.event_id = events.id WHERE {}_id=($1) ORDER BY processes.id, events.timestamp",
         dimension
     );
 
