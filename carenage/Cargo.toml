@@ -9,7 +9,7 @@ repository = "https://gitlab.com/hubblo/carenage/"
 
 [workspace]
 
-members = ["carenage-cli", "database", "carenaged"]
+members = ["carenage-cli", "database", "carenaged", "api"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

@@ -1,0 +1,10 @@
+[package]
+name = "api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+database = { path = "../database" }
+log = "0.4.22"
+sqlx = { version = "0.7.4", features = ["runtime-tokio", "postgres", "migrate", "chrono", "uuid"] }
+uuid = "1.11.0"
