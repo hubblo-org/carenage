@@ -98,10 +98,10 @@ pub struct Metrics {
     #[serde(flatten, with = "prefix_hdd")]
     pub process_hdd_embedded_impacts: Option<ProcessEmbeddedImpactValues>,
     pub cpu_usage_percentage: f64,
-    pub memory_usage_bytes: u64,
-    pub memory_virtual_usage_bytes: u64,
-    pub disk_usage_write_bytes: u64,
-    pub disk_usage_read_bytes: u64,
+    pub memory_usage_bytes: f64,
+    pub memory_virtual_usage_bytes: f64,
+    pub disk_usage_write_bytes: f64,
+    pub disk_usage_read_bytes: f64,
     pub total_operational_emission_kgc02eq: f64,
     pub total_operational_abiotic_resources_depletion_kgsbeq: f64,
     pub total_primary_energy_consumed_mj: f64,
@@ -172,28 +172,28 @@ impl Metrics {
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()
+                .parse::<f64>()
                 .unwrap(),
             memory_virtual_usage_bytes: resources
                 .get("memory_virtual_usage")
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()
+                .parse::<f64>()
                 .unwrap(),
             disk_usage_write_bytes: resources
                 .get("disk_usage_write")
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()
+                .parse::<f64>()
                 .unwrap(),
             disk_usage_read_bytes: resources
                 .get("disk_usage_read")
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()
+                .parse::<f64>()
                 .unwrap(),
             total_operational_emission_kgc02eq: boagent_response["total_operational_emissions"]
                 ["value"]["value"]

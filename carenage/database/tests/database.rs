@@ -499,10 +499,10 @@ async fn it_builds_metrics_from_json_values() {
     let metrics = Metrics::build(&process_data, &deserialized_boagent_response);
 
     assert_eq!(metrics.cpu_usage_percentage, 1.1115274);
-    assert_eq!(metrics.memory_usage_bytes, 212635648);
-    assert_eq!(metrics.memory_virtual_usage_bytes, 2866921472);
-    assert_eq!(metrics.disk_usage_read_bytes, 0);
-    assert_eq!(metrics.disk_usage_write_bytes, 0);
+    assert_eq!(metrics.memory_usage_bytes, 212635648_f64);
+    assert_eq!(metrics.memory_virtual_usage_bytes, 2866921472_f64);
+    assert_eq!(metrics.disk_usage_read_bytes, 0 as f64);
+    assert_eq!(metrics.disk_usage_write_bytes, 0 as f64);
     assert_eq!(metrics.average_power_measured_w, 14.94261724369748);
     assert_eq!(metrics.embedded_emissions_kgc02eq, 900_f64);
     assert_eq!(metrics.embedded_abiotic_resources_depletion_kgsbeq, 0.14);
