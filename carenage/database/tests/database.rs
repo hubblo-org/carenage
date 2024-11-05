@@ -109,12 +109,12 @@ async fn it_checks_if_process_metadata_is_not_already_present_for_a_given_run(po
 
     let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
 
-    let run_id = uuid!("780775f2-b458-41b1-8f96-8518f0525fb2");
+    let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
 
     let process = ProcessBuilder::new(
-        2376,
-        "/usr/local/bin/scaphandre",
-        "/usr/local/bin/scaphandre--no-headerjson-s10--resources-f/app/data/power_data.json",
+        4722,
+        "/usr/local/bin/containerd-shim-runc-v2",
+        "/usr/local/bin/containerd-shim-runc-v2-namespacemoby-idb8822e8c4218ea3e9430f7626dad0905e0f770a24d0e407fffe475d7dadbbb08-address/var/run/docker/containerd/containerd.sock",
         "running",
         now_timestamp, 
     ).build();
@@ -405,12 +405,12 @@ async fn it_gets_process_id_from_processes_table_for_a_given_run_with_pid_and_ex
 
     let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
 
-    let run_id = uuid!("780775f2-b458-41b1-8f96-8518f0525fb2");
+    let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
 
     let process = ProcessBuilder::new(
-        2376,
-        "/usr/local/bin/scaphandre",
-        "/usr/local/bin/scaphandre--no-headerjson-s10--resources-f/app/data/power_data.json",
+        4722,
+        "/usr/local/bin/containerd-shim-runc-v2",
+        "/usr/local/bin/containerd-shim-runc-v2-namespacemoby-idb8822e8c4218ea3e9430f7626dad0905e0f770a24d0e407fffe475d7dadbbb08-address/var/run/docker/containerd/containerd.sock",
         "running",
         now_timestamp, 
     ).build();
@@ -595,12 +595,12 @@ async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sql
 async fn it_selects_all_metrics_associated_with_a_given_run_id(pool: PgPool) -> sqlx::Result<()> {
     let connection = pool.acquire().await?;
 
-    let run_id = "780775f2-b458-41b1-8f96-8518f0525fb2";
-    let parsed_id = str::parse::<uuid::Uuid>(run_id).unwrap(); 
+    let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
 
-    let select_query = select_metrics_from_dimension(connection, parsed_id, "run").await?;
+    let select_query = select_metrics_from_dimension(connection, "run", run_id).await?;
 
-    assert_eq!(select_query.len(), 4290);
+    assert_eq!(select_query.len(), 8970);
+
 
     Ok(())
 }
