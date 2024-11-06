@@ -100,5 +100,5 @@ CREATE TABLE events (
 CREATE TABLE metrics (
   event_id UUID REFERENCES events(id),
   metric VARCHAR(255),
-  value NUMERIC  
+  value FLOAT8  
 );

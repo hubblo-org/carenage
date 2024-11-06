@@ -52,7 +52,7 @@ CREATE TABLE jobs (
 CREATE TABLE metrics (
     event_id uuid,
     metric character varying(255),
-    value numeric
+    value float8 
 );
 CREATE TABLE pipelines (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
