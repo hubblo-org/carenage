@@ -24,6 +24,16 @@ pub struct Ids {
     pub process_id: Uuid,
 }
 
+#[derive(sqlx::FromRow, Debug)]
+pub struct Record {
+    pub timestamp: DateTime<Local>,
+    pub pid: i32,
+    pub exe: String,
+    pub cmdline: String,
+    pub metric: String,
+    pub value: f64,
+}
+
 pub async fn get_db_connection_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
     let connection_pool = PgPool::connect(database_url);
 
@@ -347,18 +357,20 @@ pub async fn select_metrics_from_dimension(
     database_connection: PoolConnection<Postgres>,
     dimension: &str,
     dimension_id: Uuid,
-) -> Result<Vec<PgRow>, sqlx::Error> {
+) -> Result<Vec<Record>, sqlx::Error> {
     let mut connection = database_connection.detach();
 
     let formatted_query = format!(
-        "SELECT DISTINCT events.timestamp, processes.pid, processes.cmdline, processes.id, metrics.metric, metrics.value FROM PROCESSES INNER JOIN EVENTS ON events.process_id = processes.id INNER JOIN METRICS ON metrics.event_id = events.id WHERE {}_id=($1) ORDER BY processes.id, events.timestamp",
+        "SELECT DISTINCT events.timestamp, processes.pid, processes.exe, processes.cmdline, processes.id, metrics.metric, metrics.value FROM PROCESSES INNER JOIN EVENTS ON events.process_id = processes.id INNER JOIN METRICS ON metrics.event_id = events.id WHERE {}_id=($1) ORDER BY processes.id, events.timestamp, metrics.metric",
         dimension
     );
 
-    sqlx::query(&formatted_query)
+    let records: Vec<Record> = sqlx::query_as(&formatted_query)
         .bind(dimension_id)
         .fetch_all(&mut connection)
-        .await
+        .await?;
+
+    Ok(records)
 }
 
 #[cfg(test)]
