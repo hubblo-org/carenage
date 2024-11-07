@@ -11,10 +11,11 @@ fn it_formats_all_metrics_received_for_a_given_run_into_json_format(
     let db_connection = pool.acquire().await?;
     let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
 
+    let project_name = "hubblo/carenage";
     let metrics = select_metrics_from_dimension(db_connection, "run", run_id).await?;
 
-    let formatted_response = ApiResponseBuilder::new(&metrics).build();
+    let formatted_response = ApiResponseBuilder::new(&metrics, project_name).build();
 
-    todo!();
+    println!("{:?}", formatted_response);
     Ok(())
 }

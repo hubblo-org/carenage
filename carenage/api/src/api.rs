@@ -29,7 +29,7 @@ pub struct ApiResponse {
 pub struct ApiResponseBuilder(ApiResponse);
 
 impl ApiResponseBuilder {
-    pub fn new(records: &[Record], project_name: String) -> Self {
+    pub fn new(records: &[Record], project_name: &str) -> Self {
         let mut metrics_names: Vec<String> = records
             .iter()
             .map(|record| record.metric.clone())
@@ -79,7 +79,7 @@ impl ApiResponseBuilder {
             })
             .collect();
         ApiResponseBuilder(ApiResponse {
-            project_name,
+            project_name: project_name.to_owned(),
             processes,
         })
     }
