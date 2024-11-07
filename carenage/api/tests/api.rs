@@ -4,7 +4,7 @@ use sqlx::PgPool;
 use uuid::uuid;
 
 #[sqlx::test(fixtures("../../database/fixtures/metrics.sql"))]
-fn it_formats_all_metrics_received_for_a_given_run_into_json_format(
+fn it_formats_all_metrics_received_for_a_given_run_into_api_response_struct(
     pool: PgPool,
 ) -> sqlx::Result<()> {
 
@@ -16,6 +16,9 @@ fn it_formats_all_metrics_received_for_a_given_run_into_json_format(
 
     let formatted_response = ApiResponseBuilder::new(&metrics, project_name).build();
 
-    println!("{:?}", formatted_response);
+    assert_eq!(formatted_response.processes.len(), 15);
+    for process in formatted_response.processes {
+        assert_eq!(process.metrics.len(), 39);
+    }
     Ok(())
 }
