@@ -1,6 +1,6 @@
 use crate::carenaged::{insert_metadata, insert_event, query_and_insert_event};
 use carenaged::DaemonArgs;
-use database::boagent::HardwareData;
+use database::boagent::{Config, HardwareData};
 use database::ci::GitlabVariables;
 use database::event::{EventBuilder, EventType};
 use log::{error, info};
@@ -23,11 +23,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("{}", args.unix_flag);
 
     let gitlab_vars = GitlabVariables::parse_env_variables().expect("Gitlab variables are not available.");
+    let project_root_path = std::env::current_dir().unwrap().join("..");
+    let config = Config::check_configuration(&project_root_path)
+        .expect("Configuration fields should be parsable.");
 
-    let project_ids = insert_metadata(gitlab_vars, args.start_timestamp, args.unix_flag).await?;
+    let project_ids = insert_metadata(gitlab_vars, args.start_timestamp, args.unix_flag, &config).await?;
 
     let start_event = EventBuilder::new(project_ids, EventType::Start).build();
-    insert_event(&start_event).await?;
+    insert_event(&start_event, &config).await?;
 
     let _query_insert_loop = tokio::spawn(async move {
         let mut interval = time::interval(Duration::from_secs(args.time_step));
@@ -38,6 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 args.unix_flag,
                 HardwareData::Ignore,
                 EventType::Regular,
+                &config
             )
             .await;
             interval.tick().await;

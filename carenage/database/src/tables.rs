@@ -2,7 +2,7 @@ use crate::boagent::Config;
 use crate::ci::GitlabVariables;
 use crate::database::{
     format_hardware_data, get_db_connection_pool, get_project_id, insert_device_metadata,
-    insert_dimension_table_metadata, to_datetime_local,
+    insert_dimension_table_metadata
 };
 use crate::timestamp::Timestamp;
 use log::{error, info};
@@ -16,17 +16,19 @@ use std::process;
 use uuid::Uuid;
 
 pub trait Metadata {
-    fn set_name(&self) -> String;
+    fn set_name(&self, config: &Config) -> String;
     fn set_start_date(&self, start_timestamp: Timestamp) -> Timestamp;
     fn serialize(
         &self,
         start_timestamp: Timestamp,
         deserialized_boagent_response: Option<Value>,
+        config: &Config,
     ) -> Value;
     async fn insert(
         &self,
         start_timestamp: Timestamp,
         deserialized_boagent_response: Option<Value>,
+        config: &Config,
     ) -> Result<InsertAttempt, Box<dyn std::error::Error>>;
     async fn get_id(
         &self,
@@ -65,10 +67,7 @@ impl CarenageRow {
 }
 
 impl Metadata for CarenageRow {
-    fn set_name(&self) -> String {
-        let project_root_path = std::env::current_dir().unwrap().join("..");
-        let config = Config::check_configuration(&project_root_path)
-            .expect("Configuration fields should be parsable.");
+    fn set_name(&self, config: &Config) -> String {
         let gitlab_vars = GitlabVariables::parse_env_variables()
             .expect("Gitlab variables should be available to parse");
         let row_name: String = match self {
@@ -78,7 +77,7 @@ impl Metadata for CarenageRow {
             CarenageRow::Job => gitlab_vars.job_name,
             CarenageRow::Run => format!("run_{}", gitlab_vars.job_name),
             CarenageRow::Task => gitlab_vars.job_stage,
-            CarenageRow::Device => config.device_name,
+            CarenageRow::Device => config.device_name.clone(),
         };
         row_name
     }
@@ -103,10 +102,8 @@ impl Metadata for CarenageRow {
         &self,
         start_timestamp: Timestamp,
         deserialized_boagent_response: Option<Value>,
+        config: &Config,
     ) -> Value {
-        let project_root_path = std::env::current_dir().unwrap().join("..");
-        let config = Config::check_configuration(&project_root_path)
-            .expect("Configuration fields should be parsable.");
         match self {
             CarenageRow::Device => format_hardware_data(
                 deserialized_boagent_response.expect("Boagent response should be parsable."),
@@ -116,7 +113,7 @@ impl Metadata for CarenageRow {
             )
             .expect("Formatting of device data should succeed."),
             _ => {
-                let name = self.set_name();
+                let name = self.set_name(config);
                 let start_date = self.set_start_date(start_timestamp);
                 json!({
                      "name": name,
@@ -129,16 +126,15 @@ impl Metadata for CarenageRow {
         &self,
         start_timestamp: Timestamp,
         deserialized_boagent_response: Option<Value>,
+        config: &Config,
     ) -> Result<InsertAttempt, Box<dyn std::error::Error>> {
-        let project_root_path = std::env::current_dir().unwrap().join("..");
-        let config = Config::check_configuration(&project_root_path)?;
         let db_pool = get_db_connection_pool(&config.database_url).await?;
         let rows: InsertAttempt = match self {
             CarenageRow::Project => InsertAttempt::Pending(
                 insert_dimension_table_metadata(
                     db_pool.acquire().await?,
                     self.table_name(),
-                    self.serialize(start_timestamp, None),
+                    self.serialize(start_timestamp, None, config),
                 )
                 .await,
             ),
@@ -150,14 +146,14 @@ impl Metadata for CarenageRow {
                 insert_dimension_table_metadata(
                     db_pool.acquire().await?,
                     self.table_name(),
-                    self.serialize(start_timestamp, None),
+                    self.serialize(start_timestamp, None, config),
                 )
                 .await?,
             ),
             CarenageRow::Device => InsertAttempt::Success(
                 insert_device_metadata(
                     db_pool.acquire().await?,
-                    self.serialize(start_timestamp, deserialized_boagent_response),
+                    self.serialize(start_timestamp, deserialized_boagent_response, config),
                 )
                 .await?,
             ),
@@ -215,12 +211,7 @@ pub struct Process {
 pub struct ProcessBuilder(Process);
 
 impl ProcessBuilder {
-    pub fn new(
-        pid: i32,
-        exe: &str,
-        cmdline: &str,
-        state: &str,
-    ) -> Self {
+    pub fn new(pid: i32, exe: &str, cmdline: &str, state: &str) -> Self {
         ProcessBuilder(Process {
             pid,
             exe: exe.to_owned(),
@@ -238,8 +229,8 @@ impl Process {
         &self,
         db_connection: PoolConnection<Postgres>,
     ) -> Result<PgRow, Box<dyn std::error::Error>> {
-
-        let insert_query = "INSERT INTO processes (pid, exe, cmdline, state) VALUES ($1, $2, $3, $4) RETURNING id";
+        let insert_query =
+            "INSERT INTO processes (pid, exe, cmdline, state) VALUES ($1, $2, $3, $4) RETURNING id";
 
         let process_row = sqlx::query(insert_query)
             .bind(self.pid)

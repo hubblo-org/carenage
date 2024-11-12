@@ -1,6 +1,6 @@
 use carenaged::carenaged::{insert_event, insert_metadata, query_and_insert_event};
 use chrono::Local;
-use database::boagent::HardwareData;
+use database::boagent::{Config, HardwareData};
 use database::ci::GitlabVariables;
 use database::event::{EventBuilder, EventType};
 use database::timestamp::{Timestamp, UnixFlag};
@@ -33,9 +33,12 @@ async fn it_inserts_project_metadata_when_needed_gitlab_variables_are_available(
         .create_async()
         .await;
 
+    let project_root_path = std::env::current_dir().unwrap().join("..");
+    let config = Config::check_configuration(&project_root_path)
+        .expect("Configuration fields should be parsable.");
     let gitlab_vars = GitlabVariables::parse_env_variables().unwrap();
 
-    let insert_result = insert_metadata(gitlab_vars, now, UnixFlag::Unset).await;
+    let insert_result = insert_metadata(gitlab_vars, now, UnixFlag::Unset, &config).await;
 
     assert!(insert_result.is_ok())
 }
@@ -43,10 +46,13 @@ async fn it_inserts_project_metadata_when_needed_gitlab_variables_are_available(
 #[tokio::test]
 #[should_panic]
 async fn it_fails_when_needed_gitlab_variables_are_not_available() {
+    let project_root_path = std::env::current_dir().unwrap().join("..");
+    let config = Config::check_configuration(&project_root_path)
+        .expect("Configuration fields should be parsable.");
     let gitlab_vars = GitlabVariables::parse_env_variables().unwrap();
     let now = Timestamp::ISO8601(Some(Local::now()));
 
-    let _insert_result = insert_metadata(gitlab_vars, now, UnixFlag::Unset).await;
+    let _insert_result = insert_metadata(gitlab_vars, now, UnixFlag::Unset, &config).await;
 }
 #[tokio::test]
 async fn it_returns_all_uuids_of_metadata_tables_to_be_used_by_events_table_as_primary_keys() {
@@ -71,9 +77,12 @@ async fn it_returns_all_uuids_of_metadata_tables_to_be_used_by_events_table_as_p
         .create_async()
         .await;
 
+    let project_root_path = std::env::current_dir().unwrap().join("..");
+    let config = Config::check_configuration(&project_root_path)
+        .expect("Configuration fields should be parsable.");
     let gitlab_vars = GitlabVariables::parse_env_variables().unwrap();
 
-    let insert_result = insert_metadata(gitlab_vars, now, UnixFlag::Unset).await;
+    let insert_result = insert_metadata(gitlab_vars, now, UnixFlag::Unset, &config).await;
 
     assert!(insert_result.is_ok())
 }
@@ -102,11 +111,15 @@ async fn it_inserts_start_event_to_events_table() {
         .with_body_from_file(mock_boagent_path)
         .create_async()
         .await;
-    let project_ids = insert_metadata(gitlab_vars, now, UnixFlag::Unset)
+
+    let project_root_path = std::env::current_dir().unwrap().join("..");
+    let config = Config::check_configuration(&project_root_path)
+        .expect("Configuration fields should be parsable.");
+    let project_ids = insert_metadata(gitlab_vars, now, UnixFlag::Unset, &config)
         .await
         .unwrap();
     let start_event = EventBuilder::new(project_ids, EventType::Start).build();
-    let insert_event = insert_event(&start_event).await;
+    let insert_event = insert_event(&start_event, &config).await;
     assert!(insert_event.is_ok());
 }
 
@@ -115,6 +128,9 @@ async fn it_inserts_all_events_and_metrics_for_processes() {
     common::setup();
     let now = Timestamp::new(UnixFlag::Unset);
     let gitlab_vars = GitlabVariables::parse_env_variables().unwrap();
+    let project_root_path = std::env::current_dir().unwrap().join("..");
+    let config = Config::check_configuration(&project_root_path)
+        .expect("Configuration fields should be parsable.");
 
     let mut boagent_server = Server::new_async().await;
     let url = boagent_server.url();
@@ -168,11 +184,11 @@ async fn it_inserts_all_events_and_metrics_for_processes() {
         .create_async()
         .await;
 
-    let project_ids = insert_metadata(gitlab_vars, now, UnixFlag::Unset)
+    let project_ids = insert_metadata(gitlab_vars, now, UnixFlag::Unset, &config)
         .await
         .unwrap();
     let start_event = EventBuilder::new(project_ids, EventType::Start).build();
-    let _ = insert_event(&start_event).await;
+    let _ = insert_event(&start_event, &config).await;
 
     let query_and_insert = query_and_insert_event(
         project_ids,
@@ -180,6 +196,7 @@ async fn it_inserts_all_events_and_metrics_for_processes() {
         UnixFlag::Unset,
         HardwareData::Ignore,
         EventType::Regular,
+        &config
     )
     .await;
     assert!(query_and_insert.is_ok());
