@@ -1,4 +1,3 @@
-use chrono::Local;
 use sqlx::postgres::Postgres;
 use sqlx::Row;
 use sqlx::{pool::PoolConnection, postgres::PgRow};

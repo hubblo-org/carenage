@@ -2,7 +2,6 @@ use crate::tables::{
     CharacteristicValue, ComponentBuilder, ComponentCharacteristicBuilder, DeviceBuilder, Process,
     ProcessBuilder,
 };
-use crate::timestamp::Timestamp;
 use chrono::{DateTime, Local};
 use log::info;
 use serde_json::{json, Error, Value};
