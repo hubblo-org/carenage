@@ -86,7 +86,6 @@ pub async fn insert_metadata(
         "carenage",
         "carenage start",
         "running",
-        start_timestamp,
     )
     .build();
 
@@ -145,7 +144,7 @@ pub async fn query_and_insert_event(
     let deserialized_boagent_response = deserialize_boagent_json(response).await?;
 
     let processes_collection_attempt =
-        collect_processes(&deserialized_boagent_response, start_time);
+        collect_processes(&deserialized_boagent_response);
 
     /* Scaphandre, through Boagent, might not have data on processes available for the timestamps
      * sent by Carenage (notably if all of Boagent / Scaphandre / Carenage are launched at the same

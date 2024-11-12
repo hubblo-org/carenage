@@ -210,7 +210,6 @@ pub struct Process {
     pub exe: String,
     pub cmdline: String,
     pub state: String,
-    pub start_timestamp: String,
 }
 
 pub struct ProcessBuilder(Process);
@@ -221,14 +220,12 @@ impl ProcessBuilder {
         exe: &str,
         cmdline: &str,
         state: &str,
-        start_timestamp: Timestamp,
     ) -> Self {
         ProcessBuilder(Process {
             pid,
             exe: exe.to_owned(),
             cmdline: cmdline.to_owned(),
             state: state.to_owned(),
-            start_timestamp: start_timestamp.to_string(),
         })
     }
     pub fn build(self) -> Process {
@@ -241,16 +238,14 @@ impl Process {
         &self,
         db_connection: PoolConnection<Postgres>,
     ) -> Result<PgRow, Box<dyn std::error::Error>> {
-        let start_timestamptz = to_datetime_local(&self.start_timestamp);
 
-        let insert_query = "INSERT INTO processes (pid, exe, cmdline, state, start_date) VALUES ($1, $2, $3, $4, $5) RETURNING id";
+        let insert_query = "INSERT INTO processes (pid, exe, cmdline, state) VALUES ($1, $2, $3, $4) RETURNING id";
 
         let process_row = sqlx::query(insert_query)
             .bind(self.pid)
             .bind(&self.exe)
             .bind(&self.cmdline)
             .bind(&self.state)
-            .bind(start_timestamptz)
             .fetch_one(&mut db_connection.detach())
             .await?;
 

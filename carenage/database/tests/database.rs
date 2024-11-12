@@ -83,7 +83,6 @@ async fn it_inserts_valid_data_for_several_dimension_tables_in_the_carenage_data
 async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage_database(
     pool: PgPool,
 ) -> sqlx::Result<()> {
-    let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
 
     let process = ProcessBuilder::new(
         4336,
@@ -91,7 +90,6 @@ async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage
         "/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/
     usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab",
         "running",
-        now_timestamp, 
     ).build();
 
     let insert_query = Process::insert(&process, pool.acquire().await?).await;
@@ -107,8 +105,6 @@ async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage
 async fn it_checks_if_process_metadata_is_not_already_present_for_a_given_run(pool: PgPool,) -> sqlx::Result<()> {
     let db_connection = pool.acquire().await?;
 
-    let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
-
     let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
 
     let process = ProcessBuilder::new(
@@ -116,7 +112,6 @@ async fn it_checks_if_process_metadata_is_not_already_present_for_a_given_run(po
         "/usr/local/bin/containerd-shim-runc-v2",
         "/usr/local/bin/containerd-shim-runc-v2-namespacemoby-idb8822e8c4218ea3e9430f7626dad0905e0f770a24d0e407fffe475d7dadbbb08-address/var/run/docker/containerd/containerd.sock",
         "running",
-        now_timestamp, 
     ).build();
 
     let check_existing_process_query = check_process_existence_for_id(db_connection, &process, "run", run_id).await;
@@ -129,7 +124,6 @@ async fn it_checks_if_process_metadata_is_not_already_present_for_a_given_run(po
         "/does/not/exist",
         "/does/not/exist/i--do--not--exist",
         "zombie",
-        now_timestamp, 
     ).build();
 
     let db_connection = pool.acquire().await?;
@@ -298,7 +292,7 @@ async fn it_collects_all_processes_from_boagent_response_and_inserts_them_into_d
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
 
     let processes_collection =
-        collect_processes(&deserialized_boagent_response, now_timestamp);
+        collect_processes(&deserialized_boagent_response);
 
     assert!(processes_collection.is_ok());
 
@@ -403,8 +397,6 @@ async fn it_gets_process_id_from_processes_table_for_a_given_run_with_pid_and_ex
 
     let db_connection = pool.acquire().await?;
 
-    let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
-
     let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
 
     let process = ProcessBuilder::new(
@@ -412,7 +404,6 @@ async fn it_gets_process_id_from_processes_table_for_a_given_run_with_pid_and_ex
         "/usr/local/bin/containerd-shim-runc-v2",
         "/usr/local/bin/containerd-shim-runc-v2-namespacemoby-idb8822e8c4218ea3e9430f7626dad0905e0f770a24d0e407fffe475d7dadbbb08-address/var/run/docker/containerd/containerd.sock",
         "running",
-        now_timestamp, 
     ).build();
     let process_id_query = get_process_id(db_connection, &process, "run", run_id).await;
 

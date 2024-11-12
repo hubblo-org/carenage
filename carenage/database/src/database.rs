@@ -153,7 +153,6 @@ pub fn format_hardware_data(
 
 pub fn collect_processes(
     deserialized_boagent_response: &Value,
-    start_timestamp: Timestamp,
 ) -> Result<Option<Vec<Process>>, Error> {
     let processes: Option<Vec<Process>> = deserialized_boagent_response["raw_data"]["power_data"]
         ["raw_data"]
@@ -178,7 +177,6 @@ pub fn collect_processes(
                             .as_str()
                             .expect("Cmdline should be available."),
                         "running",
-                        start_timestamp,
                     )
                     .build()
                 })

@@ -54,7 +54,7 @@ CREATE TABLE processes (
   exe VARCHAR(255),
   cmdline TEXT,
   state VARCHAR(255),
-  start_date TIMESTAMPTZ,
+  start_date TIMESTAMPTZ DEFAULT localtimestamp,
   stop_date TIMESTAMPTZ
 );
 
