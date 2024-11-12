@@ -1,26 +1,33 @@
-use database::database::Record;
+use axum::Extension;
+use axum::{debug_handler, extract::Path, response::Json, routing::get, Router};
+use database::boagent::Config;
+use database::database::{get_db_connection_pool, select_metrics_from_dimension, Record};
+use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
 use std::collections::HashSet;
+use sqlx::PgPool;
+use uuid::Uuid;
 
-#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct ProcessInfo {
     pub process_pid: i32,
     pub process_exe: String,
     pub process_cmdline: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ProcessMetrics {
     pub metric_name: String,
     pub metric_values: Vec<f64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ProcessRecord {
     pub process: ProcessInfo,
     pub metrics: Vec<ProcessMetrics>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ApiResponse {
     pub project_name: String,
     pub processes: Vec<ProcessRecord>,
@@ -87,4 +94,48 @@ impl ApiResponseBuilder {
     pub fn build(self) -> ApiResponse {
         self.0
     }
+}
+
+/* #[debug_handler]
+pub async fn get_run(
+    Extension(db_pool): Extension<PgPool>,
+    Extension(project_name): Extension<String>,
+    Path(run_id): Path<Uuid>,
+) -> Json<Value> {
+    let run_rows = select_metrics_from_dimension(db_pool.acquire().await.unwrap(), "runs", run_id)
+        .await
+        .unwrap();
+
+    let response =
+        serde_json::json!(ApiResponseBuilder::new(&run_rows, &project_name).build());
+    Json(response)
+} */
+
+pub async fn get_run(
+    Extension(db_pool): Extension<PgPool>,
+    Extension(project_name): Extension<String>,
+    Path(run_id): Path<Uuid>,
+) -> Json<Value> {
+    let run_rows = select_metrics_from_dimension(db_pool.acquire().await.unwrap(), "run", run_id)
+        .await
+        .unwrap();
+    let response =
+        serde_json::json!(ApiResponseBuilder::new(&run_rows, &project_name).build());
+    Json(response)
+}
+
+pub fn app() -> Router {
+    let project_root_path = std::env::current_dir().unwrap().join("..");
+    let config = Config::check_configuration(&project_root_path)
+        .expect("Configuration fields should be parsable.");
+
+    // let database_url = &config.database_url;
+    let project_name = &config.project_name;
+
+    // println!("{}", database_url);
+    println!("{}", project_name);
+
+    Router::new()
+        .route("/", get(|| async { "Hello, world!" }))
+        .route("/runs/:run_id", get(get_run))
 }
