@@ -83,7 +83,7 @@ CREATE TYPE event_type AS ENUM ('regular', 'custom', 'start', 'stop');
 
 CREATE TABLE events (
   id UUID DEFAULT gen_random_uuid() UNIQUE,
-  timestamp TIMESTAMPTZ,
+  timestamp TIMESTAMPTZ DEFAULT localtimestamp,
   process_id UUID REFERENCES processes(id),
   task_id UUID REFERENCES tasks(id),
   job_id UUID REFERENCES jobs(id),
