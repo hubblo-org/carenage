@@ -1,11 +1,9 @@
+use axum::extract::Request;
 use axum::Extension;
-use axum::{
-    debug_handler, extract::Path, response::Json, routing::get, Router,
-};
+use axum::{debug_handler, extract::Path, http::Uri, response::Json, routing::get, Router};
 use chrono::{DateTime, Local};
 use database::database::{
-    select_metrics_from_dimension, select_project_name_from_dimension,
-    Record,
+    select_metrics_from_dimension, select_project_name_from_dimension, Record,
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, Row};
@@ -101,66 +99,41 @@ impl ApiResponseBuilder {
 }
 
 #[debug_handler]
-pub async fn get_project(
+pub async fn get_dimension(
     Extension(db_pool): Extension<PgPool>,
-    Path(project_id): Path<Uuid>,
+    Path(dimension_id): Path<Uuid>,
+    request: Request,
 ) -> Json<ApiResponse> {
-    let project_name =
-        select_project_name_from_dimension(db_pool.acquire().await.unwrap(), "project", project_id)
+
+    let mut uri = request.uri().to_string();
+    uri.remove(0);
+    let slash_offset = uri.find('/').unwrap_or(uri.len());
+    let mut dimension: String = uri.drain(..slash_offset).collect();
+    dimension.remove(dimension.len() - 1);
+
+    let project_name = select_project_name_from_dimension(
+        db_pool.acquire().await.unwrap(),
+        &dimension,
+        dimension_id,
+    )
+    .await
+    .unwrap()
+    .get::<&str, &str>("name")
+    .to_owned();
+
+    let rows =
+        select_metrics_from_dimension(db_pool.acquire().await.unwrap(), &dimension, dimension_id)
             .await
-            .unwrap()
-            .get::<&str, &str>("name")
-            .to_owned();
-
-    let project_rows = select_metrics_from_dimension(db_pool.acquire().await.unwrap(), "project", project_id)
-        .await
-        .unwrap();
-    let response = ApiResponseBuilder::new(&project_rows, &project_name).build();
-    Json(response)
-}
-
-#[debug_handler]
-pub async fn get_workflow(
-    Extension(db_pool): Extension<PgPool>,
-    Path(workflow_id): Path<Uuid>,
-) -> Json<ApiResponse> {
-    let workflow_name =
-        select_project_name_from_dimension(db_pool.acquire().await.unwrap(), "workflow", workflow_id)
-            .await
-            .unwrap()
-            .get::<&str, &str>("name")
-            .to_owned();
-
-    let workflow_rows = select_metrics_from_dimension(db_pool.acquire().await.unwrap(), "workflow", workflow_id)
-        .await
-        .unwrap();
-    let response = ApiResponseBuilder::new(&workflow_rows, &workflow_name).build();
-    Json(response)
-}
-
-#[debug_handler]
-pub async fn get_run(
-    Extension(db_pool): Extension<PgPool>,
-    Path(run_id): Path<Uuid>,
-) -> Json<ApiResponse> {
-    let project_name =
-        select_project_name_from_dimension(db_pool.acquire().await.unwrap(), "run", run_id)
-            .await
-            .unwrap()
-            .get::<&str, &str>("name")
-            .to_owned();
-
-    let run_rows = select_metrics_from_dimension(db_pool.acquire().await.unwrap(), "run", run_id)
-        .await
-        .unwrap();
-    let response = ApiResponseBuilder::new(&run_rows, &project_name).build();
+            .unwrap();
+    let response = ApiResponseBuilder::new(&rows, &project_name).build();
     Json(response)
 }
 
 pub fn app() -> Router {
     Router::new()
         .route("/", get(|| async { "Welcome to the Carenage API!" }))
-        .route("/runs/:run_id", get(get_run))
-        .route("/projects/:project_id", get(get_project))
-        .route("/workflowss/:workflow_id", get(get_workflow))
+        .route("/runs/:run_id", get(get_dimension))
+        .route("/projects/:project_id", get(get_dimension))
+        .route("/workflows/:workflow_id", get(get_dimension))
+        .route("/pipelines/:pipeline_id", get(get_dimension))
 }
