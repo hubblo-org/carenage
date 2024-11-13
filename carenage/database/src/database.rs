@@ -358,7 +358,7 @@ pub async fn select_metrics_from_dimension(
     let mut connection = database_connection.detach();
 
     let formatted_query = format!(
-        "SELECT DISTINCT events.timestamp, processes.pid, processes.exe, processes.cmdline, processes.id, metrics.metric, metrics.value FROM PROCESSES INNER JOIN EVENTS ON events.process_id = processes.id INNER JOIN METRICS ON metrics.event_id = events.id WHERE {}_id=($1) ORDER BY processes.id, events.timestamp, metrics.metric",
+        "SELECT DISTINCT events.timestamp, processes.pid, processes.exe, processes.cmdline, processes.id, metrics.metric, metrics.value FROM PROCESSES INNER JOIN EVENTS ON events.process_id = processes.id INNER JOIN METRICS ON metrics.event_id = events.id WHERE events.{}_id=($1) ORDER BY processes.id, events.timestamp, metrics.metric",
         dimension
     );
 
@@ -368,6 +368,23 @@ pub async fn select_metrics_from_dimension(
         .await?;
 
     Ok(records)
+}
+
+pub async fn select_project_name_from_dimension(
+    database_connection: PoolConnection<Postgres>,
+    dimension: &str,
+    dimension_id: Uuid,
+) -> Result<PgRow, sqlx::Error> {
+    let mut connection = database_connection.detach();
+
+    let formatted_query = format!("SELECT DISTINCT projects.name FROM PROJECTS INNER JOIN EVENTS ON events.project_id = projects.id WHERE events.{}_id=($1)", dimension);
+
+    let project_row = sqlx::query(&formatted_query)
+        .bind(dimension_id)
+        .fetch_one(&mut connection)
+        .await?;
+
+    Ok(project_row)
 }
 
 #[cfg(test)]

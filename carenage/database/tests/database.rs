@@ -3,15 +3,15 @@ use std::fs::canonicalize;
 use chrono::{Duration, Local};
 use database::boagent::{deserialize_boagent_json, query_boagent, HardwareData};
 use database::database::{
-    check_process_existence_for_id, collect_processes,
-    format_hardware_data, get_db_connection_pool, get_process_id, get_project_id,
-    insert_device_metadata, insert_dimension_table_metadata, select_metrics_from_dimension, 
-    update_stop_date,
+    check_process_existence_for_id, collect_processes, format_hardware_data,
+    get_db_connection_pool, get_process_id, get_project_id, insert_device_metadata,
+    insert_dimension_table_metadata, select_metrics_from_dimension,
+    select_project_name_from_dimension, update_stop_date,
 };
 use database::event::{Event, EventType};
 use database::metrics::Metrics;
-use database::timestamp::Timestamp;
 use database::tables::{Process, ProcessBuilder};
+use database::timestamp::Timestamp;
 use dotenv::var;
 use mockito::{Matcher, Server};
 use serde_json::json;
@@ -83,7 +83,6 @@ async fn it_inserts_valid_data_for_several_dimension_tables_in_the_carenage_data
 async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage_database(
     pool: PgPool,
 ) -> sqlx::Result<()> {
-
     let process = ProcessBuilder::new(
         4336,
         "/snap/firefox/4336/usr/lib/firefox/firefox",
@@ -102,7 +101,9 @@ async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage
 }
 
 #[sqlx::test(fixtures("../fixtures/metrics.sql"))]
-async fn it_checks_if_process_metadata_is_not_already_present_for_a_given_run(pool: PgPool,) -> sqlx::Result<()> {
+async fn it_checks_if_process_metadata_is_not_already_present_for_a_given_run(
+    pool: PgPool,
+) -> sqlx::Result<()> {
     let db_connection = pool.acquire().await?;
 
     let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
@@ -114,7 +115,8 @@ async fn it_checks_if_process_metadata_is_not_already_present_for_a_given_run(po
         "running",
     ).build();
 
-    let check_existing_process_query = check_process_existence_for_id(db_connection, &process, "run", run_id).await;
+    let check_existing_process_query =
+        check_process_existence_for_id(db_connection, &process, "run", run_id).await;
 
     assert!(check_existing_process_query.is_ok());
     assert!(check_existing_process_query.unwrap());
@@ -124,11 +126,13 @@ async fn it_checks_if_process_metadata_is_not_already_present_for_a_given_run(po
         "/does/not/exist",
         "/does/not/exist/i--do--not--exist",
         "zombie",
-    ).build();
+    )
+    .build();
 
     let db_connection = pool.acquire().await?;
 
-    let check_non_existing_process_query = check_process_existence_for_id(db_connection, &not_existing_process, "run", run_id).await;
+    let check_non_existing_process_query =
+        check_process_existence_for_id(db_connection, &not_existing_process, "run", run_id).await;
     assert!(check_non_existing_process_query.is_ok());
     assert!(!check_non_existing_process_query.unwrap());
 
@@ -291,17 +295,16 @@ async fn it_collects_all_processes_from_boagent_response_and_inserts_them_into_d
 
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
 
-    let processes_collection =
-        collect_processes(&deserialized_boagent_response);
+    let processes_collection = collect_processes(&deserialized_boagent_response);
 
     assert!(processes_collection.is_ok());
 
-    let processes = processes_collection.unwrap(); 
-    for process in processes.unwrap() 
-    {
-    let process_row = Process::insert(&process, pool.acquire().await?);
+    let processes = processes_collection.unwrap();
+    for process in processes.unwrap() {
+        let process_row = Process::insert(&process, pool.acquire().await?);
 
-    assert!(process_row.await.is_ok());}
+        assert!(process_row.await.is_ok());
+    }
     Ok(())
 }
 
@@ -393,8 +396,9 @@ async fn it_gets_project_id_from_projects_table_with_queried_project_name(
 }
 
 #[sqlx::test(fixtures("../fixtures/metrics.sql"))]
-async fn it_gets_process_id_from_processes_table_for_a_given_run_with_pid_and_exe(pool: PgPool,) -> sqlx::Result<()> {
-
+async fn it_gets_process_id_from_processes_table_for_a_given_run_with_pid_and_exe(
+    pool: PgPool,
+) -> sqlx::Result<()> {
     let db_connection = pool.acquire().await?;
 
     let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
@@ -577,7 +581,9 @@ async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sql
     .unwrap();
 
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
-    let metrics = Metrics::build(&common::process_data(), &deserialized_boagent_response).insert(event_id, another_connection).await;
+    let metrics = Metrics::build(&common::process_data(), &deserialized_boagent_response)
+        .insert(event_id, another_connection)
+        .await;
     assert!(metrics.is_ok());
     Ok(())
 }
@@ -592,7 +598,18 @@ async fn it_selects_all_metrics_associated_with_a_given_run_id(pool: PgPool) -> 
 
     assert_eq!(select_query.len(), 8970);
 
-
     Ok(())
 }
 
+#[sqlx::test(fixtures("../fixtures/metrics.sql"))]
+async fn it_selects_the_project_name_with_a_given_run_id(pool: PgPool) -> sqlx::Result<()> {
+    let connection = pool.acquire().await?;
+
+    let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
+
+    let select_query = select_project_name_from_dimension(connection, "run", run_id).await?;
+
+    assert_eq!(select_query.get::<&str, &str>("name"), "hubblo/carenage");
+
+    Ok(())
+}
