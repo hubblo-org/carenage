@@ -120,6 +120,25 @@ pub async fn get_project(
 }
 
 #[debug_handler]
+pub async fn get_workflow(
+    Extension(db_pool): Extension<PgPool>,
+    Path(workflow_id): Path<Uuid>,
+) -> Json<ApiResponse> {
+    let workflow_name =
+        select_project_name_from_dimension(db_pool.acquire().await.unwrap(), "workflow", workflow_id)
+            .await
+            .unwrap()
+            .get::<&str, &str>("name")
+            .to_owned();
+
+    let workflow_rows = select_metrics_from_dimension(db_pool.acquire().await.unwrap(), "workflow", workflow_id)
+        .await
+        .unwrap();
+    let response = ApiResponseBuilder::new(&workflow_rows, &workflow_name).build();
+    Json(response)
+}
+
+#[debug_handler]
 pub async fn get_run(
     Extension(db_pool): Extension<PgPool>,
     Path(run_id): Path<Uuid>,
@@ -143,4 +162,5 @@ pub fn app() -> Router {
         .route("/", get(|| async { "Welcome to the Carenage API!" }))
         .route("/runs/:run_id", get(get_run))
         .route("/projects/:project_id", get(get_project))
+        .route("/workflowss/:workflow_id", get(get_workflow))
 }

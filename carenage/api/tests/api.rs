@@ -1,4 +1,4 @@
-use api::api::{ get_project, get_run, ApiResponseBuilder};
+use api::api::{ get_project, get_run, get_workflow, ApiResponseBuilder};
 use axum::{
     body::Body,
     http::{Request, StatusCode},
@@ -31,7 +31,7 @@ fn it_formats_all_metrics_received_for_a_given_run_into_api_response_struct(
 }
 
 #[sqlx::test(fixtures("../../database/fixtures/metrics.sql"))]
-async fn it_returns_a_response_in_json_for_a_given_run_id(db_pool: PgPool) {
+async fn it_returns_a_200_response_for_a_given_run_id(db_pool: PgPool) {
 
     let app = Router::new().route("/runs/:run_id", get(get_run)).layer(Extension(db_pool));
 
@@ -67,13 +67,29 @@ async fn it_returns_an_error_if_database_connection_fails(db_pool: PgPool) {
 }
 
 #[sqlx::test(fixtures("../../database/fixtures/metrics.sql"))]
-async fn it_returns_a_response_in_json_for_a_given_project_id(db_pool: PgPool) {
+async fn it_returns_a_200_response_for_a_given_project_id(db_pool: PgPool) {
 
     let app = Router::new().route("/projects/:project_id", get(get_project)).layer(Extension(db_pool));
 
     let project_id = uuid!("95dfae11-5cad-41d9-bcf9-fa6564c22dd6");
 
     let url = format!("/projects/{project_id}");
+
+    let request = Request::builder().uri(url).body(Body::empty()).unwrap();
+
+    let response = app.oneshot(request).await.unwrap(); 
+
+    assert_eq!(response.status(), StatusCode::OK);
+}
+
+#[sqlx::test(fixtures("../../database/fixtures/metrics.sql"))]
+async fn it_returns_a_200_response_for_a_given_workflow_id(db_pool: PgPool) {
+
+    let app = Router::new().route("/workflows/:workflow_id", get(get_workflow)).layer(Extension(db_pool));
+
+    let workflow_id = uuid!("03c06a5e-a139-4a9e-a770-f69821b10faf");
+
+    let url = format!("/workflows/{workflow_id}");
 
     let request = Request::builder().uri(url).body(Body::empty()).unwrap();
 
