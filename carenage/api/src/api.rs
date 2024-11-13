@@ -1,11 +1,14 @@
 use axum::Extension;
-use axum::{debug_handler, extract::Path, response::Json, routing::get, Router};
-use database::boagent::Config;
-use database::database::{get_db_connection_pool, select_metrics_from_dimension, Record};
+use axum::{
+    debug_handler, extract::Path, response::Json, routing::get, Router,
+};
+use database::database::{
+    select_metrics_from_dimension, select_project_name_from_dimension,
+    Record,
+};
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use sqlx::{PgPool, Row};
 use std::collections::HashSet;
-use sqlx::PgPool;
 use uuid::Uuid;
 
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
@@ -96,46 +99,27 @@ impl ApiResponseBuilder {
     }
 }
 
-/* #[debug_handler]
+#[debug_handler]
 pub async fn get_run(
     Extension(db_pool): Extension<PgPool>,
-    Extension(project_name): Extension<String>,
     Path(run_id): Path<Uuid>,
-) -> Json<Value> {
-    let run_rows = select_metrics_from_dimension(db_pool.acquire().await.unwrap(), "runs", run_id)
-        .await
-        .unwrap();
+) -> Json<ApiResponse> {
+    let project_name =
+        select_project_name_from_dimension(db_pool.acquire().await.unwrap(), "run", run_id)
+            .await
+            .unwrap()
+            .get::<&str, &str>("name")
+            .to_owned();
 
-    let response =
-        serde_json::json!(ApiResponseBuilder::new(&run_rows, &project_name).build());
-    Json(response)
-} */
-
-pub async fn get_run(
-    Extension(db_pool): Extension<PgPool>,
-    Extension(project_name): Extension<String>,
-    Path(run_id): Path<Uuid>,
-) -> Json<Value> {
     let run_rows = select_metrics_from_dimension(db_pool.acquire().await.unwrap(), "run", run_id)
         .await
         .unwrap();
-    let response =
-        serde_json::json!(ApiResponseBuilder::new(&run_rows, &project_name).build());
+    let response = ApiResponseBuilder::new(&run_rows, &project_name).build();
     Json(response)
 }
 
 pub fn app() -> Router {
-    let project_root_path = std::env::current_dir().unwrap().join("..");
-    let config = Config::check_configuration(&project_root_path)
-        .expect("Configuration fields should be parsable.");
-
-    // let database_url = &config.database_url;
-    let project_name = &config.project_name;
-
-    // println!("{}", database_url);
-    println!("{}", project_name);
-
     Router::new()
-        .route("/", get(|| async { "Hello, world!" }))
+        .route("/", get(|| async { "Welcome to the Carenage API!" }))
         .route("/runs/:run_id", get(get_run))
 }
