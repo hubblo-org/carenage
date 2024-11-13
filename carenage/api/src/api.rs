@@ -2,6 +2,7 @@ use axum::Extension;
 use axum::{
     debug_handler, extract::Path, response::Json, routing::get, Router,
 };
+use chrono::{DateTime, Local};
 use database::database::{
     select_metrics_from_dimension, select_project_name_from_dimension,
     Record,
@@ -21,7 +22,7 @@ pub struct ProcessInfo {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ProcessMetrics {
     pub metric_name: String,
-    pub metric_values: Vec<f64>,
+    pub metric_values: Vec<(DateTime<Local>, f64)>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -73,8 +74,8 @@ impl ApiResponseBuilder {
                             .filter(|record| {
                                 record.pid == process.process_pid && record.metric == metric_name
                             })
-                            .map(|record| record.value)
-                            .collect::<Vec<f64>>();
+                            .map(|record| (record.timestamp, record.value))
+                            .collect::<Vec<(DateTime<Local>, f64)>>();
 
                         ProcessMetrics {
                             metric_name,

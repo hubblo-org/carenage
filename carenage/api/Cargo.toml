@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 axum = { version = "0.7.7", features = ["macros"] }
+chrono = "0.4.38"
 database = { path = "../database" }
 hyper = "1.5.0"
 log = "0.4.22"
