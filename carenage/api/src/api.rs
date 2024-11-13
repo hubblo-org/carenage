@@ -101,6 +101,25 @@ impl ApiResponseBuilder {
 }
 
 #[debug_handler]
+pub async fn get_project(
+    Extension(db_pool): Extension<PgPool>,
+    Path(project_id): Path<Uuid>,
+) -> Json<ApiResponse> {
+    let project_name =
+        select_project_name_from_dimension(db_pool.acquire().await.unwrap(), "project", project_id)
+            .await
+            .unwrap()
+            .get::<&str, &str>("name")
+            .to_owned();
+
+    let project_rows = select_metrics_from_dimension(db_pool.acquire().await.unwrap(), "project", project_id)
+        .await
+        .unwrap();
+    let response = ApiResponseBuilder::new(&project_rows, &project_name).build();
+    Json(response)
+}
+
+#[debug_handler]
 pub async fn get_run(
     Extension(db_pool): Extension<PgPool>,
     Path(run_id): Path<Uuid>,
@@ -123,4 +142,5 @@ pub fn app() -> Router {
     Router::new()
         .route("/", get(|| async { "Welcome to the Carenage API!" }))
         .route("/runs/:run_id", get(get_run))
+        .route("/projects/:project_id", get(get_project))
 }

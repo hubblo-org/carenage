@@ -1,4 +1,4 @@
-use api::api::{ get_run, ApiResponseBuilder};
+use api::api::{ get_project, get_run, ApiResponseBuilder};
 use axum::{
     body::Body,
     http::{Request, StatusCode},
@@ -64,4 +64,20 @@ async fn it_returns_an_error_if_database_connection_fails(db_pool: PgPool) {
     let response = app.oneshot(request).await.unwrap(); 
 
     assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+}
+
+#[sqlx::test(fixtures("../../database/fixtures/metrics.sql"))]
+async fn it_returns_a_response_in_json_for_a_given_project_id(db_pool: PgPool) {
+
+    let app = Router::new().route("/projects/:project_id", get(get_project)).layer(Extension(db_pool));
+
+    let project_id = uuid!("95dfae11-5cad-41d9-bcf9-fa6564c22dd6");
+
+    let url = format!("/projects/{project_id}");
+
+    let request = Request::builder().uri(url).body(Body::empty()).unwrap();
+
+    let response = app.oneshot(request).await.unwrap(); 
+
+    assert_eq!(response.status(), StatusCode::OK);
 }
