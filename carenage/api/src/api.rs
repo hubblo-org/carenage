@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, Row};
 use std::collections::HashSet;
 use uuid::Uuid;
+use crate::utils::format_uri_to_dimension;
 
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct ProcessInfo {
@@ -105,11 +106,8 @@ pub async fn get_dimension(
     request: Request,
 ) -> Json<ApiResponse> {
 
-    let mut uri = request.uri().to_string();
-    uri.remove(0);
-    let slash_offset = uri.find('/').unwrap_or(uri.len());
-    let mut dimension: String = uri.drain(..slash_offset).collect();
-    dimension.remove(dimension.len() - 1);
+    let uri = request.uri();
+    let dimension = format_uri_to_dimension(uri);
 
     let project_name = select_project_name_from_dimension(
         db_pool.acquire().await.unwrap(),
