@@ -54,7 +54,7 @@ CREATE TABLE processes (
   exe VARCHAR(255),
   cmdline TEXT,
   state VARCHAR(255),
-  start_date TIMESTAMPTZ DEFAULT localtimestamp,
+  start_date TIMESTAMPTZ DEFAULT current_timestamp,
   stop_date TIMESTAMPTZ
 );
 
@@ -83,7 +83,7 @@ CREATE TYPE event_type AS ENUM ('regular', 'custom', 'start', 'stop');
 
 CREATE TABLE events (
   id UUID DEFAULT gen_random_uuid() UNIQUE,
-  timestamp TIMESTAMPTZ DEFAULT localtimestamp,
+  timestamp TIMESTAMPTZ DEFAULT current_timestamp,
   process_id UUID REFERENCES processes(id),
   task_id UUID REFERENCES tasks(id),
   job_id UUID REFERENCES jobs(id),
