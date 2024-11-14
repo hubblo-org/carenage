@@ -134,4 +134,6 @@ pub fn app() -> Router {
         .route("/projects/:project_id", get(get_dimension))
         .route("/workflows/:workflow_id", get(get_dimension))
         .route("/pipelines/:pipeline_id", get(get_dimension))
+        .route("/jobs/:job_id", get(get_dimension))
+        .route("/tasks/:task_id", get(get_dimension))
 }

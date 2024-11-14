@@ -116,3 +116,37 @@ async fn it_returns_a_200_response_for_a_given_pipeline_id(db_pool: PgPool) {
 
     assert_eq!(response.status(), StatusCode::OK);
 }
+
+#[sqlx::test(fixtures("../../database/fixtures/metrics.sql"))]
+async fn it_returns_a_200_response_for_a_given_job_id(db_pool: PgPool) {
+    let app = Router::new()
+        .route("/jobs/:job_id", get(get_dimension))
+        .layer(Extension(db_pool));
+
+    let job_id = uuid!("6579f658-9286-493e-a3ed-0d92afa09edd");
+
+    let url = format!("/jobs/{job_id}");
+
+    let request = Request::builder().uri(url).body(Body::empty()).unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+}
+
+#[sqlx::test(fixtures("../../database/fixtures/metrics.sql"))]
+async fn it_returns_a_200_response_for_a_given_task_id(db_pool: PgPool) {
+    let app = Router::new()
+        .route("/tasks/:task_id", get(get_dimension))
+        .layer(Extension(db_pool));
+
+    let task_id = uuid!("83e9b273-9aa9-4996-8141-751b91aa98b2");
+
+    let url = format!("/tasks/{task_id}");
+
+    let request = Request::builder().uri(url).body(Body::empty()).unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+}
