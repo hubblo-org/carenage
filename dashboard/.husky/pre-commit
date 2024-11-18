@@ -1,0 +1,2 @@
+cd dashboard
+npx lint-staged

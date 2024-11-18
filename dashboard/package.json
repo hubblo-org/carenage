@@ -11,7 +11,14 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
-		"test": "vitest run"
+		"test": "vitest run",
+		"prepare": "cd .. && husky dashboard/.husky"
+	},
+	"lint-staged": {
+		"**/*": [
+			"eslint --fix",
+			"prettier --write --ignore-unknown"
+		]
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -24,7 +31,9 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.36.0",
 		"globals": "^15.0.0",
+		"husky": "^9.1.7",
 		"jsdom": "^25.0.1",
+		"lint-staged": "^15.2.10",
 		"prettier": "^3.3.2",
 		"prettier-plugin-svelte": "^3.2.6",
 		"svelte": "^5.0.0",
