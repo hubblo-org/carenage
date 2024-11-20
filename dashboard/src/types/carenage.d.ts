@@ -4,16 +4,16 @@ export declare type ProcessInfo = {
   process_cmdline: string;
 };
 
-export declare type MetricValues = [Date, number];
+export declare type MetricValues = (string | number)[][];
 
 export declare type Metric = {
   metric_name: string;
-  metric_values: MetricValues[];
+  metric_values: MetricValues;
 };
 
 export declare type Process = {
   process: ProcessInfo;
-  metrics: Array<Metric>;
+  metrics: Metric[];
 };
 
 export declare type CiRun = {
