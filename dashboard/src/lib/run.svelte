@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CiRun, Metric, MetricValues, Process } from "./types/carenage";
+  import type { CiRun, Metric, MetricValues, Process } from "../types/carenage";
   import format_duration from "$lib/utils.js";
 
   interface Props {

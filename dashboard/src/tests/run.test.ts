@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import userEvent from "@testing-library/user-event";
 import type { CiRun, Metric, MetricValues, Process } from "../types/carenage";
 import processes from "./fixtures/run.json";
-import Run from "../run.svelte";
+import Run from "$lib/run.svelte";
 
 describe("run test suite", () => {
   const run_id = "Run #8228228299";
