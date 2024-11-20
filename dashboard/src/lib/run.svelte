@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { CiRun, Metric, MetricValues, Process } from "../types/carenage";
+  import { onMount } from "svelte";
   import format_duration from "$lib/utils.js";
 
   interface Props {
@@ -24,6 +25,18 @@
       (metrics: Metric[]) => metrics[metricIndex]
     )[0].metric_values;
     return metricValues;
+  });
+
+  onMount(async () => {
+    const Dygraph = (await import("dygraphs")).default;
+    let values = metricValues.map((value) => {
+      let date = new Date(value[0]);
+      return [date, value[1]];
+    });
+    new Dygraph(document.getElementById("graph"), values, {
+      labels: ["time", "metric"]
+    });
+    console.log("mounted");
   });
 </script>
 
@@ -66,6 +79,7 @@
     <p>{metricValue[1]}</p>
   {/each}
 </section>
+<div id="graph"></div>
 
 <style>
 </style>
