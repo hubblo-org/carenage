@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CiRun, Metric } from "./types/carenage";
+  import type { CiRun, Metric, MetricValues, Process } from "./types/carenage";
 
   interface Props {
     run: CiRun;
@@ -8,6 +8,21 @@
   const { run }: Props = $props();
   const numberOfRegisteredProcesses = run.processes.length;
   const metricsNames = run.processes[0].metrics.map((metric: Metric) => metric.metric_name);
+
+  let processSelected = $state(run.processes[0].process.process_pid);
+  let metricSelected = $state(metricsNames[0]);
+
+  let metricValues = $derived.by(() => {
+    const isMetricSelected = (metric: Metric) => metric.metric_name === metricSelected;
+    const processMetrics = run.processes
+      .filter((process: Process) => process.process.process_pid === processSelected)
+      .map((process: Process) => process.metrics);
+    const metricIndex = processMetrics[0].findIndex(isMetricSelected);
+    const metricValues: MetricValues[] = processMetrics.map(
+      (metrics: Metric[]) => metrics[metricIndex]
+    )[0].metric_values;
+    return metricValues;
+  });
 </script>
 
 <section>
@@ -26,13 +41,28 @@
 
 <section>
   <label for="metric-name-select">Select a metric: </label>
-  <select name="metric-names" id="metric-name-select">
+  <select name="metric-names" id="metric-name-select" bind:value={metricSelected}>
     {#each metricsNames as metricName}
-      <option>
+      <option value={metricName}>
         {metricName}
       </option>
     {/each}
   </select>
+  <label for="process-select">Select a process: </label>
+  <select name="processes" id="process-select" bind:value={processSelected}>
+    {#each run.processes as process}
+      <option value={process.process.process_pid}>
+        PID #{process.process.process_pid}
+        {process.process.process_exe}
+      </option>
+    {/each}
+  </select>
+</section>
+<section>
+  {#each metricValues as metricValue}
+    <p>{metricValue[0]}</p>
+    <p>{metricValue[1]}</p>
+  {/each}
 </section>
 
 <style>
