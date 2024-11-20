@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { CiRun, Metric, MetricValues, Process } from "./types/carenage";
+  import format_duration from "$lib/utils.js";
 
   interface Props {
     run: CiRun;
@@ -11,6 +12,7 @@
 
   let processSelected = $state(run.processes[0].process.process_pid);
   let metricSelected = $state(metricsNames[0]);
+  let formatted_run_duration = format_duration(run.job_duration);
 
   let metricValues = $derived.by(() => {
     const isMetricSelected = (metric: Metric) => metric.metric_name === metricSelected;
@@ -18,7 +20,7 @@
       .filter((process: Process) => process.process.process_pid === processSelected)
       .map((process: Process) => process.metrics);
     const metricIndex = processMetrics[0].findIndex(isMetricSelected);
-    const metricValues: MetricValues[] = processMetrics.map(
+    const metricValues: MetricValues = processMetrics.map(
       (metrics: Metric[]) => metrics[metricIndex]
     )[0].metric_values;
     return metricValues;
@@ -32,7 +34,7 @@
     <a href="/{run.pipeline_id}">Pipeline {run.pipeline_id}</a>
   </div>
   <div>
-    <p>Run executed in {run.job_duration}</p>
+    <p>Run executed in {formatted_run_duration}</p>
     <p>Job: {run.job_name}</p>
     <p>Processes registered: {numberOfRegisteredProcesses}</p>
     <p>Run status: {run.job_status}</p>

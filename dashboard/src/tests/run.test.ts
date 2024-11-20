@@ -38,7 +38,7 @@ describe("run test suite", () => {
     expect(projectLink).toBeVisible();
   });
   it("displays metadata on the processed run", () => {
-    const runDuration = screen.getByText(/180/i);
+    const runDuration = screen.getByText(/00:03:00/i);
     const numberOfProcesses = screen.getByText(/Processes registered: 15/i);
     const jobName = screen.getByText(/test_for_merge_request/i);
     const jobStatus = screen.getByText(/success/i);
