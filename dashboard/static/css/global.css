@@ -1,0 +1,37 @@
+:root {
+  --gray-100: #c2c2c9;
+
+  --blue-100: #e5f0fa;
+  --blue-200: #0066cc;
+
+  --main-font-family: "Lexend";
+  --main-font-weight: 400;
+  --main-font-style: normal;
+  --fallback-font-family: "Noto";
+}
+
+@font-face {
+  font-family: "Lexend";
+  src: url("/fonts/Lexend-Regular.ttf");
+}
+
+body {
+  font-family: var(--main-font-family), var(--fallback-font-family);
+  font-weight: 400;
+  font-style: normal;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+}
+
+header,
+section,
+label,
+.wrapper {
+  padding: 12px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--gray-100);
+}
