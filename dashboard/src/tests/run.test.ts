@@ -6,8 +6,8 @@ import processes from "./fixtures/run.json";
 import Run from "$lib/run.svelte";
 
 describe("run test suite", () => {
-  const run_id = "Run #8228228299";
-  const processes_data: Array<Process> = processes.processes;
+  const runId = "Run #8228228299";
+  const processesData: Array<Process> = processes.processes;
 
   const run: CiRun = {
     project_name: "hubblo/carenage",
@@ -16,7 +16,7 @@ describe("run test suite", () => {
     job_name: "test_for_merge_request",
     job_status: "success",
     job_duration: 180,
-    processes: processes_data
+    processes: processesData
   };
 
   beforeEach(() => {
@@ -28,7 +28,7 @@ describe("run test suite", () => {
   });
 
   it("displays a heading with the run ID", () => {
-    const runHeading = screen.getByRole("heading", { name: run_id });
+    const runHeading = screen.getByRole("heading", { name: runId });
     expect(runHeading).toBeVisible();
   });
   it("displays links to higher dimensions: to the pipeline related to the run, to the project related to the pipeline", () => {
@@ -48,7 +48,7 @@ describe("run test suite", () => {
     expect(jobStatus).toBeVisible();
   });
   it("displays a selection of metric names to choose from in order to display the metric values", () => {
-    const metricsNames = processes_data[0].metrics.map((metric: Metric) => metric.metric_name);
+    const metricsNames = processesData[0].metrics.map((metric: Metric) => metric.metric_name);
     const metricNamesSelect = screen.getByRole("combobox", { name: /Select a metric/i });
     const { getAllByRole } = within(metricNamesSelect);
     const metricOptions = getAllByRole("option");
@@ -57,8 +57,8 @@ describe("run test suite", () => {
     );
   });
   it("displays a selection of processes to choose from in order to display the metric values", () => {
-    const processesExes = processes_data.map((process: Process) => process.process.process_exe);
-    const processesPids = processes_data.map((process: Process) =>
+    const processesExes = processesData.map((process: Process) => process.process.process_exe);
+    const processesPids = processesData.map((process: Process) =>
       process.process.process_pid.toString()
     );
     const processesSelect = screen.getByRole("combobox", { name: /Select a process/i });
@@ -72,8 +72,8 @@ describe("run test suite", () => {
   it("displays the metric values for the process and the metric_name selected by the user", async () => {
     const user = userEvent.setup();
     const isCpuAdpAvgImpact = (metric: Metric) => metric.metric_name === "cpu_adp_average_impact";
-    const cpuAdpAvgImpactIndex = processes_data[0].metrics.findIndex(isCpuAdpAvgImpact);
-    const pid64AvgPowerMeasuredValues = processes_data
+    const cpuAdpAvgImpactIndex = processesData[0].metrics.findIndex(isCpuAdpAvgImpact);
+    const pid64CpuAvgAdpValues = processesData
       .filter((process: Process) => process.process.process_pid === 64)
       .map((process: Process) => process.metrics[cpuAdpAvgImpactIndex].metric_values);
     const processesSelect = screen.getByRole("combobox", { name: /Select a process/i });
@@ -82,7 +82,7 @@ describe("run test suite", () => {
     await user.selectOptions(metricNamesSelect, ["cpu_adp_average_impact"]);
 
     // Might have to change those assertions depending on how values are to be represented and are accessible through the DOM.
-    pid64AvgPowerMeasuredValues.map((metric_value: MetricValues, index) => {
+    pid64CpuAvgAdpValues.map((metric_value: MetricValues, index) => {
       const timestamp = metric_value[index][0].toString();
       const value = metric_value[index][1].toString();
       const timestampText = screen.getByText(timestamp);
@@ -90,5 +90,9 @@ describe("run test suite", () => {
       expect(timestampText).toBeVisible();
       expect(valueText[0]).toBeVisible();
     });
+  });
+  it("displays an accessible element where a graph will be generated from the values of the process and metric_name selected by the user", async () => {
+    const graph = screen.getByRole("img", { name: "Metric values distributed on a graph" });
+    expect(graph).toBeVisible();
   });
 });
