@@ -17,8 +17,8 @@ export declare type Process = {
 };
 
 export declare type CiRun = {
-  pipeline_id: string;
-  run_id: string;
+  pipeline_id: number;
+  run_id: number;
   project_name: string;
   job_name: string;
   job_status: string;
