@@ -83,14 +83,23 @@ describe("run test suite", () => {
     const processesSelect = screen.getByRole("combobox", { name: /Select a process/i });
     const metricNamesSelect = screen.getByRole("combobox", { name: /Select a metric/i });
     await user.selectOptions(processesSelect, ["64"]);
-    await user.selectOptions(metricNamesSelect, ["cpu_adp_average_impact"]);
+    await user.selectOptions(metricNamesSelect, ["cpu_adp_average_impact_kgsbeq"]);
 
-    // Might have to change those assertions depending on how values are to be represented and are accessible through the DOM.
+    const metricsTable = screen.getByRole("table", {
+      name: "Values for selected process and metric"
+    });
+    const timestampsColumn = screen.getByRole("columnheader", { name: "Timestamp" });
+    const metricValuesColumn = screen.getByRole("columnheader", { name: /Metric value/i });
+
+    expect(metricsTable).toBeVisible();
+    expect(timestampsColumn).toBeVisible();
+    expect(metricValuesColumn).toBeVisible();
+
     pid64CpuAvgAdpValues.map((metric_value: MetricValues, index) => {
       const timestamp = metric_value[index][0].toString();
       const value = metric_value[index][1].toString();
-      const timestampText = screen.getByText(timestamp);
-      const valueText = screen.getAllByText(value);
+      const timestampText = screen.getByRole("cell", { name: timestamp });
+      const valueText = screen.getAllByRole("cell", { name: value });
       expect(timestampText).toBeVisible();
       expect(valueText[0]).toBeVisible();
     });
