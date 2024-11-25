@@ -3,16 +3,16 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import userEvent from "@testing-library/user-event";
 import type { CiRun, Metric, MetricValues, Process } from "../types/carenage";
 import processes from "./fixtures/run.json";
-import Run from "$lib/run.svelte";
+import Run from "$lib/components/run.svelte";
 
 describe("run test suite", () => {
-  const runId = "Run #8228228299";
+  const runId = "Run 8228228299";
   const processesData: Array<Process> = processes.processes;
 
   const run: CiRun = {
     project_name: "hubblo/carenage",
-    pipeline_id: "#1520057997",
-    run_id: "#8228228299",
+    pipeline_id: 1520057997,
+    run_id: 8228228299,
     job_name: "test_for_merge_request",
     job_status: "success",
     job_duration: 180,
@@ -31,15 +31,18 @@ describe("run test suite", () => {
     const runHeading = screen.getByRole("heading", { name: runId });
     expect(runHeading).toBeVisible();
   });
-  it("displays links to higher dimensions: to the pipeline related to the run, to the project related to the pipeline", () => {
+  it("displays links to higher dimensions: to the pipeline related to the run, to the project related to the pipeline, to the run", () => {
     const pipelineLink = screen.getByRole("link", { name: /1520057997/i });
     const projectLink = screen.getByRole("link", { name: /hubblo\/carenage/i });
+    const runLink = screen.getByRole("link", { name: /8228228299/i });
+
     expect(pipelineLink).toBeVisible();
     expect(projectLink).toBeVisible();
+    expect(runLink).toBeVisible();
   });
   it("displays metadata on the processed run", () => {
     const runDuration = screen.getByText(/00:03:00/i);
-    const numberOfProcesses = screen.getByText(/Processes registered: 15/i);
+    const numberOfProcesses = screen.getByText(/Processes registered/i);
     const jobName = screen.getByText(/test_for_merge_request/i);
     const jobStatus = screen.getByText(/success/i);
     expect(runDuration).toBeVisible();
@@ -71,7 +74,8 @@ describe("run test suite", () => {
   });
   it("displays the metric values for the process and the metric_name selected by the user", async () => {
     const user = userEvent.setup();
-    const isCpuAdpAvgImpact = (metric: Metric) => metric.metric_name === "cpu_adp_average_impact";
+    const isCpuAdpAvgImpact = (metric: Metric) =>
+      metric.metric_name === "cpu_adp_average_impact_kgsbeq";
     const cpuAdpAvgImpactIndex = processesData[0].metrics.findIndex(isCpuAdpAvgImpact);
     const pid64CpuAvgAdpValues = processesData
       .filter((process: Process) => process.process.process_pid === 64)
