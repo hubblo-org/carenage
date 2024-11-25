@@ -31,7 +31,7 @@ describe("run test suite", () => {
     const runHeading = screen.getByRole("heading", { name: runId });
     expect(runHeading).toBeVisible();
   });
-  it("displays links to higher dimensions: to the pipeline related to the run, to the project related to the pipeline, to the run", () => {
+  it("displays links to Gitlab logs: to the pipeline related to the run, to the project related to the pipeline, to the run", () => {
     const pipelineLink = screen.getByRole("link", { name: /1520057997/i });
     const projectLink = screen.getByRole("link", { name: /hubblo\/carenage/i });
     const runLink = screen.getByRole("link", { name: /8228228299/i });
@@ -107,5 +107,35 @@ describe("run test suite", () => {
   it("displays an accessible element where a graph will be generated from the values of the process and metric_name selected by the user", async () => {
     const graph = screen.getByRole("img", { name: "Metric values distributed on a graph" });
     expect(graph).toBeVisible();
+  });
+  it("displays a summary of the metric values for the process and metric_name selected by the user", async () => {
+    const isAvgPowerMeasured = (metric: Metric) =>
+      metric.metric_name === "average_power_measured_w";
+    const avgPowerMeasuredIndex = processesData[0].metrics.findIndex(isAvgPowerMeasured);
+    const pid53AvgPowerMeasuredValues = processesData
+      .filter((process: Process) => process.process.process_pid === 53)
+      .map((process: Process) => process.metrics[avgPowerMeasuredIndex].metric_values);
+
+    const values = pid53AvgPowerMeasuredValues[0].map((value) => value[1]);
+    const maxValue = Math.max.apply(null, values);
+    const average = (array: number[]) =>
+      array.reduce((a: number, b: number) => a + b) / array.length;
+    const avgValue = average(values);
+    const minValue = Math.min.apply(null, values);
+    const metricsTable = screen.getByRole("table", {
+      name: "Values for selected process and metric"
+    });
+    const maxValueText = within(metricsTable).getByRole("rowheader", {
+      name: `Highest value: ${maxValue}`
+    });
+    const minValueText = within(metricsTable).getByRole("rowheader", {
+      name: `Smallest value: ${minValue}`
+    });
+    const avgValueText = within(metricsTable).getByRole("rowheader", {
+      name: `Average value: ${avgValue}`
+    });
+    expect(maxValueText).toBeVisible();
+    expect(minValueText).toBeVisible();
+    expect(avgValueText).toBeVisible();
   });
 });
