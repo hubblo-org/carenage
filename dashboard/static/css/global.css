@@ -35,3 +35,27 @@ label,
   margin-bottom: 12px;
   border: 1px solid var(--gray-100);
 }
+
+header,
+section {
+  background-color: var(--blue-100);
+}
+
+header:hover,
+section:hover {
+  color: white;
+
+  background-color: var(--blue-200);
+}
+
+header:hover a,
+section:hover a {
+  color: white;
+  text-decoration-color: white;
+}
+
+header:hover label,
+section:hover label {
+  color: black;
+  background-color: white;
+}
