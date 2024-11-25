@@ -2,7 +2,7 @@
   import type { CiRun, Metric, MetricValues, Process } from "../types/carenage";
   import { onMount } from "svelte";
   import { createGraph } from "$lib/create-graph.svelte";
-  import { formatDuration } from "$lib/utils.js";
+  import { average, formatDuration, getMetricUnit } from "$lib/utils.js";
 
   interface Props {
     run: CiRun;
@@ -15,6 +15,7 @@
   let processSelected = $state(run.processes[0].process.process_pid);
   let metricSelected = $state(metricsNames[0]);
   let formatted_run_duration = formatDuration(run.job_duration);
+  let metricUnit = $derived(getMetricUnit(metricSelected));
 
   let metricValues = $derived.by(() => {
     const isMetricSelected = (metric: Metric) => metric.metric_name === metricSelected;
@@ -28,19 +29,29 @@
     return metricValues;
   });
 
+  let summaryValues = $derived.by(() => {
+    const values = metricValues.map((value: MetricValues) => value[1]);
+    const maxValue = Math.max.apply(null, values);
+    const minValue = Math.min.apply(null, values);
+    const avgValue = average(values);
+    return [maxValue, avgValue, minValue];
+  });
+
   onMount(async () => {
-    await createGraph(metricValues);
-    console.log("mounted");
+    await createGraph(metricValues, metricSelected);
   });
 </script>
 
 <main>
   <div class="wrapper">
     <section>
-      <div>
+      <div class="run-links">
         <h1>Run {run.run_id}</h1>
-        <a href="/{run.project_name}">Project {run.project_name}</a> >
-        <a href="/{run.pipeline_id}">Pipeline {run.pipeline_id}</a>
+        <a href="https://gitlab.com/{run.project_name}">Project {run.project_name}</a>
+        <a href="https://gitlab.com/{run.project_name}/-/pipelines/{run.pipeline_id}"
+          >Pipeline #{run.pipeline_id}
+        </a>
+        <a href="https://gitlab.com/{run.project_name}/-/jobs/{run.run_id}"> Run #{run.run_id}</a>
       </div>
       <div>
         <p>Run executed in {formatted_run_duration}</p>
@@ -55,7 +66,7 @@
         name="metric-names"
         id="metric-name-select"
         bind:value={metricSelected}
-        onchange={() => createGraph(metricValues)}
+        onchange={() => createGraph(metricValues, metricSelected)}
       >
         {#each metricsNames as metricName}
           <option value={metricName}>
@@ -68,7 +79,7 @@
         name="processes"
         id="process-select"
         bind:value={processSelected}
-        onchange={() => createGraph(metricValues)}
+        onchange={() => createGraph(metricValues, metricSelected)}
       >
         {#each run.processes as process}
           <option value={process.process.process_pid}>
@@ -80,26 +91,56 @@
     </section>
 
     <section class="values">
-      <h3>Metric values</h3>
-      {#each metricValues as metricValue}
-        <p>Timestamp</p>
-        <p>{metricValue[0]}</p>
-        <p>Value</p>
-        <p>{metricValue[1]}</p>
-      {/each}
+      <table>
+        <caption>Values for selected process and metric</caption>
+        <thead>
+          <tr><th scope="row" colspan="2"> Highest value: {summaryValues[0]} </th></tr>
+          <tr><th scope="row" colspan="2"> Average value: {summaryValues[1]} </th></tr>
+          <tr><th scope="row" colspan="2"> Smallest value: {summaryValues[2]} </th></tr>
+          <tr><th scope="col">Timestamp</th><th scope="col">Metric value (in {metricUnit})</th></tr
+          ></thead
+        >
+        <tbody>
+          {#each metricValues as metricValue}
+            <tr>
+              <td>{metricValue[0]}</td>
+              <td>{metricValue[1]}</td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
     </section>
   </div>
   <div id="graph" aria-label="Metric values distributed on a graph" role="img"></div>
 </main>
 
 <style>
+  caption {
+    border: 3px solid black;
+  }
+  th {
+    border: 2px solid black;
+  }
+  td {
+    border: 1px solid black;
+  }
+  section {
+    width: 30%;
+    height: 40%;
+  }
+  .run-links {
+    display: flex;
+    gap: 5px;
+    flex-direction: column;
+  }
   .wrapper {
     display: flex;
     justify-content: space-around;
   }
   .values {
     overflow: auto;
-    height: 200px;
+    width: 500px;
+    height: 300px;
   }
   .metric-selection {
     display: flex;
@@ -107,8 +148,12 @@
     justify-content: space-evenly;
   }
   .metric-selection label {
-    width: 30%;
+    width: 40%;
     color: white;
     background-color: black;
+  }
+  .metric-selection:hover label {
+    color: black;
+    background-color: white;
   }
 </style>
