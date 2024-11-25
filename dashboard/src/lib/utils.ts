@@ -10,3 +10,8 @@ export function getMetricUnit(metric: string) {
   const metric_unit = metric.substring(underscore_offset + 1, metric.length);
   return metric_unit;
 }
+
+export function average(array: number[]) {
+  const averageValue = array.reduce((a: number, b: number) => a + b) / array.length;
+  return averageValue;
+}
