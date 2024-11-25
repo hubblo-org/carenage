@@ -37,7 +37,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0000102576351262],
             ["2024-11-05T12:19:33.492160+01:00", 0.0000102576351262],
@@ -65,7 +65,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0000102576351262],
             ["2024-11-05T12:19:33.492160+01:00", 0.0000102576351262],
@@ -93,7 +93,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0000102576351262],
             ["2024-11-05T12:19:33.492160+01:00", 0.0000102576351262],
@@ -121,7 +121,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0100540408],
             ["2024-11-05T12:19:33.492160+01:00", 0.0100540408],
@@ -149,7 +149,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0100540408],
             ["2024-11-05T12:19:33.492160+01:00", 0.0100540408],
@@ -177,7 +177,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0100540408],
             ["2024-11-05T12:19:33.492160+01:00", 0.0100540408],
@@ -205,7 +205,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.150810612],
             ["2024-11-05T12:19:33.492160+01:00", 0.150810612],
@@ -233,7 +233,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.150810612],
             ["2024-11-05T12:19:33.492160+01:00", 0.150810612],
@@ -261,7 +261,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.150810612],
             ["2024-11-05T12:19:33.492160+01:00", 0.150810612],
@@ -513,7 +513,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -541,7 +541,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -569,7 +569,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -597,7 +597,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -625,7 +625,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -653,7 +653,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -681,7 +681,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -709,7 +709,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -737,7 +737,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -765,7 +765,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -793,7 +793,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -821,7 +821,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -849,7 +849,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -877,7 +877,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -905,7 +905,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -933,7 +933,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -961,7 +961,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -989,7 +989,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.514674+01:00", 0.0],
             ["2024-11-05T12:19:33.492160+01:00", 0.0],
@@ -1138,7 +1138,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0000102576351262],
             ["2024-11-05T12:19:33.440712+01:00", 0.0000102576351262],
@@ -1166,7 +1166,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0000102576351262],
             ["2024-11-05T12:19:33.440712+01:00", 0.0000102576351262],
@@ -1194,7 +1194,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0000102576351262],
             ["2024-11-05T12:19:33.440712+01:00", 0.0000102576351262],
@@ -1222,7 +1222,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0100540408],
             ["2024-11-05T12:19:33.440712+01:00", 0.0100540408],
@@ -1250,7 +1250,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0100540408],
             ["2024-11-05T12:19:33.440712+01:00", 0.0100540408],
@@ -1278,7 +1278,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0100540408],
             ["2024-11-05T12:19:33.440712+01:00", 0.0100540408],
@@ -1306,7 +1306,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.150810612],
             ["2024-11-05T12:19:33.440712+01:00", 0.150810612],
@@ -1334,7 +1334,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.150810612],
             ["2024-11-05T12:19:33.440712+01:00", 0.150810612],
@@ -1362,7 +1362,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.150810612],
             ["2024-11-05T12:19:33.440712+01:00", 0.150810612],
@@ -1614,7 +1614,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.000124039649963379],
             ["2024-11-05T12:19:33.440712+01:00", 0.000124039649963379],
@@ -1642,7 +1642,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.000124039649963379],
             ["2024-11-05T12:19:33.440712+01:00", 0.000124039649963379],
@@ -1670,7 +1670,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.000124039649963379],
             ["2024-11-05T12:19:33.440712+01:00", 0.000124039649963379],
@@ -1698,7 +1698,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 2.33767032623291],
             ["2024-11-05T12:19:33.440712+01:00", 2.33767032623291],
@@ -1726,7 +1726,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 2.33767032623291],
             ["2024-11-05T12:19:33.440712+01:00", 2.33767032623291],
@@ -1754,7 +1754,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 2.33767032623291],
             ["2024-11-05T12:19:33.440712+01:00", 2.33767032623291],
@@ -1782,7 +1782,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 28.6245346069336],
             ["2024-11-05T12:19:33.440712+01:00", 28.6245346069336],
@@ -1810,7 +1810,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 28.6245346069336],
             ["2024-11-05T12:19:33.440712+01:00", 28.6245346069336],
@@ -1838,7 +1838,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 28.6245346069336],
             ["2024-11-05T12:19:33.440712+01:00", 28.6245346069336],
@@ -1866,7 +1866,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0],
             ["2024-11-05T12:19:33.440712+01:00", 0.0],
@@ -1894,7 +1894,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0],
             ["2024-11-05T12:19:33.440712+01:00", 0.0],
@@ -1922,7 +1922,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0],
             ["2024-11-05T12:19:33.440712+01:00", 0.0],
@@ -1950,7 +1950,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0],
             ["2024-11-05T12:19:33.440712+01:00", 0.0],
@@ -1978,7 +1978,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0],
             ["2024-11-05T12:19:33.440712+01:00", 0.0],
@@ -2006,7 +2006,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0],
             ["2024-11-05T12:19:33.440712+01:00", 0.0],
@@ -2034,7 +2034,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0],
             ["2024-11-05T12:19:33.440712+01:00", 0.0],
@@ -2062,7 +2062,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0],
             ["2024-11-05T12:19:33.440712+01:00", 0.0],
@@ -2090,7 +2090,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.462296+01:00", 0.0],
             ["2024-11-05T12:19:33.440712+01:00", 0.0],
@@ -2218,63 +2218,63 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 5.1198091637e-6],
             ["2024-11-05T12:19:53.649619+01:00", 5.1198091637e-6]
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 5.1198091637e-6],
             ["2024-11-05T12:19:53.649619+01:00", 5.1198091637e-6]
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 5.1198091637e-6],
             ["2024-11-05T12:19:53.649619+01:00", 5.1198091637e-6]
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0050181908],
             ["2024-11-05T12:19:53.649619+01:00", 0.0050181908]
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0050181908],
             ["2024-11-05T12:19:53.649619+01:00", 0.0050181908]
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0050181908],
             ["2024-11-05T12:19:53.649619+01:00", 0.0050181908]
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.075272862],
             ["2024-11-05T12:19:53.649619+01:00", 0.075272862]
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.075272862],
             ["2024-11-05T12:19:53.649619+01:00", 0.075272862]
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.075272862],
             ["2024-11-05T12:19:53.649619+01:00", 0.075272862]
@@ -2337,126 +2337,126 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:48.678576+01:00", 0.0],
             ["2024-11-05T12:19:53.649619+01:00", 0.0]
@@ -2515,7 +2515,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 5.1288175631e-6],
             ["2024-11-05T12:19:33.651351+01:00", 5.1288175631e-6],
@@ -2537,7 +2537,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 5.1288175631e-6],
             ["2024-11-05T12:19:33.651351+01:00", 5.1288175631e-6],
@@ -2559,7 +2559,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 5.1288175631e-6],
             ["2024-11-05T12:19:33.651351+01:00", 5.1288175631e-6],
@@ -2581,7 +2581,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0050270204],
             ["2024-11-05T12:19:33.651351+01:00", 0.0050270204],
@@ -2603,7 +2603,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0050270204],
             ["2024-11-05T12:19:33.651351+01:00", 0.0050270204],
@@ -2625,7 +2625,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0050270204],
             ["2024-11-05T12:19:33.651351+01:00", 0.0050270204],
@@ -2647,7 +2647,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.075405306],
             ["2024-11-05T12:19:33.651351+01:00", 0.075405306],
@@ -2669,7 +2669,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.075405306],
             ["2024-11-05T12:19:33.651351+01:00", 0.075405306],
@@ -2691,7 +2691,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.075405306],
             ["2024-11-05T12:19:33.651351+01:00", 0.075405306],
@@ -2889,7 +2889,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.000134218215942383],
             ["2024-11-05T12:19:33.651351+01:00", 0.000134218215942383],
@@ -2911,7 +2911,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.000134218215942383],
             ["2024-11-05T12:19:33.651351+01:00", 0.000134218215942383],
@@ -2933,7 +2933,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.000134218215942383],
             ["2024-11-05T12:19:33.651351+01:00", 0.000134218215942383],
@@ -2955,7 +2955,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 2.52949714660645],
             ["2024-11-05T12:19:33.651351+01:00", 2.52949714660645],
@@ -2977,7 +2977,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 2.52949714660645],
             ["2024-11-05T12:19:33.651351+01:00", 2.52949714660645],
@@ -2999,7 +2999,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 2.52949714660645],
             ["2024-11-05T12:19:33.651351+01:00", 2.52949714660645],
@@ -3021,7 +3021,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 30.9734344482422],
             ["2024-11-05T12:19:33.651351+01:00", 30.9734344482422],
@@ -3043,7 +3043,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 30.9734344482422],
             ["2024-11-05T12:19:33.651351+01:00", 30.9734344482422],
@@ -3065,7 +3065,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 30.9734344482422],
             ["2024-11-05T12:19:33.651351+01:00", 30.9734344482422],
@@ -3087,7 +3087,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0],
             ["2024-11-05T12:19:33.651351+01:00", 0.0],
@@ -3109,7 +3109,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0],
             ["2024-11-05T12:19:33.651351+01:00", 0.0],
@@ -3131,7 +3131,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0],
             ["2024-11-05T12:19:33.651351+01:00", 0.0],
@@ -3153,7 +3153,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0],
             ["2024-11-05T12:19:33.651351+01:00", 0.0],
@@ -3175,7 +3175,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0],
             ["2024-11-05T12:19:33.651351+01:00", 0.0],
@@ -3197,7 +3197,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0],
             ["2024-11-05T12:19:33.651351+01:00", 0.0],
@@ -3219,7 +3219,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0],
             ["2024-11-05T12:19:33.651351+01:00", 0.0],
@@ -3241,7 +3241,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0],
             ["2024-11-05T12:19:33.651351+01:00", 0.0],
@@ -3263,7 +3263,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.615438+01:00", 0.0],
             ["2024-11-05T12:19:33.651351+01:00", 0.0],
@@ -3381,7 +3381,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3402,7 +3402,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3423,7 +3423,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3444,7 +3444,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3465,7 +3465,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3486,7 +3486,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3507,7 +3507,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3528,7 +3528,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3549,7 +3549,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3738,7 +3738,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0000423011779785156],
             ["2024-11-05T12:19:33.720641+01:00", 0.0000423011779785156],
@@ -3759,7 +3759,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0000423011779785156],
             ["2024-11-05T12:19:33.720641+01:00", 0.0000423011779785156],
@@ -3780,7 +3780,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0000423011779785156],
             ["2024-11-05T12:19:33.720641+01:00", 0.0000423011779785156],
@@ -3801,7 +3801,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.797214508056641],
             ["2024-11-05T12:19:33.720641+01:00", 0.797214508056641],
@@ -3822,7 +3822,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.797214508056641],
             ["2024-11-05T12:19:33.720641+01:00", 0.797214508056641],
@@ -3843,7 +3843,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.797214508056641],
             ["2024-11-05T12:19:33.720641+01:00", 0.797214508056641],
@@ -3864,7 +3864,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 9.76181030273438],
             ["2024-11-05T12:19:33.720641+01:00", 9.76181030273438],
@@ -3885,7 +3885,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 9.76181030273438],
             ["2024-11-05T12:19:33.720641+01:00", 9.76181030273438],
@@ -3906,7 +3906,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 9.76181030273438],
             ["2024-11-05T12:19:33.720641+01:00", 9.76181030273438],
@@ -3927,7 +3927,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3948,7 +3948,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3969,7 +3969,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -3990,7 +3990,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -4011,7 +4011,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -4032,7 +4032,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -4053,7 +4053,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -4074,7 +4074,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -4095,7 +4095,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.664085+01:00", 0.0],
             ["2024-11-05T12:19:33.720641+01:00", 0.0],
@@ -4216,7 +4216,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 5.1288175631e-6],
             ["2024-11-05T12:19:33.544467+01:00", 5.1288175631e-6],
@@ -4244,7 +4244,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 5.1288175631e-6],
             ["2024-11-05T12:19:33.544467+01:00", 5.1288175631e-6],
@@ -4272,7 +4272,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 5.1288175631e-6],
             ["2024-11-05T12:19:33.544467+01:00", 5.1288175631e-6],
@@ -4300,7 +4300,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0050270204],
             ["2024-11-05T12:19:33.544467+01:00", 0.0050270204],
@@ -4328,7 +4328,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0050270204],
             ["2024-11-05T12:19:33.544467+01:00", 0.0050270204],
@@ -4356,7 +4356,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0050270204],
             ["2024-11-05T12:19:33.544467+01:00", 0.0050270204],
@@ -4384,7 +4384,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.075405306],
             ["2024-11-05T12:19:33.544467+01:00", 0.075405306],
@@ -4412,7 +4412,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.075405306],
             ["2024-11-05T12:19:33.544467+01:00", 0.075405306],
@@ -4440,7 +4440,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.075405306],
             ["2024-11-05T12:19:33.544467+01:00", 0.075405306],
@@ -4692,7 +4692,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.000090057373046875],
             ["2024-11-05T12:19:33.544467+01:00", 0.000090057373046875],
@@ -4720,7 +4720,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.000090057373046875],
             ["2024-11-05T12:19:33.544467+01:00", 0.000090057373046875],
@@ -4748,7 +4748,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.000090057373046875],
             ["2024-11-05T12:19:33.544467+01:00", 0.000090057373046875],
@@ -4776,7 +4776,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 1.69723510742188],
             ["2024-11-05T12:19:33.544467+01:00", 1.69723510742188],
@@ -4804,7 +4804,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 1.69723510742188],
             ["2024-11-05T12:19:33.544467+01:00", 1.69723510742188],
@@ -4832,7 +4832,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 1.69723510742188],
             ["2024-11-05T12:19:33.544467+01:00", 1.69723510742188],
@@ -4860,7 +4860,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 20.782470703125],
             ["2024-11-05T12:19:33.544467+01:00", 20.782470703125],
@@ -4888,7 +4888,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 20.782470703125],
             ["2024-11-05T12:19:33.544467+01:00", 20.782470703125],
@@ -4916,7 +4916,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 20.782470703125],
             ["2024-11-05T12:19:33.544467+01:00", 20.782470703125],
@@ -4944,7 +4944,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0],
             ["2024-11-05T12:19:33.544467+01:00", 0.0],
@@ -4972,7 +4972,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0],
             ["2024-11-05T12:19:33.544467+01:00", 0.0],
@@ -5000,7 +5000,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0],
             ["2024-11-05T12:19:33.544467+01:00", 0.0],
@@ -5028,7 +5028,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0],
             ["2024-11-05T12:19:33.544467+01:00", 0.0],
@@ -5056,7 +5056,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0],
             ["2024-11-05T12:19:33.544467+01:00", 0.0],
@@ -5084,7 +5084,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0],
             ["2024-11-05T12:19:33.544467+01:00", 0.0],
@@ -5112,7 +5112,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0],
             ["2024-11-05T12:19:33.544467+01:00", 0.0],
@@ -5140,7 +5140,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0],
             ["2024-11-05T12:19:33.544467+01:00", 0.0],
@@ -5168,7 +5168,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.566999+01:00", 0.0],
             ["2024-11-05T12:19:33.544467+01:00", 0.0],
@@ -5304,7 +5304,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5319,7 +5319,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5334,7 +5334,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5349,7 +5349,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5364,7 +5364,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5379,7 +5379,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5394,7 +5394,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5409,7 +5409,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5424,7 +5424,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5559,7 +5559,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5574,7 +5574,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5589,7 +5589,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5604,7 +5604,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5619,7 +5619,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5634,7 +5634,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5649,7 +5649,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5664,7 +5664,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5679,7 +5679,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5694,7 +5694,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5709,7 +5709,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5724,7 +5724,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5739,7 +5739,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5754,7 +5754,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5769,7 +5769,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5784,7 +5784,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5799,7 +5799,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5814,7 +5814,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.712579+01:00", 0.0],
             ["2024-11-05T12:19:33.778385+01:00", 0.0],
@@ -5891,7 +5891,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 5.1230229512e-6],
             ["2024-11-05T12:20:33.748425+01:00", 5.1230229512e-6],
@@ -5899,7 +5899,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 5.1230229512e-6],
             ["2024-11-05T12:20:33.748425+01:00", 5.1230229512e-6],
@@ -5907,7 +5907,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 5.1230229512e-6],
             ["2024-11-05T12:20:33.748425+01:00", 5.1230229512e-6],
@@ -5915,7 +5915,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0050213408],
             ["2024-11-05T12:20:33.748425+01:00", 0.0050213408],
@@ -5923,7 +5923,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0050213408],
             ["2024-11-05T12:20:33.748425+01:00", 0.0050213408],
@@ -5931,7 +5931,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0050213408],
             ["2024-11-05T12:20:33.748425+01:00", 0.0050213408],
@@ -5939,7 +5939,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.075320112],
             ["2024-11-05T12:20:33.748425+01:00", 0.075320112],
@@ -5947,7 +5947,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.075320112],
             ["2024-11-05T12:20:33.748425+01:00", 0.075320112],
@@ -5955,7 +5955,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.075320112],
             ["2024-11-05T12:20:33.748425+01:00", 0.075320112],
@@ -6027,7 +6027,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6035,7 +6035,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6043,7 +6043,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6051,7 +6051,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6059,7 +6059,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6067,7 +6067,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6075,7 +6075,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6083,7 +6083,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6091,7 +6091,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6099,7 +6099,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6107,7 +6107,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6115,7 +6115,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6123,7 +6123,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6131,7 +6131,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6139,7 +6139,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6147,7 +6147,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6155,7 +6155,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6163,7 +6163,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:20:28.773607+01:00", 0.0],
             ["2024-11-05T12:20:33.748425+01:00", 0.0],
@@ -6232,7 +6232,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0000102576351262],
             ["2024-11-05T12:19:33.386873+01:00", 0.0000102576351262],
@@ -6260,7 +6260,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0000102576351262],
             ["2024-11-05T12:19:33.386873+01:00", 0.0000102576351262],
@@ -6288,7 +6288,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0000102576351262],
             ["2024-11-05T12:19:33.386873+01:00", 0.0000102576351262],
@@ -6316,7 +6316,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0100540408],
             ["2024-11-05T12:19:33.386873+01:00", 0.0100540408],
@@ -6344,7 +6344,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0100540408],
             ["2024-11-05T12:19:33.386873+01:00", 0.0100540408],
@@ -6372,7 +6372,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0100540408],
             ["2024-11-05T12:19:33.386873+01:00", 0.0100540408],
@@ -6400,7 +6400,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.150810612],
             ["2024-11-05T12:19:33.386873+01:00", 0.150810612],
@@ -6428,7 +6428,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.150810612],
             ["2024-11-05T12:19:33.386873+01:00", 0.150810612],
@@ -6456,7 +6456,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.150810612],
             ["2024-11-05T12:19:33.386873+01:00", 0.150810612],
@@ -6708,7 +6708,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0000364990234375],
             ["2024-11-05T12:19:33.386873+01:00", 0.0000364990234375],
@@ -6736,7 +6736,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0000364990234375],
             ["2024-11-05T12:19:33.386873+01:00", 0.0000364990234375],
@@ -6764,7 +6764,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0000364990234375],
             ["2024-11-05T12:19:33.386873+01:00", 0.0000364990234375],
@@ -6792,7 +6792,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.6878662109375],
             ["2024-11-05T12:19:33.386873+01:00", 0.6878662109375],
@@ -6820,7 +6820,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.6878662109375],
             ["2024-11-05T12:19:33.386873+01:00", 0.6878662109375],
@@ -6848,7 +6848,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.6878662109375],
             ["2024-11-05T12:19:33.386873+01:00", 0.6878662109375],
@@ -6876,7 +6876,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 8.4228515625],
             ["2024-11-05T12:19:33.386873+01:00", 8.4228515625],
@@ -6904,7 +6904,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 8.4228515625],
             ["2024-11-05T12:19:33.386873+01:00", 8.4228515625],
@@ -6932,7 +6932,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 8.4228515625],
             ["2024-11-05T12:19:33.386873+01:00", 8.4228515625],
@@ -6960,7 +6960,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0],
             ["2024-11-05T12:19:33.386873+01:00", 0.0],
@@ -6988,7 +6988,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0],
             ["2024-11-05T12:19:33.386873+01:00", 0.0],
@@ -7016,7 +7016,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0],
             ["2024-11-05T12:19:33.386873+01:00", 0.0],
@@ -7044,7 +7044,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0],
             ["2024-11-05T12:19:33.386873+01:00", 0.0],
@@ -7072,7 +7072,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0],
             ["2024-11-05T12:19:33.386873+01:00", 0.0],
@@ -7100,7 +7100,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0],
             ["2024-11-05T12:19:33.386873+01:00", 0.0],
@@ -7128,7 +7128,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0],
             ["2024-11-05T12:19:33.386873+01:00", 0.0],
@@ -7156,7 +7156,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0],
             ["2024-11-05T12:19:33.386873+01:00", 0.0],
@@ -7184,7 +7184,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.410967+01:00", 0.0],
             ["2024-11-05T12:19:33.386873+01:00", 0.0],
@@ -7333,7 +7333,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.000025644089856],
             ["2024-11-05T12:19:33.335037+01:00", 0.000025644089856],
@@ -7361,7 +7361,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.000025644089856],
             ["2024-11-05T12:19:33.335037+01:00", 0.000025644089856],
@@ -7389,7 +7389,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.000025644089856],
             ["2024-11-05T12:19:33.335037+01:00", 0.000025644089856],
@@ -7417,7 +7417,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.025135104],
             ["2024-11-05T12:19:33.335037+01:00", 0.025135104],
@@ -7445,7 +7445,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.025135104],
             ["2024-11-05T12:19:33.335037+01:00", 0.025135104],
@@ -7473,7 +7473,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.025135104],
             ["2024-11-05T12:19:33.335037+01:00", 0.025135104],
@@ -7501,7 +7501,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.37702656],
             ["2024-11-05T12:19:33.335037+01:00", 0.37702656],
@@ -7529,7 +7529,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.37702656],
             ["2024-11-05T12:19:33.335037+01:00", 0.37702656],
@@ -7557,7 +7557,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.37702656],
             ["2024-11-05T12:19:33.335037+01:00", 0.37702656],
@@ -7809,7 +7809,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -7837,7 +7837,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -7865,7 +7865,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -7893,7 +7893,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -7921,7 +7921,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -7949,7 +7949,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -7977,7 +7977,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8005,7 +8005,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8033,7 +8033,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8061,7 +8061,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8089,7 +8089,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8117,7 +8117,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8145,7 +8145,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8173,7 +8173,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8201,7 +8201,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8229,7 +8229,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8257,7 +8257,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8285,7 +8285,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.361217+01:00", 0.0],
             ["2024-11-05T12:19:33.335037+01:00", 0.0],
@@ -8415,7 +8415,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 5.12624061565e-6],
             ["2024-11-05T12:20:03.754210+01:00", 5.12624061565e-6],
@@ -8424,7 +8424,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 5.12624061565e-6],
             ["2024-11-05T12:20:03.754210+01:00", 5.12624061565e-6],
@@ -8433,7 +8433,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 5.12624061565e-6],
             ["2024-11-05T12:20:03.754210+01:00", 5.12624061565e-6],
@@ -8442,7 +8442,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0050244946],
             ["2024-11-05T12:20:03.754210+01:00", 0.0050244946],
@@ -8451,7 +8451,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0050244946],
             ["2024-11-05T12:20:03.754210+01:00", 0.0050244946],
@@ -8460,7 +8460,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0050244946],
             ["2024-11-05T12:20:03.754210+01:00", 0.0050244946],
@@ -8469,7 +8469,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.075367419],
             ["2024-11-05T12:20:03.754210+01:00", 0.075367419],
@@ -8478,7 +8478,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.075367419],
             ["2024-11-05T12:20:03.754210+01:00", 0.075367419],
@@ -8487,7 +8487,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.075367419],
             ["2024-11-05T12:20:03.754210+01:00", 0.075367419],
@@ -8568,7 +8568,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8577,7 +8577,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8586,7 +8586,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8595,7 +8595,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8604,7 +8604,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8613,7 +8613,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8622,7 +8622,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8631,7 +8631,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8640,7 +8640,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8649,7 +8649,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8658,7 +8658,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8667,7 +8667,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8676,7 +8676,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8685,7 +8685,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8694,7 +8694,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8703,7 +8703,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8712,7 +8712,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8721,7 +8721,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:58.646752+01:00", 0.0],
             ["2024-11-05T12:20:03.754210+01:00", 0.0],
@@ -8790,7 +8790,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.000133349258273],
             ["2024-11-05T12:19:33.227214+01:00", 0.000133349258273],
@@ -8818,7 +8818,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.000133349258273],
             ["2024-11-05T12:19:33.227214+01:00", 0.000133349258273],
@@ -8846,7 +8846,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.000133349258273],
             ["2024-11-05T12:19:33.227214+01:00", 0.000133349258273],
@@ -8874,7 +8874,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.130702532],
             ["2024-11-05T12:19:33.227214+01:00", 0.130702532],
@@ -8902,7 +8902,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.130702532],
             ["2024-11-05T12:19:33.227214+01:00", 0.130702532],
@@ -8930,7 +8930,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.130702532],
             ["2024-11-05T12:19:33.227214+01:00", 0.130702532],
@@ -8958,7 +8958,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 1.96053798],
             ["2024-11-05T12:19:33.227214+01:00", 1.96053798],
@@ -8986,7 +8986,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 1.96053798],
             ["2024-11-05T12:19:33.227214+01:00", 1.96053798],
@@ -9014,7 +9014,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 1.96053798],
             ["2024-11-05T12:19:33.227214+01:00", 1.96053798],
@@ -9266,7 +9266,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9294,7 +9294,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9322,7 +9322,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9350,7 +9350,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9378,7 +9378,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9406,7 +9406,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9434,7 +9434,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9462,7 +9462,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9490,7 +9490,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9518,7 +9518,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9546,7 +9546,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9574,7 +9574,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9602,7 +9602,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9630,7 +9630,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9658,7 +9658,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9686,7 +9686,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9714,7 +9714,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9742,7 +9742,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.232558+01:00", 0.0],
             ["2024-11-05T12:19:33.227214+01:00", 0.0],
@@ -9870,63 +9870,63 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 5.1527779303e-6],
             ["2024-11-05T12:21:08.878204+01:00", 5.1527779303e-6]
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 5.1527779303e-6],
             ["2024-11-05T12:21:08.878204+01:00", 5.1527779303e-6]
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 5.1527779303e-6],
             ["2024-11-05T12:21:08.878204+01:00", 5.1527779303e-6]
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0050505052],
             ["2024-11-05T12:21:08.878204+01:00", 0.0050505052]
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0050505052],
             ["2024-11-05T12:21:08.878204+01:00", 0.0050505052]
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0050505052],
             ["2024-11-05T12:21:08.878204+01:00", 0.0050505052]
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.075757578],
             ["2024-11-05T12:21:08.878204+01:00", 0.075757578]
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.075757578],
             ["2024-11-05T12:21:08.878204+01:00", 0.075757578]
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.075757578],
             ["2024-11-05T12:21:08.878204+01:00", 0.075757578]
@@ -9989,126 +9989,126 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0000304737091064453],
             ["2024-11-05T12:21:08.878204+01:00", 0.0000304737091064453]
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0000304737091064453],
             ["2024-11-05T12:21:08.878204+01:00", 0.0000304737091064453]
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0000304737091064453],
             ["2024-11-05T12:21:08.878204+01:00", 0.0000304737091064453]
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.574312210083008],
             ["2024-11-05T12:21:08.878204+01:00", 0.574312210083008]
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.574312210083008],
             ["2024-11-05T12:21:08.878204+01:00", 0.574312210083008]
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.574312210083008],
             ["2024-11-05T12:21:08.878204+01:00", 0.574312210083008]
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 7.03239440917969],
             ["2024-11-05T12:21:08.878204+01:00", 7.03239440917969]
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 7.03239440917969],
             ["2024-11-05T12:21:08.878204+01:00", 7.03239440917969]
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 7.03239440917969],
             ["2024-11-05T12:21:08.878204+01:00", 7.03239440917969]
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0],
             ["2024-11-05T12:21:08.878204+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0],
             ["2024-11-05T12:21:08.878204+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0],
             ["2024-11-05T12:21:08.878204+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0],
             ["2024-11-05T12:21:08.878204+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0],
             ["2024-11-05T12:21:08.878204+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0],
             ["2024-11-05T12:21:08.878204+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0],
             ["2024-11-05T12:21:08.878204+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0],
             ["2024-11-05T12:21:08.878204+01:00", 0.0]
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:21:03.771426+01:00", 0.0],
             ["2024-11-05T12:21:08.878204+01:00", 0.0]
@@ -10171,7 +10171,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.000030772907011],
             ["2024-11-05T12:19:33.281180+01:00", 0.000030772907011],
@@ -10197,7 +10197,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.000030772907011],
             ["2024-11-05T12:19:33.281180+01:00", 0.000030772907011],
@@ -10223,7 +10223,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.000030772907011],
             ["2024-11-05T12:19:33.281180+01:00", 0.000030772907011],
@@ -10249,7 +10249,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.030162124],
             ["2024-11-05T12:19:33.281180+01:00", 0.030162124],
@@ -10275,7 +10275,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.030162124],
             ["2024-11-05T12:19:33.281180+01:00", 0.030162124],
@@ -10301,7 +10301,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.030162124],
             ["2024-11-05T12:19:33.281180+01:00", 0.030162124],
@@ -10327,7 +10327,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.45243186],
             ["2024-11-05T12:19:33.281180+01:00", 0.45243186],
@@ -10353,7 +10353,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.45243186],
             ["2024-11-05T12:19:33.281180+01:00", 0.45243186],
@@ -10379,7 +10379,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.45243186],
             ["2024-11-05T12:19:33.281180+01:00", 0.45243186],
@@ -10613,7 +10613,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10639,7 +10639,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10665,7 +10665,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10691,7 +10691,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10717,7 +10717,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10743,7 +10743,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10769,7 +10769,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10795,7 +10795,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10821,7 +10821,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10847,7 +10847,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10873,7 +10873,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10899,7 +10899,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10925,7 +10925,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10951,7 +10951,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -10977,7 +10977,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -11003,7 +11003,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -11029,7 +11029,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -11055,7 +11055,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:28.303712+01:00", 0.0],
             ["2024-11-05T12:19:33.281180+01:00", 0.0],
@@ -11190,7 +11190,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_average_impact",
+          "metric_name": "cpu_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.000276851746633],
             ["2024-11-05T12:19:43.219705+01:00", 0.000276851746633],
@@ -11212,7 +11212,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_max_impact",
+          "metric_name": "cpu_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.000276851746633],
             ["2024-11-05T12:19:43.219705+01:00", 0.000276851746633],
@@ -11234,7 +11234,7 @@
           ]
         },
         {
-          "metric_name": "cpu_adp_min_impact",
+          "metric_name": "cpu_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.000276851746633],
             ["2024-11-05T12:19:43.219705+01:00", 0.000276851746633],
@@ -11256,7 +11256,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_average_impact",
+          "metric_name": "cpu_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.271356772],
             ["2024-11-05T12:19:43.219705+01:00", 0.271356772],
@@ -11278,7 +11278,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_max_impact",
+          "metric_name": "cpu_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.271356772],
             ["2024-11-05T12:19:43.219705+01:00", 0.271356772],
@@ -11300,7 +11300,7 @@
           ]
         },
         {
-          "metric_name": "cpu_gwp_min_impact",
+          "metric_name": "cpu_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.271356772],
             ["2024-11-05T12:19:43.219705+01:00", 0.271356772],
@@ -11322,7 +11322,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_average_impact",
+          "metric_name": "cpu_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 4.07035158],
             ["2024-11-05T12:19:43.219705+01:00", 4.07035158],
@@ -11344,7 +11344,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_max_impact",
+          "metric_name": "cpu_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 4.07035158],
             ["2024-11-05T12:19:43.219705+01:00", 4.07035158],
@@ -11366,7 +11366,7 @@
           ]
         },
         {
-          "metric_name": "cpu_pe_min_impact",
+          "metric_name": "cpu_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 4.07035158],
             ["2024-11-05T12:19:43.219705+01:00", 4.07035158],
@@ -11564,7 +11564,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_average_impact",
+          "metric_name": "ram_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11586,7 +11586,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_max_impact",
+          "metric_name": "ram_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11608,7 +11608,7 @@
           ]
         },
         {
-          "metric_name": "ram_adp_min_impact",
+          "metric_name": "ram_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11630,7 +11630,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_average_impact",
+          "metric_name": "ram_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11652,7 +11652,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_max_impact",
+          "metric_name": "ram_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11674,7 +11674,7 @@
           ]
         },
         {
-          "metric_name": "ram_gwp_min_impact",
+          "metric_name": "ram_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11696,7 +11696,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_average_impact",
+          "metric_name": "ram_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11718,7 +11718,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_max_impact",
+          "metric_name": "ram_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11740,7 +11740,7 @@
           ]
         },
         {
-          "metric_name": "ram_pe_min_impact",
+          "metric_name": "ram_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11762,7 +11762,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_average_impact",
+          "metric_name": "ssd_adp_average_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11784,7 +11784,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_max_impact",
+          "metric_name": "ssd_adp_max_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11806,7 +11806,7 @@
           ]
         },
         {
-          "metric_name": "ssd_adp_min_impact",
+          "metric_name": "ssd_adp_min_impact_kgsbeq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11828,7 +11828,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_average_impact",
+          "metric_name": "ssd_gwp_average_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11850,7 +11850,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_max_impact",
+          "metric_name": "ssd_gwp_max_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11872,7 +11872,7 @@
           ]
         },
         {
-          "metric_name": "ssd_gwp_min_impact",
+          "metric_name": "ssd_gwp_min_impact_kgc02eq",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11894,7 +11894,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_average_impact",
+          "metric_name": "ssd_pe_average_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11916,7 +11916,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_max_impact",
+          "metric_name": "ssd_pe_max_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
@@ -11938,7 +11938,7 @@
           ]
         },
         {
-          "metric_name": "ssd_pe_min_impact",
+          "metric_name": "ssd_pe_min_impact_mj",
           "metric_values": [
             ["2024-11-05T12:19:38.197854+01:00", 0.0],
             ["2024-11-05T12:19:43.219705+01:00", 0.0],
