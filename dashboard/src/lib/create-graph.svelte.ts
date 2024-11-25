@@ -6,8 +6,8 @@ export async function createGraph(metricValues: MetricValues, metric: string) {
     const date = new Date(value[0]);
     return [date, value[1]];
   });
-  console.log(metric);
   const dygraph = new Dygraph("graph", values, {
+    axisLabelWidth: 100,
     labels: ["timestamp", "metric_value"],
     title: "Metric values for selected process and metric",
     xlabel: "Time",
