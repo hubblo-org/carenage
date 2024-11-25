@@ -11,8 +11,8 @@
 <header>
   <div>
     <h1>Carenage</h1>
-    <h2>{run.project_name}</h2>
-    <a href={`https://gitlab.com/${run.project_name}`}> Link to your project's repository </a>
+
+    <a href={`https://gitlab.com/${run.project_name}`}> <h2>{run.project_name}</h2></a>
   </div>
   <div>
     <p>Number of pipelines executed</p>
