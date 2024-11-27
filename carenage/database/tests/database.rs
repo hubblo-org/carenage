@@ -506,21 +506,21 @@ async fn it_builds_metrics_from_json_values() {
         metrics
             .process_cpu_embedded_impacts
             .unwrap()
-            .gwp_average_impact,
+            .gwp_average_impact_kgc02eq,
         0.38336191697478994
     );
     assert_eq!(
         metrics
             .process_ram_embedded_impacts
             .unwrap()
-            .gwp_average_impact,
+            .gwp_average_impact_kgc02eq,
         6.628147200042126
     );
     assert_eq!(
         metrics
             .process_ssd_embedded_impacts
             .unwrap()
-            .gwp_average_impact,
+            .gwp_average_impact_kgc02eq,
         0.0000021533829645868956
     );
     assert!(metrics.process_hdd_embedded_impacts.is_none());
