@@ -15,3 +15,9 @@ export function average(array: number[]) {
   const averageValue = array.reduce((a: number, b: number) => a + b) / array.length;
   return averageValue;
 }
+
+export function formatDate(date: string) {
+  const str_to_date = new Date(date);
+  const formattedDate = str_to_date.toLocaleDateString("en-US");
+  return formattedDate;
+}
