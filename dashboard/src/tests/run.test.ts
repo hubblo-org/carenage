@@ -13,6 +13,7 @@ describe("run test suite", () => {
     project_name: "hubblo/carenage",
     pipeline_id: 1520057997,
     run_id: 8228228299,
+    started_at: "2024-11-24T17:54:27.722Z",
     job_name: "test_for_merge_request",
     job_status: "success",
     job_duration: 180,

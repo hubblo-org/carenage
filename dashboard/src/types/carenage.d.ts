@@ -20,6 +20,7 @@ export declare type CiRun = {
   pipeline_id: number;
   run_id: number;
   project_name: string;
+  started_at: string;
   job_name: string;
   job_status: string;
   job_duration: number;
