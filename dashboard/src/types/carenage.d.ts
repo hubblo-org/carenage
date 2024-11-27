@@ -26,4 +26,10 @@ export declare type CiRun = {
   processes: Process[];
 };
 
+export declare type ProjectRecord = {
+  project_id: string;
+  project_name: string;
+  created_at: string;
+  runs: CiRun[];
+};
 declare module "carenage";
