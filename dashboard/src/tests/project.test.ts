@@ -1,19 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { CiRun, ProjectRecord } from "$lib/types/carenage";
+import type { CiRun, CiPipeline } from "$lib/types/carenage";
 import { cleanup, render, screen, within } from "@testing-library/svelte";
 import Project from "$lib/components/project.svelte";
-import runs from "./fixtures/runs.json";
+import project_metadata from "./fixtures/project_metadata.json";
 
 describe("project component test suite", () => {
-  const project: ProjectRecord = {
-    project_id: "c2b04067-7c6d-40bb-a7e0-d094a9850196",
-    project_name: "hubblo/carenage",
-    created_at: "2024-06-13T18:10:14.658Z",
-    runs: runs
-  };
-
   beforeEach(() => {
-    render(Project, { props: { project: project } });
+    render(Project, { props: { project: project_metadata } });
   });
   afterEach(() => {
     cleanup();
@@ -39,13 +32,17 @@ describe("project component test suite", () => {
     expect(runIdsColumn).toBeVisible();
     expect(runExecutionDateColumn).toBeVisible();
 
-    runs.map((run: CiRun) => {
-      const runId = run.run_id;
-      const runExecutionDate = run.started_at;
-      const runIdCell = within(runsTable).getByRole("link", { name: runId.toString() });
-      const runExecutionDateCell = within(runsTable).getByRole("cell", { name: runExecutionDate });
-      expect(runIdCell).toBeVisible();
-      expect(runExecutionDateCell).toBeVisible();
+    project_metadata.pipelines.forEach((pipeline: CiPipeline) => {
+      pipeline.runs.forEach((run: CiRun) => {
+        const runId = run.run_id;
+        const runExecutionDate = run.started_at;
+        const runIdCell = within(runsTable).getByRole("link", { name: runId.toString() });
+        const runExecutionDateCell = within(runsTable).getByRole("cell", {
+          name: runExecutionDate
+        });
+        expect(runIdCell).toBeVisible();
+        expect(runExecutionDateCell).toBeVisible();
+      });
     });
   });
   it("displays a list of pipelines executed, with each pipeline element allowing the user to navigate to the pipeline's metrics", () => {
@@ -61,13 +58,16 @@ describe("project component test suite", () => {
     expect(pipelineIdsColumn).toBeVisible();
     expect(pipelineExecutionDateColumn).toBeVisible();
 
-    // To modify according to API response that returns runs associated to a pipeline
-    const pipelineExecutionDate = runs[0].started_at;
-    const pipelineId = runs[0].pipeline_id;
-    const pipelineIdCell = screen.getAllByRole("cell", { name: pipelineId.toString() });
-    const pipelineExecutionDateCell = screen.getAllByRole("cell", { name: pipelineExecutionDate });
-    expect(pipelineExecutionDateCell[0]).toBeVisible();
-    expect(pipelineIdCell[0]).toBeVisible();
+    project_metadata.pipelines.forEach((pipeline: CiPipeline) => {
+      const pipelineExecutionDate = pipeline.started_at;
+      const pipelineId = pipeline.pipeline_id;
+      const pipelineIdCell = screen.getAllByRole("cell", { name: pipelineId.toString() });
+      const pipelineExecutionDateCell = screen.getAllByRole("cell", {
+        name: pipelineExecutionDate
+      });
+      expect(pipelineExecutionDateCell[0]).toBeVisible();
+      expect(pipelineIdCell[0]).toBeVisible();
+    });
   });
   it("displays a section with the aggregated metrics for the project, where the user can select a metric to see the associated aggregated values", () => {
     const aggregatedMetricValuesLabel = "Project's aggregated metric values";

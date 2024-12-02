@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ProjectRecord } from "$lib/types/carenage";
+  import type { CiPipeline, CiRun, ProjectRecord } from "$lib/types/carenage";
   import { formatDate } from "$lib/utils.js";
 
   interface Props {
@@ -7,6 +7,9 @@
   }
 
   const { project }: Props = $props();
+  const pipeline_runs = project.pipelines.map((pipeline: CiPipeline) =>
+    pipeline.runs.map((run: CiRun) => run)
+  );
   const formattedDate = formatDate(project.created_at);
 </script>
 
@@ -21,9 +24,9 @@
         ></thead
       >
       <tbody
-        >{#each project.runs as run}<tr
-            ><td><a href="/pipelines/{run.pipeline_id}">{run.pipeline_id}</a></td>
-            <td>{run.started_at}</td></tr
+        >{#each project.pipelines as pipeline}<tr
+            ><td><a href="/pipelines/{pipeline.pipeline_id}">{pipeline.pipeline_id}</a></td>
+            <td>{pipeline.started_at}</td></tr
           >
         {/each}</tbody
       >
@@ -33,8 +36,10 @@
         ><tr><th scope="col">Run ID</th><th scope="col">Run date of execution</th></tr></thead
       >
       <tbody>
-        {#each project.runs as run}
-          <tr><td><a href="/runs/{run.run_id}">{run.run_id}</a></td><td>{run.started_at}</td></tr>
+        {#each pipeline_runs as runs}
+          {#each runs as run}
+            <tr><td><a href="/runs/{run.run_id}">{run.run_id}</a></td><td>{run.started_at}</td></tr>
+          {/each}
         {/each}
       </tbody>
     </table>
