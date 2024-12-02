@@ -46,7 +46,7 @@
   <div class="wrapper">
     <section>
       <div class="run-links">
-        <h1>Run {run.run_id}</h1>
+        <h2>Run {run.run_id}</h2>
         <a href="https://gitlab.com/{run.project_name}">Project {run.project_name}</a>
         <a href="https://gitlab.com/{run.project_name}/-/pipelines/{run.pipeline_id}"
           >Pipeline #{run.pipeline_id}
@@ -60,7 +60,8 @@
         <p><b>Run status</b>: {run.job_status}</p>
       </div>
     </section>
-    <section class="metric-selection">
+    <section class="metric-selection" aria-labelledby="metric-selection-heading">
+      <h2 id="metric-selection-heading">Metric for process selection</h2>
       <label for="metric-name-select">Select a metric: </label>
       <select
         name="metric-names"
@@ -90,7 +91,8 @@
       </select>
     </section>
 
-    <section class="values">
+    <section class="metric-values" aria-labelledby="metric-values-heading">
+      <h2 id="metric-values-heading">Metric values</h2>
       <table>
         <caption>Values for selected process and metric</caption>
         <thead>
@@ -137,7 +139,7 @@
     display: flex;
     justify-content: space-around;
   }
-  .values {
+  .metric-values {
     overflow: auto;
     width: 500px;
     height: 300px;

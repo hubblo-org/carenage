@@ -52,10 +52,20 @@ describe("run test suite", () => {
     expect(jobStatus).toBeVisible();
   });
   it("displays a selection of metric names to choose from in order to display the metric values", () => {
+    const metricSelectionLabel = "Metric for process selection";
+    const metricSelectionHeading = screen.getByRole("heading", {
+      name: metricSelectionLabel
+    });
+    const metricSelectionSection = screen.getByRole("region", {
+      name: metricSelectionLabel
+    });
     const metricsNames = processesData[0].metrics.map((metric: Metric) => metric.metric_name);
     const metricNamesSelect = screen.getByRole("combobox", { name: /Select a metric/i });
     const { getAllByRole } = within(metricNamesSelect);
     const metricOptions = getAllByRole("option");
+
+    expect(metricSelectionHeading).toBeVisible();
+    expect(metricSelectionSection).toBeVisible();
     metricOptions.map((metric_option, index) =>
       expect(metric_option).toHaveTextContent(metricsNames[index])
     );
@@ -81,6 +91,10 @@ describe("run test suite", () => {
     const pid64CpuAvgAdpValues = processesData
       .filter((process: Process) => process.process.process_pid === 64)
       .map((process: Process) => process.metrics[cpuAdpAvgImpactIndex].metric_values);
+
+    const metricValuesLabel = "Metric values";
+    const metricValuesHeading = screen.getByRole("heading", { name: metricValuesLabel });
+    const metricValuesSection = screen.getByRole("region", { name: metricValuesLabel });
     const processesSelect = screen.getByRole("combobox", { name: /Select a process/i });
     const metricNamesSelect = screen.getByRole("combobox", { name: /Select a metric/i });
     await user.selectOptions(processesSelect, ["64"]);
@@ -92,6 +106,8 @@ describe("run test suite", () => {
     const timestampsColumn = screen.getByRole("columnheader", { name: "Timestamp" });
     const metricValuesColumn = screen.getByRole("columnheader", { name: /Metric value/i });
 
+    expect(metricValuesHeading).toBeVisible();
+    expect(metricValuesSection).toBeVisible();
     expect(metricsTable).toBeVisible();
     expect(timestampsColumn).toBeVisible();
     expect(metricValuesColumn).toBeVisible();

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { CiRun, ProjectRecord } from "$lib/types/carenage";
-import { cleanup, render, screen } from "@testing-library/svelte";
+import { cleanup, render, screen, within } from "@testing-library/svelte";
 import Project from "$lib/components/project.svelte";
 import runs from "./fixtures/runs.json";
 
@@ -19,9 +19,11 @@ describe("project component test suite", () => {
     cleanup();
   });
   it("displays metadata on the project", () => {
+    const projectMetadataSection = screen.getByRole("region", { name: /hubblo\/carenage/i });
     const projectName = screen.getByRole("heading", { name: /hubblo\/carenage/i });
     const projectStartDate = screen.getByText(/6\/13\/2024/i);
 
+    expect(projectMetadataSection).toBeVisible();
     expect(projectName).toBeVisible();
     expect(projectStartDate).toBeVisible();
   });
@@ -40,8 +42,8 @@ describe("project component test suite", () => {
     runs.map((run: CiRun) => {
       const runId = run.run_id;
       const runExecutionDate = run.started_at;
-      const runIdCell = screen.getByRole("link", { name: runId.toString() });
-      const runExecutionDateCell = screen.getByRole("cell", { name: runExecutionDate });
+      const runIdCell = within(runsTable).getByRole("link", { name: runId.toString() });
+      const runExecutionDateCell = within(runsTable).getByRole("cell", { name: runExecutionDate });
       expect(runIdCell).toBeVisible();
       expect(runExecutionDateCell).toBeVisible();
     });
