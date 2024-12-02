@@ -27,10 +27,22 @@ export declare type CiRun = {
   processes: Process[];
 };
 
+export declare type CiPipeline = {
+  pipeline_id: string;
+  pipeline_repo_id: number;
+  pipeline_repo_url: string;
+  started_at: string;
+  finished_at: string;
+  duration: number;
+  runs: CiRun[];
+};
+
 export declare type ProjectRecord = {
   project_id: string;
   project_name: string;
+  project_url: string;
+  project_repo_id: number;
   created_at: string;
-  runs: CiRun[];
+  pipelines: CiPipeline[];
 };
 declare module "carenage";
