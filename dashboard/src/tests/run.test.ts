@@ -1,7 +1,7 @@
 import { cleanup, render, screen, within } from "@testing-library/svelte";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import userEvent from "@testing-library/user-event";
-import type { CiRun, Metric, MetricValues, Process } from "../types/carenage";
+import type { CiRun, Metric, MetricValues, Process } from "$lib/types/carenage";
 import processes from "./fixtures/run.json";
 import Run from "$lib/components/run.svelte";
 

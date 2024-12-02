@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CiRun } from "../../types/carenage";
+  import type { CiRun } from "$lib/types/carenage";
 
   interface Props {
     run: CiRun;

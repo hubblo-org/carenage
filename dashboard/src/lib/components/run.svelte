@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CiRun, Metric, MetricValues, Process } from "../types/carenage";
+  import type { CiRun, Metric, MetricValues, Process } from "$lib/types/carenage";
   import { onMount } from "svelte";
   import { createGraph } from "$lib/create-graph.svelte";
   import { average, formatDuration, getMetricUnit } from "$lib/utils.js";

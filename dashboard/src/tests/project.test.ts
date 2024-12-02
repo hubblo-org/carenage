@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { CiRun, ProjectRecord } from "../types/carenage";
+import type { CiRun, ProjectRecord } from "$lib/types/carenage";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import Project from "$lib/components/project.svelte";
 import runs from "./fixtures/runs.json";

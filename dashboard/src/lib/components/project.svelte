@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ProjectRecord } from "../types/carenage";
+  import type { ProjectRecord } from "$lib/types/carenage";
   import { formatDate } from "$lib/utils.js";
 
   interface Props {

@@ -1,4 +1,4 @@
-import type { MetricValues } from "../types/carenage";
+import type { MetricValues } from "$lib/types/carenage";
 
 export async function createGraph(metricValues: MetricValues, metric: string) {
   const Dygraph = (await import("dygraphs")).default;
