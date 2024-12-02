@@ -1,0 +1,53 @@
+{
+  "project_id": "3a1f9a71-fdd2-4e89-9769-70cfb731a02d",
+  "project_name": "hubblo/carenage",
+  "project_url": "https://gitlab.com/hubblo/carenage/",
+  "project_repo_id": 58830056,
+  "created_at": "2024-06-13T16:10:39.582Z",
+  "pipelines": [
+    {
+      "pipeline_id": "d199e857-fb0f-46b1-9846-74e53b494740",
+      "pipeline_repo_id": 1520057997,
+      "pipeline_repo_url": "https://gitlab.com/hubblo/carenage/-/pipelines/1520057997",
+      "started_at": "2024-10-30T13:39:18.617Z",
+      "finished_at": "2024-10-30T13:42:19.101Z",
+      "duration": 180,
+      "runs": [
+        {
+          "run_id": "d910fcd3-fef1-4077-9294-efea1975e3fc",
+          "run_repo_id": 8228228299,
+          "run_repo_url": "https://gitlab.com/hubblo/carenage/-/jobs/8228228299",
+          "started_at": "2024-11-24T17:54:27.722Z",
+          "finished_at": "2024-10-30T13:40:34.358Z",
+          "duration": 75.886483
+        },
+        {
+          "run_id": "2d89d626-6a45-455d-92f9-b8032cc93c80",
+          "run_repo_id": 8228228301,
+          "run_repo_url": "https://gitlab.com/hubblo/carenage/-/jobs/8228228301",
+          "started_at": "2024-10-30T13:40:34.701Z",
+          "finished_at": "2024-10-30T13:42:19.010Z",
+          "duration": 104.309727
+        }
+      ]
+    },
+    {
+      "pipeline_id": "d7d12808-0093-45cc-8355-753183084314",
+      "pipeline_repo_id": 1516655560,
+      "pipeline_repo_url": "https://gitlab.com/hubblo/carenage/-/pipelines/1516655560",
+      "started_at": "2024-10-28T15:14:18.528Z",
+      "finished_at": "2024-10-28T15:17:14.809Z",
+      "duration": 176,
+      "runs": [
+        {
+          "run_id": "3e309c54-09ec-4105-aebf-a41b77a8cba7",
+          "run_repo_id": 8206528018,
+          "run_repo_url": "https://gitlab.com/hubblo/carenage/-/jobs/8206528018",
+          "started_at": "2024-10-28T15:14:18.332Z",
+          "finished_at": "2024-10-28T15:17:14.731Z",
+          "duration": 176.3991
+        }
+      ]
+    }
+  ]
+}
