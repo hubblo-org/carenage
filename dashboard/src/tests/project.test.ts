@@ -67,4 +67,15 @@ describe("project component test suite", () => {
     expect(pipelineExecutionDateCell[0]).toBeVisible();
     expect(pipelineIdCell[0]).toBeVisible();
   });
+  it("displays a section with the aggregated metrics for the project, where the user can select a metric to see the associated aggregated values", () => {
+    const aggregatedMetricValuesLabel = "Project's aggregated metric values";
+    const aggregatedMetricValuesHeading = screen.getByRole("heading", {
+      name: aggregatedMetricValuesLabel
+    });
+    const aggregatedMetricValuesSection = screen.getByRole("region", {
+      name: aggregatedMetricValuesLabel
+    });
+    expect(aggregatedMetricValuesSection).toBeVisible();
+    expect(aggregatedMetricValuesHeading).toBeVisible();
+  });
 });
