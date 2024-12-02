@@ -22,7 +22,7 @@
     <tbody
       >{#each project.runs as run}<tr
           ><td><a href="/pipelines/{run.pipeline_id}">{run.pipeline_id}</a></td>
-          <td>{run.created_at}</td></tr
+          <td>{run.started_at}</td></tr
         >
       {/each}</tbody
     >
