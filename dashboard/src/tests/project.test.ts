@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { CiRun, CiPipeline } from "$lib/types/carenage";
+import type { CiPipelineMetadata, CiRunMetadata } from "$lib/types/carenage";
 import { cleanup, render, screen, within } from "@testing-library/svelte";
 import Project from "$lib/components/project.svelte";
 import project_metadata from "./fixtures/project_metadata.json";
@@ -32,9 +32,14 @@ describe("project component test suite", () => {
     expect(runIdsColumn).toBeVisible();
     expect(runExecutionDateColumn).toBeVisible();
 
-    project_metadata.pipelines.forEach((pipeline: CiPipeline) => {
-      pipeline.runs.forEach((run: CiRun) => {
-        const runId = run.run_id;
+    project_metadata.pipelines.forEach((pipeline: CiPipelineMetadata) => {
+      const pipelineId = pipeline.pipeline_repo_id;
+      const pipelineIdCell = within(runsTable).getByRole("cell", {
+        name: `Pipeline ID #${pipelineId.toString()}`
+      });
+      expect(pipelineIdCell).toBeVisible();
+      pipeline.runs.forEach((run: CiRunMetadata) => {
+        const runId = run.run_repo_id;
         const runExecutionDate = run.started_at;
         const runIdCell = within(runsTable).getByRole("link", { name: runId.toString() });
         const runExecutionDateCell = within(runsTable).getByRole("cell", {
@@ -58,10 +63,10 @@ describe("project component test suite", () => {
     expect(pipelineIdsColumn).toBeVisible();
     expect(pipelineExecutionDateColumn).toBeVisible();
 
-    project_metadata.pipelines.forEach((pipeline: CiPipeline) => {
+    project_metadata.pipelines.forEach((pipeline: CiPipelineMetadata) => {
       const pipelineExecutionDate = pipeline.started_at;
-      const pipelineId = pipeline.pipeline_id;
-      const pipelineIdCell = screen.getAllByRole("cell", { name: pipelineId.toString() });
+      const pipelineId = pipeline.pipeline_repo_id;
+      const pipelineIdCell = screen.getAllByRole("link", { name: pipelineId.toString() });
       const pipelineExecutionDateCell = screen.getAllByRole("cell", {
         name: pipelineExecutionDate
       });
