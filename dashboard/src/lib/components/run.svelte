@@ -59,7 +59,7 @@
       </div>
     </section>
     <section class="metric-selection" aria-labelledby="metric-selection-heading">
-      <h2 id="metric-selection-heading">Metric for process selection</h2>
+      <h2 id="metric-selection-heading">Metric and process selection</h2>
       <label for="metric-name-select">Select a metric: </label>
       <select
         name="metric-names"

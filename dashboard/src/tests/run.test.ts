@@ -41,7 +41,7 @@ describe("run test suite", () => {
     expect(jobStatus).toBeVisible();
   });
   it("displays a selection of metric names to choose from in order to display the metric values", () => {
-    const metricSelectionLabel = "Metric for process selection";
+    const metricSelectionLabel = "Metric and process selection";
     const metricSelectionHeading = screen.getByRole("heading", {
       name: metricSelectionLabel
     });
