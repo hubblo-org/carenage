@@ -16,33 +16,45 @@ export declare type Process = {
   metrics: Metric[];
 };
 
-export declare type CiRun = {
-  pipeline_id: number;
-  run_id: number;
-  project_name: string;
+export declare type CiRunMetadata = {
+  run_id: string;
+  run_repo_id: number;
+  run_repo_url: string;
   started_at: string;
+  finished_at: string;
+  duration: number;
+};
+
+export declare type CiRun = CiRunMetadata & {
+  pipeline_id: string;
+  pipeline_repo_id: number;
+  pipeline_repo_url: string;
+  project_name: string;
   job_name: string;
   job_status: string;
-  job_duration: number;
   processes: Process[];
 };
 
-export declare type CiPipeline = {
+export declare type CiPipelineMetadata = {
   pipeline_id: string;
   pipeline_repo_id: number;
   pipeline_repo_url: string;
   started_at: string;
   finished_at: string;
   duration: number;
+  runs: CiRunMetadata[];
+};
+
+export declare type CiPipeline = CiPipelineMetadata & {
   runs: CiRun[];
 };
 
-export declare type ProjectRecord = {
+export declare type ProjectMetadata = {
   project_id: string;
   project_name: string;
   project_url: string;
   project_repo_id: number;
   created_at: string;
-  pipelines: CiPipeline[];
+  pipelines: CiPipelineMetadata[];
 };
 declare module "carenage";
