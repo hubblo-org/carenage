@@ -30,6 +30,7 @@ export declare type CiRun = CiRunMetadata & {
   pipeline_repo_id: number;
   pipeline_repo_url: string;
   project_name: string;
+  project_repo_url: string;
   job_name: string;
   job_status: string;
   processes: Process[];
@@ -39,6 +40,8 @@ export declare type CiPipelineMetadata = {
   pipeline_id: string;
   pipeline_repo_id: number;
   pipeline_repo_url: string;
+  project_name: string;
+  project_repo_url: string;
   started_at: string;
   finished_at: string;
   duration: number;
