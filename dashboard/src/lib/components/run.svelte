@@ -14,7 +14,7 @@
 
   let processSelected = $state(run.processes[0].process.process_pid);
   let metricSelected = $state(metricsNames[0]);
-  let formatted_run_duration = formatDuration(run.job_duration);
+  let formatted_run_duration = formatDuration(run.duration);
   let metricUnit = $derived(getMetricUnit(metricSelected));
 
   let metricValues = $derived.by(() => {
@@ -46,12 +46,12 @@
   <div class="wrapper">
     <section>
       <div class="run-links">
-        <h2>Run {run.run_id}</h2>
+        <h2>Run {run.run_repo_id}</h2>
         <a href="https://gitlab.com/{run.project_name}">Project {run.project_name}</a>
-        <a href="https://gitlab.com/{run.project_name}/-/pipelines/{run.pipeline_id}"
-          >Pipeline #{run.pipeline_id}
+        <a href="https://gitlab.com/{run.project_name}/-/pipelines/{run.pipeline_repo_id}"
+          >Pipeline #{run.pipeline_repo_id}
         </a>
-        <a href="https://gitlab.com/{run.project_name}/-/jobs/{run.run_id}"> Run #{run.run_id}</a>
+        <a href={run.run_repo_url}> Run #{run.run_repo_id}</a>
       </div>
       <div>
         <p>Run executed in {formatted_run_duration}</p>
