@@ -4,7 +4,7 @@ import project from "../tests/fixtures/project_metadata.json";
 import pipeline from "../tests/fixtures/pipeline.json";
 
 export const handlers = [
-  http.get("https://api.carenage.hubblo.org/runs/c86fe1e5-8828-4f53-822b-df7e2ced37db", () => {
+  http.get("https://api.carenage.hubblo.org/runs/d910fcd3-fef1-4077-9294-efea1975e3fc", () => {
     return HttpResponse.json(run);
   }),
   http.get("https://api.carenage.hubblo.org/projects/3a1f9a71-fdd2-4e89-9769-70cfb731a02d", () => {
