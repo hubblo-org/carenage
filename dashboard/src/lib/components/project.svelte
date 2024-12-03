@@ -46,6 +46,6 @@
     </table>
   </section>
   <section class="aggregated-metric-values" aria-labelledby="aggregated-metric-values-heading">
-    <h2 id="aggregated-metric-values-heading">Project's aggregated metric values</h2>
+    <h2 id="aggregated-metric-values-heading">Project aggregated metric values</h2>
   </section>
 </main>

@@ -20,7 +20,7 @@ describe("project component test suite", () => {
     expect(projectName).toBeVisible();
     expect(projectStartDate).toBeVisible();
   });
-  it("displays a list of runs executed, with each run element allowing the user to navigate to the run's metrics", () => {
+  it("displays a list of runs executed, with each run element allowing the user to navigate to the run metrics", () => {
     const runsTable = screen.getByRole("table", {
       name: "List of executed CI runs for the project"
     });
@@ -50,7 +50,7 @@ describe("project component test suite", () => {
       });
     });
   });
-  it("displays a list of pipelines executed, with each pipeline element allowing the user to navigate to the pipeline's metrics", () => {
+  it("displays a list of pipelines executed, with each pipeline element allowing the user to navigate to the pipeline metrics", () => {
     const pipelinesTable = screen.getByRole("table", {
       name: "List of executed CI pipelines for the project"
     });
@@ -75,7 +75,7 @@ describe("project component test suite", () => {
     });
   });
   it("displays a section with the aggregated metrics for the project, where the user can select a metric to see the associated aggregated values", () => {
-    const aggregatedMetricValuesLabel = "Project's aggregated metric values";
+    const aggregatedMetricValuesLabel = "Project aggregated metric values";
     const aggregatedMetricValuesHeading = screen.getByRole("heading", {
       name: aggregatedMetricValuesLabel
     });

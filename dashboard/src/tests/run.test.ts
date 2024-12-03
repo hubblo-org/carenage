@@ -21,7 +21,7 @@ describe("run test suite", () => {
     const runHeading = screen.getByRole("heading", { name: runId });
     expect(runHeading).toBeVisible();
   });
-  it("displays links to Gitlab logs: to the pipeline related to the run, to the project related to the pipeline, to the run", () => {
+  it("displays links to the repository page, to the pipeline logs related to the run, to the run logs", () => {
     const pipelineLink = screen.getByRole("link", { name: /1520057997/i });
     const projectLink = screen.getByRole("link", { name: /hubblo\/carenage/i });
     const runLink = screen.getByRole("link", { name: /8228228299/i });
