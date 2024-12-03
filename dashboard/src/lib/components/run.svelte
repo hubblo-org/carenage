@@ -47,10 +47,8 @@
     <section>
       <div class="run-links">
         <h2>Run {run.run_repo_id}</h2>
-        <a href="https://gitlab.com/{run.project_name}">Project {run.project_name}</a>
-        <a href="https://gitlab.com/{run.project_name}/-/pipelines/{run.pipeline_repo_id}"
-          >Pipeline #{run.pipeline_repo_id}
-        </a>
+        <a href={run.project_repo_url}>Project {run.project_name}</a>
+        <a href={run.pipeline_repo_url}>Pipeline #{run.pipeline_repo_id} </a>
         <a href={run.run_repo_url}> Run #{run.run_repo_id}</a>
       </div>
       <div>
