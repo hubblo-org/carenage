@@ -29,7 +29,7 @@
       >
       <tbody
         >{#each pipeline.runs as run}<tr
-            ><td><a href={run.run_repo_url}>Run #{run.run_repo_id}</a></td><td
+            ><td><a href="/runs/{run.run_id}">Run #{run.run_repo_id}</a></td><td
               >{formatTime(run.started_at)}</td
             ></tr
           >{/each}</tbody

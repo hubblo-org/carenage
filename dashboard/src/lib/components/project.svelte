@@ -22,7 +22,7 @@
       >
       <tbody
         >{#each project.pipelines as pipeline}<tr
-            ><td><a href={pipeline.pipeline_repo_url}>{pipeline.pipeline_repo_id}</a></td>
+            ><td><a href="/pipelines/{pipeline.pipeline_id}">{pipeline.pipeline_repo_id}</a></td>
             <td>{pipeline.started_at}</td></tr
           >
         {/each}</tbody
@@ -37,7 +37,7 @@
           <tr><td>Pipeline ID #{pipeline.pipeline_repo_id}</td></tr>
           {#each pipeline.runs as run}
             <tr
-              ><td><a href={run.run_repo_url}>{run.run_repo_id}</a></td><td>{run.started_at}</td
+              ><td><a href="/runs/{run.run_id}">{run.run_repo_id}</a></td><td>{run.started_at}</td
               ></tr
             >
           {/each}
