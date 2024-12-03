@@ -21,3 +21,9 @@ export function formatDate(date: string) {
   const formattedDate = str_to_date.toLocaleDateString("en-US");
   return formattedDate;
 }
+
+export function formatTime(date: string) {
+  const str_to_date = new Date(date);
+  const formattedTime = str_to_date.toTimeString();
+  return formattedTime;
+}
