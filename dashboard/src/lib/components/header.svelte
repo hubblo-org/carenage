@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ProjectMetadata } from "$lib/types/carenage";
+  import { page } from "$app/stores";
 
   interface Props {
     project: ProjectMetadata;
@@ -16,16 +17,40 @@
   <div>
     <h1>Carenage</h1>
 
-    <a href={`/projects/${project.project_id}`}> <h2>{project.project_name}</h2></a>
+    <a href={project.project_url}> <h2>{project.project_name}</h2></a>
   </div>
-  <div>
+  <div class="project-metadata">
     <p>Number of pipelines executed: {numberOfPipelines}</p>
     <p>Number of job runs executed: {numberOfRuns}</p>
   </div>
+  <nav>
+    <a href="/projects/{project.project_id}">Project summary and metrics</a>
+    {#if $page.data.run}<a href="/pipelines/{$page.data.run.pipeline_id}"
+        >Pipeline summary and metrics
+      </a>
+    {/if}
+  </nav>
 </header>
 
 <style>
   header {
     display: flex;
+  }
+  nav {
+    display: flex;
+    width: 50%;
+    justify-content: space-around;
+  }
+  nav a {
+    text-decoration: none;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+  }
+  nav a:hover {
+    border-bottom: 1px solid black;
+  }
+  .project-metadata {
+    margin-left: 24px;
   }
 </style>
