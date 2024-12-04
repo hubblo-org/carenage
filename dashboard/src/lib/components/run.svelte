@@ -45,7 +45,7 @@
 <main>
   <div class="wrapper">
     <section>
-      <div class="run-links">
+      <div class="run-metadata">
         <h2>Run {run.run_repo_id}</h2>
         <a href={run.project_repo_url}>Project {run.project_name}</a>
         <a href={run.pipeline_repo_url}>Pipeline #{run.pipeline_repo_id} </a>
@@ -115,19 +115,13 @@
 </main>
 
 <style>
-  section {
-    width: 30%;
-    height: 40%;
-  }
-  .run-links {
+  .run-metadata {
     display: flex;
     gap: 5px;
     flex-direction: column;
   }
   .metric-values {
     overflow: auto;
-    width: 500px;
-    height: 300px;
   }
   .metric-selection {
     display: flex;
