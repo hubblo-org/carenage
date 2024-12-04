@@ -1,22 +1,26 @@
 <script lang="ts">
-  import type { CiRun } from "$lib/types/carenage";
+  import type { ProjectMetadata } from "$lib/types/carenage";
 
   interface Props {
-    run: CiRun;
+    project: ProjectMetadata;
   }
 
-  const { run }: Props = $props();
+  const { project }: Props = $props();
+  const numberOfPipelines = $derived(project.pipelines.length);
+  const numberOfRuns = $derived(
+    project.pipelines.map((pipeline) => pipeline.runs.length).reduce((acc, val) => acc + val, 0)
+  );
 </script>
 
 <header>
   <div>
     <h1>Carenage</h1>
 
-    <a href={`https://gitlab.com/${run.project_name}`}> <h2>{run.project_name}</h2></a>
+    <a href={`/projects/${project.project_id}`}> <h2>{project.project_name}</h2></a>
   </div>
   <div>
-    <p>Number of pipelines executed</p>
-    <p>Number of job runs executed</p>
+    <p>Number of pipelines executed: {numberOfPipelines}</p>
+    <p>Number of job runs executed: {numberOfRuns}</p>
   </div>
 </header>
 
