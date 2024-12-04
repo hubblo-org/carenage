@@ -59,3 +59,25 @@ section:hover label {
   color: black;
   background-color: white;
 }
+
+caption {
+  border: 3px solid black;
+}
+
+th {
+  border: 2px solid black;
+}
+
+td {
+  border: 1px solid black;
+}
+
+.wrapper section {
+  width: 30%;
+  height: 40%;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: space-around;
+}
