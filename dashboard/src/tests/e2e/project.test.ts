@@ -4,9 +4,12 @@ const projectId = "3a1f9a71-fdd2-4e89-9769-70cfb731a02d";
 const pipelineId = 1520057997;
 const runId = 8228228299;
 
-test("renders the associated project page for the given id", async ({ page }) => {
+test("renders the associated project page for the given id", async ({ context, page }) => {
+  await context.addCookies([
+    { name: "projectid", value: projectId, domain: "localhost", path: "/" }
+  ]);
   await page.goto(`/projects/${projectId}`);
-  const projectNameHeading = page.getByRole("heading", { name: /hubblo\/carenage/i });
+  const projectNameHeading = page.getByRole("heading", { name: "Project: hubblo/carenage" });
   const projectPipelinesTable = page.getByRole("table", {
     name: "List of executed CI pipelines for the project"
   });
@@ -19,8 +22,12 @@ test("renders the associated project page for the given id", async ({ page }) =>
 });
 
 test("routes to the selected pipeline page after clicking on the selected pipeline link", async ({
+  context,
   page
 }) => {
+  await context.addCookies([
+    { name: "projectid", value: projectId, domain: "localhost", path: "/" }
+  ]);
   await page.goto(`/projects/${projectId}`);
   const projectPipelinesTable = page.getByRole("table", {
     name: "List of executed CI pipelines for the project"
@@ -37,8 +44,12 @@ test("routes to the selected pipeline page after clicking on the selected pipeli
 });
 
 test("routes to the selected run page after clicking on the selected run link", async ({
+  context,
   page
 }) => {
+  await context.addCookies([
+    { name: "projectid", value: projectId, domain: "localhost", path: "/" }
+  ]);
   await page.goto(`/projects/${projectId}`);
   const projectRunsTable = page.getByRole("table", {
     name: "List of executed CI runs for the project"
