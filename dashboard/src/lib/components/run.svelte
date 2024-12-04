@@ -115,15 +115,6 @@
 </main>
 
 <style>
-  caption {
-    border: 3px solid black;
-  }
-  th {
-    border: 2px solid black;
-  }
-  td {
-    border: 1px solid black;
-  }
   section {
     width: 30%;
     height: 40%;
@@ -132,10 +123,6 @@
     display: flex;
     gap: 5px;
     flex-direction: column;
-  }
-  .wrapper {
-    display: flex;
-    justify-content: space-around;
   }
   .metric-values {
     overflow: auto;
