@@ -8,7 +8,7 @@ import type { CiRunMetadata } from "$lib/types/carenage";
 describe("pipeline test suite", () => {
   beforeEach(() => render(Pipeline, { props: { pipeline: pipeline } }));
   afterEach(() => cleanup());
-  it("displays to the user a section with links to the project's page and pipeline's logs", () => {
+  it("displays to the user a section with links to the project page and pipeline logs", () => {
     const pipelineMetadataLabel = `Pipeline #${pipeline.pipeline_repo_id} metadata`;
     const pipelineMetadataSection = screen.getByRole("region", { name: pipelineMetadataLabel });
     const pipelineHeading = screen.getByRole("heading", {
@@ -32,13 +32,16 @@ describe("pipeline test suite", () => {
     const formattedPipelineEndDate = formatTime(pipeline.finished_at);
 
     const pipelineDuration = within(pipelineMetadataSection).getByText(
-      `Pipeline duration: ${formattedPipelineDuration}`
+      `${formattedPipelineDuration}`,
+      { exact: false }
     );
     const pipelineStartDate = within(pipelineMetadataSection).getByText(
-      `Pipeline started at: ${formattedPipelineStartDate}`
+      `${formattedPipelineStartDate}`,
+      { exact: false }
     );
     const pipelineEndDate = within(pipelineMetadataSection).getByText(
-      `Pipeline finished at: ${formattedPipelineEndDate}`
+      `${formattedPipelineEndDate}`,
+      { exact: false }
     );
     expect(pipelineDuration).toBeVisible();
     expect(pipelineStartDate).toBeVisible();

@@ -18,9 +18,9 @@
       <h2 id="pipeline-metadata-heading">Pipeline #{pipeline.pipeline_repo_id} metadata</h2>
       <a href={pipeline.project_repo_url}>{pipeline.project_name}</a>
       <a href={pipeline.pipeline_repo_url}>Pipeline #{pipeline.pipeline_repo_id}</a>
-      <p>Pipeline duration: {pipelineDuration}</p>
-      <p>Pipeline started at: {pipelineStartTime}</p>
-      <p>Pipeline finished at: {pipelineEndTime}</p>
+      <p><b>Pipeline duration:</b> {pipelineDuration}</p>
+      <p><b>Pipeline started at:</b> {pipelineStartTime}</p>
+      <p><b>Pipeline finished at:</b> {pipelineEndTime}</p>
     </section>
     <section aria-labelledby="pipeline-runs-heading">
       <h2 id="pipeline-runs-heading">Executed runs for pipeline #{pipeline.pipeline_repo_id}</h2>
