@@ -1,8 +1,7 @@
 import type { PageServerLoad } from "./$types";
 import type { ProjectMetadata } from "$lib/types/carenage";
 
-export const load: PageServerLoad = async ({ params, cookies }) => {
-  cookies.set("projectid", params.id, { path: "/" });
+export const load: PageServerLoad = async ({ params }) => {
   return { project: await fetchProject(params.id) };
 };
 
