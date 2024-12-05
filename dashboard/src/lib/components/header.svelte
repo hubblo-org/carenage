@@ -25,7 +25,7 @@
   </div>
   <nav>
     <a href="/projects/{project.project_id}">Project summary and metrics</a>
-    {#if $page.data.run}<a href="/pipelines/{$page.data.run.pipeline_id}"
+    {#if $page.data?.run}<a href="/pipelines/{$page.data.run.pipeline_id}"
         >Pipeline summary and metrics
       </a>
     {/if}
