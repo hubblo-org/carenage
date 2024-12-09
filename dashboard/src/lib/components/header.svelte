@@ -48,7 +48,8 @@
     align-items: center;
   }
   nav a:hover {
-    border-bottom: 1px solid black;
+    background-color: var(--blue-100);
+    color: black;
   }
   .project-metadata {
     margin-left: 24px;
