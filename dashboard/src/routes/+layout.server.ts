@@ -1,14 +1,13 @@
+import { error } from "@sveltejs/kit";
+import { fetchProject } from "$lib/fetchCarenage";
 import type { LayoutServerLoad } from "./$types";
-import type { ProjectMetadata } from "$lib/types/carenage";
 
 export const load: LayoutServerLoad = async ({ cookies }) => {
   const projectId = cookies.get("projectid");
-  return { project: await fetchProject(projectId) };
+  const project = await fetchProject(projectId);
+  if (!project) {
+    error(404, "Not found");
+  }
+
+  return { project: project };
 };
-
-async function fetchProject(projectId: string) {
-  const response = await fetch(`https://api.carenage.hubblo.org/projects/${projectId}`);
-  const project = (await response.json()) as Promise<ProjectMetadata>;
-
-  return project;
-}
