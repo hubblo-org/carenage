@@ -1,3 +1,5 @@
+import type { UUID } from "crypto";
+
 export function formatDuration(duration_in_seconds: number) {
   const date = new Date(0);
   date.setSeconds(duration_in_seconds);
@@ -26,4 +28,8 @@ export function formatTime(date: string) {
   const str_to_date = new Date(date);
   const formattedTime = str_to_date.toTimeString();
   return formattedTime;
+}
+
+export function isUUID(uuid: string): uuid is UUID {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
 }
