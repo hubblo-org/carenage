@@ -1,13 +1,11 @@
+import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
-import type { CiPipeline } from "$lib/types/carenage";
+import { fetchPipeline } from "$lib/fetchCarenage";
 
 export const load: PageServerLoad = async ({ params }) => {
-  return { pipeline: await fetchPipeline(params.id) };
+  const pipeline = await fetchPipeline(params.id);
+  if (!pipeline) {
+    error(404, "Not found");
+  }
+  return { pipeline: pipeline };
 };
-
-async function fetchPipeline(pipeline_id: string) {
-  const response = await fetch(`https://api.carenage.hubblo.org/pipelines/${pipeline_id}`);
-  const pipeline = (await response.json()) as Promise<CiPipeline>;
-
-  return pipeline;
-}

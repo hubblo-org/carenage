@@ -1,13 +1,11 @@
 import type { PageServerLoad } from "./$types";
-import type { CiRun } from "$lib/types/carenage";
+import { fetchRun } from "$lib/fetchCarenage";
+import { error } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async ({ params }) => {
+  const run = await fetchRun(params.id);
+  if (!run) {
+    error(404, "Not found");
+  }
   return { run: await fetchRun(params.id) };
 };
-
-async function fetchRun(run_id: string) {
-  const response = await fetch(`https://api.carenage.hubblo.org/runs/${run_id}`);
-  const run = (await response.json()) as Promise<CiRun>;
-
-  return run;
-}
