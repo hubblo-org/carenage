@@ -1,3 +1,5 @@
+import type { JobStatus } from "./enums";
+
 export declare type ProcessInfo = {
   process_pid: number;
   process_exe: string;
@@ -24,7 +26,7 @@ export declare type CiRunMetadata = {
   finished_at: string;
   duration: number;
   stage: string;
-  job_status: string;
+  job_status: JobStatus;
   name: string;
 };
 
