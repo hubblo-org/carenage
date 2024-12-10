@@ -14,7 +14,21 @@
       "run_repo_url": "https://gitlab.com/hubblo/carenage/-/jobs/8228228299",
       "started_at": "2024-11-24T17:54:27.722Z",
       "finished_at": "2024-10-30T13:40:34.358Z",
-      "duration": 75.886483
+      "duration": 75.886483,
+      "stage": "build-and-test",
+      "name": "unit-tests-for-merge-request",
+      "job_status": "success"
+    },
+    {
+      "run_id": "cea7e112-9db1-4f8e-a69a-4c2349165314",
+      "run_repo_id": 8228228300,
+      "run_repo_url": "https://gitlab.com/hubblo/carenage/-/jobs/8228228300",
+      "started_at": "2024-11-24T17:54:28.722Z",
+      "finished_at": "2024-10-30T13:40:35.358Z",
+      "duration": 76.886483,
+      "stage": "build-and-test",
+      "name": "integration-tests-for-merge-request",
+      "job_status": "failed"
     },
     {
       "run_id": "2d89d626-6a45-455d-92f9-b8032cc93c80",
@@ -22,7 +36,10 @@
       "run_repo_url": "https://gitlab.com/hubblo/carenage/-/jobs/8228228301",
       "started_at": "2024-10-30T13:40:34.701Z",
       "finished_at": "2024-10-30T13:42:19.010Z",
-      "duration": 104.309727
+      "duration": 104.309727,
+      "stage": "test-e2e",
+      "name": "test-carenage-e2e",
+      "job_status": "success"
     }
   ]
 }
