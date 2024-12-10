@@ -86,4 +86,26 @@ describe("pipeline test suite", () => {
     expect(aggregatedMetricValuesSection).toBeVisible();
     expect(aggregatedMetricValuesHeading).toBeVisible();
   });
+  it("displays to the user a section with all the runs associated with the pipeline represented as a flowchart", () => {
+    const jobsStages = pipeline.runs.map((run) => run.stage);
+    /* const jobsNames = pipeline.runs.map((run) => run.name);
+    const jobsStatuses = pipeline.runs.map((run) => run.job_status); */
+    const jobsFlowchartLabel = "Pipeline jobs flowchart";
+    const jobsFlowchartHeading = screen.getByRole("heading", { name: jobsFlowchartLabel });
+    const jobsFlowchartSection = screen.getByRole("region", { name: jobsFlowchartLabel });
+    const { getAllByRole } = within(jobsFlowchartSection);
+    const jobsLists = getAllByRole("list");
+
+    expect(jobsFlowchartHeading).toBeVisible();
+    jobsStages.forEach((jobStage) => {
+      const jobStageText = within(jobsFlowchartSection).getByText(jobStage);
+      expect(jobStageText).toBeVisible();
+    });
+    jobsLists.forEach((jobList) => {
+      const { getAllByRole } = within(jobList);
+      const jobListItems = getAllByRole("listitem");
+      expect(jobList).toBeVisible();
+      jobListItems.forEach((jobListItem) => expect(jobListItem).toBeVisible());
+    });
+  });
 });
