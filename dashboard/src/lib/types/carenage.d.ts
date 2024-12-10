@@ -23,6 +23,9 @@ export declare type CiRunMetadata = {
   started_at: string;
   finished_at: string;
   duration: number;
+  stage: string;
+  job_status: string;
+  name: string;
 };
 
 export declare type CiRun = CiRunMetadata & {
