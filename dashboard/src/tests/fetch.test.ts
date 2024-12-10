@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { fetchPipeline, fetchProject } from "$lib/fetchCarenage";
+import { fetchPipeline, fetchProject, fetchRun } from "$lib/fetchCarenage";
 import type { CiPipelineMetadata, CiRunMetadata, ProjectMetadata } from "$lib/types/carenage";
 
 const { server } = await import("../mocks/node");
@@ -26,6 +26,8 @@ describe("fetchRun test suite", () => {
   const runId = "d910fcd3-fef1-4077-9294-efea1975e3fc";
   it("fetches data from the Carenage API with a valid run ID", async () => {
     const runMetadata: CiRunMetadata = await fetchRun(runId);
-    expect(runMetadata.run_repo_url).toEqual();
+    expect(runMetadata.run_repo_url).toEqual(
+      "https://gitlab.com/hubblo/carenage/-/jobs/8228228299"
+    );
   });
 });
