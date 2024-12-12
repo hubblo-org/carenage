@@ -84,6 +84,15 @@ services:
     networks:
       - carenage
 
+  dashboard:
+    build:
+     context: ../dashboard
+    ports:
+      - "5173:5173"
+    profiles: [prod]
+    networks:
+      - carenage
+
 
 volumes:
   powerdata: {}
