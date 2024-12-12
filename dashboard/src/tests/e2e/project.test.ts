@@ -37,10 +37,11 @@ test("routes to the selected pipeline page after clicking on the selected pipeli
   });
   await pipelineLink.click();
 
-  const pipelineMetadataHeading = page.getByRole("heading", {
-    name: `Pipeline #${pipelineId} metadata`
-  });
-  await expect(pipelineMetadataHeading).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: `Pipeline #${pipelineId} metadata`
+    })
+  ).toBeVisible();
 });
 
 test("routes to the selected run page after clicking on the selected run link", async ({
