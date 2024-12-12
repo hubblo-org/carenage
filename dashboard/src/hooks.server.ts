@@ -13,7 +13,12 @@ export const handle: Handle = async ({ event, resolve }) => {
       const splitPathName = event.url.pathname.split("/");
       const projectId = splitPathName[2];
       if (isUUID(projectId)) {
-        event.cookies.set("projectid", projectId, { path: "/" });
+        event.cookies.set("projectid", projectId, {
+          httpOnly: true,
+          sameSite: "strict",
+          secure: true,
+          path: "/"
+        });
       }
     }
   }
