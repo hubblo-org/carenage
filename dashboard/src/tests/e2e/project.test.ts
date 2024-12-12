@@ -62,3 +62,11 @@ test("routes to the selected run page after clicking on the selected run link", 
   });
   await expect(metricSelectionHeading).toBeVisible();
 });
+
+test("routes to a 404 page when navigating to a project route with invalid id", async ({
+  page
+}) => {
+  await page.goto(`/projects/invalid-id`);
+  const error404NotFound = page.getByText("404 Not found");
+  await expect(error404NotFound).toBeVisible();
+});

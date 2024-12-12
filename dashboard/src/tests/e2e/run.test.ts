@@ -23,3 +23,9 @@ test("renders header with a link to the related pipeline for the displayed run p
   await expect(pipelineLink).toBeVisible();
   await expect(pipelineLink).toHaveAttribute("href", `/pipelines/${pipelineId}`);
 });
+
+test("routes to a 404 page when navigating to a run route with invalid id", async ({ page }) => {
+  await page.goto(`/runs/invalid-id`);
+  const error404NotFound = page.getByText("404 Not found");
+  await expect(error404NotFound).toBeVisible();
+});
