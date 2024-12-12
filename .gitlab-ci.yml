@@ -52,6 +52,7 @@ test-carenage-e2e:
   stage: test-e2e
   allow_failure: true
   image: docker:24.0.7
+  allow_failure: true
   variables:
     MANIFEST_PATH: "/builds/hubblo/carenage/carenage/Cargo.toml"
   before_script:
