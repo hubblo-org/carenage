@@ -36,6 +36,18 @@ test-for-merge-request:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
       - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
+dashboard-test-for-merge-request:
+  stage: build-and-test
+  image: node:lts-slim
+  script:
+    - cd dashboard
+    - npm ci
+    - npm run test
+  rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
 test-carenage-e2e:
   stage: test-e2e
   allow_failure: true
@@ -61,4 +73,15 @@ test-carenage-e2e:
     - ./target/debug/carenage-cli stop
   rules:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+test-dashboard-e2e:
+  stage: test-e2e
+  image: mcr.microsoft.com/playwright:v1.49.1-noble
+  script:
+    - npm ci
+    - npx playwright test --retries=2
+  rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
       - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
