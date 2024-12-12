@@ -20,7 +20,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-    profiles: [test] 
+    profiles: [test, prod] 
     networks:
       - carenage
 
@@ -80,6 +80,7 @@ services:
       - boagent
       - scaphandre
       - boaviztapi
+    profiles: [prod]
     networks:
       - carenage
 

@@ -1,4 +1,3 @@
-use chrono::Local;
 use sqlx::postgres::Postgres;
 use sqlx::Row;
 use sqlx::{pool::PoolConnection, postgres::PgRow};
@@ -75,13 +74,11 @@ impl Event {
         &self,
         db_connection: PoolConnection<Postgres>,
     ) -> Result<PgRow, Box<dyn std::error::Error>> {
-        let timestamptz = Local::now();
-        let formatted_query = "INSERT INTO events (timestamp, project_id, workflow_id, pipeline_id, job_id, run_id, task_id, process_id, device_id, event_type) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+        let formatted_query = "INSERT INTO events (project_id, workflow_id, pipeline_id, job_id, run_id, task_id, process_id, device_id, event_type) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
     RETURNING id";
 
         let event_row = sqlx::query(formatted_query)
-            .bind(timestamptz)
             .bind(self.project_id)
             .bind(self.workflow_id)
             .bind(self.pipeline_id)

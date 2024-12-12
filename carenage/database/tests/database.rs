@@ -3,19 +3,20 @@ use std::fs::canonicalize;
 use chrono::{Duration, Local};
 use database::boagent::{deserialize_boagent_json, query_boagent, HardwareData};
 use database::database::{
-    collect_processes,
-    format_hardware_data, get_db_connection_pool, get_project_id,
-    insert_device_metadata, insert_dimension_table_metadata, 
-    update_stop_date,
+    check_process_existence_for_id, collect_processes, format_hardware_data,
+    get_db_connection_pool, get_process_id, get_project_id, insert_device_metadata,
+    insert_dimension_table_metadata, select_metrics_from_dimension,
+    select_project_name_from_dimension, update_stop_date,
 };
 use database::event::{Event, EventType};
 use database::metrics::Metrics;
-use database::timestamp::Timestamp;
 use database::tables::{Process, ProcessBuilder};
+use database::timestamp::Timestamp;
 use dotenv::var;
 use mockito::{Matcher, Server};
 use serde_json::json;
 use sqlx::{PgPool, Row};
+use uuid::uuid;
 mod common;
 
 #[sqlx::test(migrations = "../../db/")]
@@ -36,10 +37,10 @@ async fn it_inserts_valid_data_in_projects_table_in_the_carenage_database(
 
     assert!(insert_query.is_ok());
 
-    let rows = insert_query.unwrap();
-    let project_name: String = rows[0].get("name");
+    let row = insert_query.unwrap();
+    let project_name: String = row.get("name");
     assert_eq!(project_name, project_metadata["name"]);
-    assert_eq!(rows.len(), 1);
+    assert_eq!(row.len(), 4);
     Ok(())
 }
 
@@ -70,8 +71,10 @@ async fn it_inserts_valid_data_for_several_dimension_tables_in_the_carenage_data
             insert_dimension_table_metadata(db_connection, table, dimension_table_metadata.clone())
                 .await;
         assert!(insert_query.is_ok());
-        let rows = insert_query.unwrap();
-        assert_eq!(rows.len(), 1);
+        let row = insert_query.unwrap();
+        let project_name: String = row.get("name");
+        assert_eq!(row.len(), 4);
+        assert_eq!(project_name, dimension_table_metadata["name"]);
     }
 
     Ok(())
@@ -80,15 +83,12 @@ async fn it_inserts_valid_data_for_several_dimension_tables_in_the_carenage_data
 async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage_database(
     pool: PgPool,
 ) -> sqlx::Result<()> {
-    let now_timestamp = Timestamp::ISO8601(Some(Local::now()));
-
     let process = ProcessBuilder::new(
         4336,
         "/snap/firefox/4336/usr/lib/firefox/firefox",
         "/snap/firefox/4336/usr/lib/firefox/firefox-contentproc-childID58-isForBrowser-prefsLen32076-prefMapSize244787-jsInitLen231800-parentBuildID20240527194810-greomni/snap/firefox/4336/
     usr/lib/firefox/omni.ja-appomni/snap/firefox/4336/usr/lib/firefox/browser/omni.ja-appDir/snap/firefox/4336/usr/lib/firefox/browser{1e76e076-a55a-41cf-bf27-94855c01b247}3099truetab",
         "running",
-        now_timestamp, 
     ).build();
 
     let insert_query = Process::insert(&process, pool.acquire().await?).await;
@@ -97,6 +97,45 @@ async fn it_inserts_valid_data_for_the_processes_dimension_table_in_the_carenage
 
     let row = insert_query.unwrap();
     assert_eq!(row.len(), 1);
+    Ok(())
+}
+
+#[sqlx::test(fixtures("../fixtures/metrics.sql"))]
+async fn it_checks_if_process_metadata_is_not_already_present_for_a_given_run(
+    pool: PgPool,
+) -> sqlx::Result<()> {
+    let db_connection = pool.acquire().await?;
+
+    let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
+
+    let process = ProcessBuilder::new(
+        4722,
+        "/usr/local/bin/containerd-shim-runc-v2",
+        "/usr/local/bin/containerd-shim-runc-v2-namespacemoby-idb8822e8c4218ea3e9430f7626dad0905e0f770a24d0e407fffe475d7dadbbb08-address/var/run/docker/containerd/containerd.sock",
+        "running",
+    ).build();
+
+    let check_existing_process_query =
+        check_process_existence_for_id(db_connection, &process, "run", run_id).await;
+
+    assert!(check_existing_process_query.is_ok());
+    assert!(check_existing_process_query.unwrap());
+
+    let not_existing_process = ProcessBuilder::new(
+        1234,
+        "/does/not/exist",
+        "/does/not/exist/i--do--not--exist",
+        "zombie",
+    )
+    .build();
+
+    let db_connection = pool.acquire().await?;
+
+    let check_non_existing_process_query =
+        check_process_existence_for_id(db_connection, &not_existing_process, "run", run_id).await;
+    assert!(check_non_existing_process_query.is_ok());
+    assert!(!check_non_existing_process_query.unwrap());
+
     Ok(())
 }
 
@@ -256,17 +295,16 @@ async fn it_collects_all_processes_from_boagent_response_and_inserts_them_into_d
 
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
 
-    let processes_collection =
-        collect_processes(&deserialized_boagent_response, now_timestamp);
+    let processes_collection = collect_processes(&deserialized_boagent_response);
 
     assert!(processes_collection.is_ok());
 
-    let processes = processes_collection.unwrap(); 
-    for process in processes.unwrap() 
-    {
-    let process_row = Process::insert(&process, pool.acquire().await?);
+    let processes = processes_collection.unwrap();
+    for process in processes.unwrap() {
+        let process_row = Process::insert(&process, pool.acquire().await?);
 
-    assert!(process_row.await.is_ok());}
+        assert!(process_row.await.is_ok());
+    }
     Ok(())
 }
 
@@ -356,6 +394,28 @@ async fn it_gets_project_id_from_projects_table_with_queried_project_name(
 
     Ok(())
 }
+
+#[sqlx::test(fixtures("../fixtures/metrics.sql"))]
+async fn it_gets_process_id_from_processes_table_for_a_given_run_with_pid_and_exe(
+    pool: PgPool,
+) -> sqlx::Result<()> {
+    let db_connection = pool.acquire().await?;
+
+    let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
+
+    let process = ProcessBuilder::new(
+        4722,
+        "/usr/local/bin/containerd-shim-runc-v2",
+        "/usr/local/bin/containerd-shim-runc-v2-namespacemoby-idb8822e8c4218ea3e9430f7626dad0905e0f770a24d0e407fffe475d7dadbbb08-address/var/run/docker/containerd/containerd.sock",
+        "running",
+    ).build();
+    let process_id_query = get_process_id(db_connection, &process, "run", run_id).await;
+
+    assert!(process_id_query.is_ok());
+
+    Ok(())
+}
+
 #[sqlx::test(fixtures("../fixtures/dimensions.sql"))]
 async fn it_inserts_foreign_keys_into_events_table(pool: PgPool) -> sqlx::Result<()> {
     let connection = pool.acquire().await?;
@@ -434,10 +494,10 @@ async fn it_builds_metrics_from_json_values() {
     let metrics = Metrics::build(&process_data, &deserialized_boagent_response);
 
     assert_eq!(metrics.cpu_usage_percentage, 1.1115274);
-    assert_eq!(metrics.memory_usage_bytes, 212635648);
-    assert_eq!(metrics.memory_virtual_usage_bytes, 2866921472);
-    assert_eq!(metrics.disk_usage_read_bytes, 0);
-    assert_eq!(metrics.disk_usage_write_bytes, 0);
+    assert_eq!(metrics.memory_usage_bytes, 212635648_f64);
+    assert_eq!(metrics.memory_virtual_usage_bytes, 2866921472_f64);
+    assert_eq!(metrics.disk_usage_read_bytes, 0 as f64);
+    assert_eq!(metrics.disk_usage_write_bytes, 0 as f64);
     assert_eq!(metrics.average_power_measured_w, 14.94261724369748);
     assert_eq!(metrics.embedded_emissions_kgc02eq, 900_f64);
     assert_eq!(metrics.embedded_abiotic_resources_depletion_kgsbeq, 0.14);
@@ -446,21 +506,21 @@ async fn it_builds_metrics_from_json_values() {
         metrics
             .process_cpu_embedded_impacts
             .unwrap()
-            .gwp_average_impact,
+            .gwp_average_impact_kgc02eq,
         0.38336191697478994
     );
     assert_eq!(
         metrics
             .process_ram_embedded_impacts
             .unwrap()
-            .gwp_average_impact,
+            .gwp_average_impact_kgc02eq,
         6.628147200042126
     );
     assert_eq!(
         metrics
             .process_ssd_embedded_impacts
             .unwrap()
-            .gwp_average_impact,
+            .gwp_average_impact_kgc02eq,
         0.0000021533829645868956
     );
     assert!(metrics.process_hdd_embedded_impacts.is_none());
@@ -521,7 +581,35 @@ async fn it_inserts_metrics_for_an_event_into_metrics_table(pool: PgPool) -> sql
     .unwrap();
 
     let deserialized_boagent_response = deserialize_boagent_json(response).await.unwrap();
-    let metrics = Metrics::build(&common::process_data(), &deserialized_boagent_response).insert(event_id, another_connection).await;
+    let metrics = Metrics::build(&common::process_data(), &deserialized_boagent_response)
+        .insert(event_id, another_connection)
+        .await;
     assert!(metrics.is_ok());
+    Ok(())
+}
+
+#[sqlx::test(fixtures("../fixtures/metrics.sql"))]
+async fn it_selects_all_metrics_associated_with_a_given_run_id(pool: PgPool) -> sqlx::Result<()> {
+    let connection = pool.acquire().await?;
+
+    let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
+
+    let select_query = select_metrics_from_dimension(connection, "run", run_id).await?;
+
+    assert_eq!(select_query.len(), 8970);
+
+    Ok(())
+}
+
+#[sqlx::test(fixtures("../fixtures/metrics.sql"))]
+async fn it_selects_the_project_name_with_a_given_run_id(pool: PgPool) -> sqlx::Result<()> {
+    let connection = pool.acquire().await?;
+
+    let run_id = uuid!("e51076c8-5c47-4a47-a146-04625e77a6ae");
+
+    let select_query = select_project_name_from_dimension(connection, "run", run_id).await?;
+
+    assert_eq!(select_query.get::<&str, &str>("name"), "hubblo/carenage");
+
     Ok(())
 }

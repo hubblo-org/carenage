@@ -20,63 +20,63 @@ pub enum ProcessEmbeddedImpacts {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProcessEmbeddedImpactValues {
-    pub gwp_average_impact: f64,
-    pub gwp_max_impact: f64,
-    pub gwp_min_impact: f64,
-    pub adp_average_impact: f64,
-    pub adp_max_impact: f64,
-    pub adp_min_impact: f64,
-    pub pe_average_impact: f64,
-    pub pe_max_impact: f64,
-    pub pe_min_impact: f64,
+    pub gwp_average_impact_kgc02eq: f64,
+    pub gwp_max_impact_kgc02eq: f64,
+    pub gwp_min_impact_kgc02eq: f64,
+    pub adp_average_impact_kgsbeq: f64,
+    pub adp_max_impact_kgsbeq: f64,
+    pub adp_min_impact_kgsbeq: f64,
+    pub pe_average_impact_mj: f64,
+    pub pe_max_impact_mj: f64,
+    pub pe_min_impact_mj: f64,
 }
 
 impl Metric for ProcessEmbeddedImpacts {
     fn build(&self, component_values: &Value) -> ProcessEmbeddedImpactValues {
         match self {
             ProcessEmbeddedImpacts::Cpu => ProcessEmbeddedImpactValues {
-                gwp_average_impact: component_values["gwp_cpu_average_impact"].as_f64().unwrap(),
-                gwp_max_impact: component_values["gwp_cpu_max_impact"].as_f64().unwrap(),
-                gwp_min_impact: component_values["gwp_cpu_min_impact"].as_f64().unwrap(),
-                adp_average_impact: component_values["adp_cpu_average_impact"].as_f64().unwrap(),
-                adp_max_impact: component_values["adp_cpu_max_impact"].as_f64().unwrap(),
-                adp_min_impact: component_values["adp_cpu_min_impact"].as_f64().unwrap(),
-                pe_average_impact: component_values["pe_cpu_average_impact"].as_f64().unwrap(),
-                pe_max_impact: component_values["pe_cpu_max_impact"].as_f64().unwrap(),
-                pe_min_impact: component_values["pe_cpu_min_impact"].as_f64().unwrap(),
+                gwp_average_impact_kgc02eq: component_values["gwp_cpu_average_impact"].as_f64().unwrap(),
+                gwp_max_impact_kgc02eq: component_values["gwp_cpu_max_impact"].as_f64().unwrap(),
+                gwp_min_impact_kgc02eq: component_values["gwp_cpu_min_impact"].as_f64().unwrap(),
+                adp_average_impact_kgsbeq: component_values["adp_cpu_average_impact"].as_f64().unwrap(),
+                adp_max_impact_kgsbeq: component_values["adp_cpu_max_impact"].as_f64().unwrap(),
+                adp_min_impact_kgsbeq: component_values["adp_cpu_min_impact"].as_f64().unwrap(),
+                pe_average_impact_mj: component_values["pe_cpu_average_impact"].as_f64().unwrap(),
+                pe_max_impact_mj: component_values["pe_cpu_max_impact"].as_f64().unwrap(),
+                pe_min_impact_mj: component_values["pe_cpu_min_impact"].as_f64().unwrap(),
             },
             ProcessEmbeddedImpacts::Ram => ProcessEmbeddedImpactValues {
-                gwp_average_impact: component_values["gwp_ram_average_impact"].as_f64().unwrap(),
-                gwp_max_impact: component_values["gwp_ram_max_impact"].as_f64().unwrap(),
-                gwp_min_impact: component_values["gwp_ram_min_impact"].as_f64().unwrap(),
-                adp_average_impact: component_values["adp_ram_average_impact"].as_f64().unwrap(),
-                adp_max_impact: component_values["adp_ram_max_impact"].as_f64().unwrap(),
-                adp_min_impact: component_values["adp_ram_min_impact"].as_f64().unwrap(),
-                pe_average_impact: component_values["pe_ram_average_impact"].as_f64().unwrap(),
-                pe_max_impact: component_values["pe_ram_max_impact"].as_f64().unwrap(),
-                pe_min_impact: component_values["pe_ram_min_impact"].as_f64().unwrap(),
+                gwp_average_impact_kgc02eq: component_values["gwp_ram_average_impact"].as_f64().unwrap(),
+                gwp_max_impact_kgc02eq: component_values["gwp_ram_max_impact"].as_f64().unwrap(),
+                gwp_min_impact_kgc02eq: component_values["gwp_ram_min_impact"].as_f64().unwrap(),
+                adp_average_impact_kgsbeq: component_values["adp_ram_average_impact"].as_f64().unwrap(),
+                adp_max_impact_kgsbeq: component_values["adp_ram_max_impact"].as_f64().unwrap(),
+                adp_min_impact_kgsbeq: component_values["adp_ram_min_impact"].as_f64().unwrap(),
+                pe_average_impact_mj: component_values["pe_ram_average_impact"].as_f64().unwrap(),
+                pe_max_impact_mj: component_values["pe_ram_max_impact"].as_f64().unwrap(),
+                pe_min_impact_mj: component_values["pe_ram_min_impact"].as_f64().unwrap(),
             },
             ProcessEmbeddedImpacts::Ssd => ProcessEmbeddedImpactValues {
-                gwp_average_impact: component_values["gwp_ssd_average_impact"].as_f64().unwrap(),
-                gwp_max_impact: component_values["gwp_ssd_max_impact"].as_f64().unwrap(),
-                gwp_min_impact: component_values["gwp_ssd_min_impact"].as_f64().unwrap(),
-                adp_average_impact: component_values["adp_ssd_average_impact"].as_f64().unwrap(),
-                adp_max_impact: component_values["adp_ssd_max_impact"].as_f64().unwrap(),
-                adp_min_impact: component_values["adp_ssd_min_impact"].as_f64().unwrap(),
-                pe_average_impact: component_values["pe_ssd_average_impact"].as_f64().unwrap(),
-                pe_max_impact: component_values["pe_ssd_max_impact"].as_f64().unwrap(),
-                pe_min_impact: component_values["pe_ssd_min_impact"].as_f64().unwrap(),
+                gwp_average_impact_kgc02eq: component_values["gwp_ssd_average_impact"].as_f64().unwrap(),
+                gwp_max_impact_kgc02eq: component_values["gwp_ssd_max_impact"].as_f64().unwrap(),
+                gwp_min_impact_kgc02eq: component_values["gwp_ssd_min_impact"].as_f64().unwrap(),
+                adp_average_impact_kgsbeq: component_values["adp_ssd_average_impact"].as_f64().unwrap(),
+                adp_max_impact_kgsbeq: component_values["adp_ssd_max_impact"].as_f64().unwrap(),
+                adp_min_impact_kgsbeq: component_values["adp_ssd_min_impact"].as_f64().unwrap(),
+                pe_average_impact_mj: component_values["pe_ssd_average_impact"].as_f64().unwrap(),
+                pe_max_impact_mj: component_values["pe_ssd_max_impact"].as_f64().unwrap(),
+                pe_min_impact_mj: component_values["pe_ssd_min_impact"].as_f64().unwrap(),
             },
             ProcessEmbeddedImpacts::Hdd => ProcessEmbeddedImpactValues {
-                gwp_average_impact: component_values["gwp_hdd_average_impact"].as_f64().unwrap(),
-                gwp_max_impact: component_values["gwp_hdd_max_impact"].as_f64().unwrap(),
-                gwp_min_impact: component_values["gwp_hdd_min_impact"].as_f64().unwrap(),
-                adp_average_impact: component_values["adp_hdd_average_impact"].as_f64().unwrap(),
-                adp_max_impact: component_values["adp_hdd_max_impact"].as_f64().unwrap(),
-                adp_min_impact: component_values["adp_hdd_min_impact"].as_f64().unwrap(),
-                pe_average_impact: component_values["pe_hdd_average_impact"].as_f64().unwrap(),
-                pe_max_impact: component_values["pe_hdd_max_impact"].as_f64().unwrap(),
-                pe_min_impact: component_values["pe_hdd_min_impact"].as_f64().unwrap(),
+                gwp_average_impact_kgc02eq: component_values["gwp_hdd_average_impact"].as_f64().unwrap(),
+                gwp_max_impact_kgc02eq: component_values["gwp_hdd_max_impact"].as_f64().unwrap(),
+                gwp_min_impact_kgc02eq: component_values["gwp_hdd_min_impact"].as_f64().unwrap(),
+                adp_average_impact_kgsbeq: component_values["adp_hdd_average_impact"].as_f64().unwrap(),
+                adp_max_impact_kgsbeq: component_values["adp_hdd_max_impact"].as_f64().unwrap(),
+                adp_min_impact_kgsbeq: component_values["adp_hdd_min_impact"].as_f64().unwrap(),
+                pe_average_impact_mj: component_values["pe_hdd_average_impact"].as_f64().unwrap(),
+                pe_max_impact_mj: component_values["pe_hdd_max_impact"].as_f64().unwrap(),
+                pe_min_impact_mj: component_values["pe_hdd_min_impact"].as_f64().unwrap(),
             },
         }
     }
@@ -98,10 +98,10 @@ pub struct Metrics {
     #[serde(flatten, with = "prefix_hdd")]
     pub process_hdd_embedded_impacts: Option<ProcessEmbeddedImpactValues>,
     pub cpu_usage_percentage: f64,
-    pub memory_usage_bytes: u64,
-    pub memory_virtual_usage_bytes: u64,
-    pub disk_usage_write_bytes: u64,
-    pub disk_usage_read_bytes: u64,
+    pub memory_usage_bytes: f64,
+    pub memory_virtual_usage_bytes: f64,
+    pub disk_usage_write_bytes: f64,
+    pub disk_usage_read_bytes: f64,
     pub total_operational_emission_kgc02eq: f64,
     pub total_operational_abiotic_resources_depletion_kgsbeq: f64,
     pub total_primary_energy_consumed_mj: f64,
@@ -172,28 +172,28 @@ impl Metrics {
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()
+                .parse::<f64>()
                 .unwrap(),
             memory_virtual_usage_bytes: resources
                 .get("memory_virtual_usage")
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()
+                .parse::<f64>()
                 .unwrap(),
             disk_usage_write_bytes: resources
                 .get("disk_usage_write")
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()
+                .parse::<f64>()
                 .unwrap(),
             disk_usage_read_bytes: resources
                 .get("disk_usage_read")
                 .unwrap()
                 .as_str()
                 .unwrap()
-                .parse::<u64>()
+                .parse::<f64>()
                 .unwrap(),
             total_operational_emission_kgc02eq: boagent_response["total_operational_emissions"]
                 ["value"]["value"]
@@ -324,19 +324,19 @@ mod tests {
             .build(&data["process_embedded_impacts"]["process_hdd_embedded_impact_values"]);
 
         assert_eq!(
-            process_cpu_embedded_impacts.gwp_average_impact,
+            process_cpu_embedded_impacts.gwp_average_impact_kgc02eq,
             0.38336191697478994
         );
         assert_eq!(
-            process_ram_embedded_impacts.gwp_average_impact,
+            process_ram_embedded_impacts.gwp_average_impact_kgc02eq,
             6.628147200042126
         );
         assert_eq!(
-            process_ssd_embedded_impacts.gwp_average_impact,
+            process_ssd_embedded_impacts.gwp_average_impact_kgc02eq,
             0.0000021533829645868956
         );
         assert_eq!(
-            process_hdd_embedded_impacts.gwp_average_impact,
+            process_hdd_embedded_impacts.gwp_average_impact_kgc02eq,
             0.0000021533829645868956
         );
     }
