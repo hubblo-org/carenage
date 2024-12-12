@@ -1,0 +1,83 @@
+:root {
+  --gray-100: #c2c2c9;
+
+  --blue-100: #e5f0fa;
+  --blue-200: #0066cc;
+
+  --main-font-family: "Lexend";
+  --main-font-weight: 400;
+  --main-font-style: normal;
+  --fallback-font-family: "Noto";
+}
+
+@font-face {
+  font-family: "Lexend";
+  src: url("/fonts/Lexend-Regular.ttf");
+}
+
+body {
+  font-family: var(--main-font-family), var(--fallback-font-family);
+  font-weight: 400;
+  font-style: normal;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+}
+
+header,
+section,
+label,
+.wrapper {
+  padding: 12px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--gray-100);
+}
+
+header,
+section {
+  background-color: var(--blue-100);
+}
+
+header:hover,
+section:hover {
+  color: white;
+
+  background-color: var(--blue-200);
+}
+
+header:hover a,
+section:hover a {
+  color: white;
+  text-decoration-color: white;
+}
+
+header:hover label,
+section:hover label {
+  color: black;
+  background-color: white;
+}
+
+caption {
+  border: 3px solid black;
+}
+
+th {
+  border: 2px solid black;
+}
+
+td {
+  border: 1px solid black;
+}
+
+.wrapper section {
+  width: 500px;
+  height: 300px;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: space-around;
+}
