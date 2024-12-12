@@ -80,6 +80,7 @@ test-dashboard-e2e:
   stage: test-e2e
   image: mcr.microsoft.com/playwright:v1.49.1-noble
   script:
+    - cd dashboard
     - npm ci
     - npx playwright test --retries=2
   rules:
