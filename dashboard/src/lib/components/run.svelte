@@ -14,7 +14,7 @@
 
   let processSelected = $state(run.processes[0].process.process_pid);
   let metricSelected = $state(metricsNames[0]);
-  let formatted_run_duration = formatDuration(run.duration);
+  let formattedRunDuration = formatDuration(run.duration);
   let metricUnit = $derived(getMetricUnit(metricSelected));
 
   let metricValues = $derived.by(() => {
@@ -52,7 +52,7 @@
         <a href={run.run_repo_url}> Run #{run.run_repo_id}</a>
       </div>
       <div>
-        <p>Run executed in {formatted_run_duration}</p>
+        <p>Run executed in {formattedRunDuration}</p>
         <p><b>Job</b>: {run.job_name}</p>
         <p><b>Processes registered</b>: {numberOfRegisteredProcesses}</p>
         <p><b>Run status</b>: {run.job_status}</p>
