@@ -17,4 +17,6 @@ COPY . .
 
 EXPOSE $PORT
 
-CMD ["npm", "run", "build"]
+RUN npm run build
+
+CMD ["node", "build"]
