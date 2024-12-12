@@ -15,7 +15,19 @@ export const handlers = [
   http.get(`${carenageApiBaseUrl}/projects/${projectId}`, () => {
     return HttpResponse.json(project);
   }),
-  http.get(`${carenageApiBaseUrl}/projects/invalid_id`, () => {
+  http.get(`${carenageApiBaseUrl}/projects/invalid-id`, () => {
+    return new HttpResponse(null, {
+      status: 404,
+      statusText: "Not found"
+    });
+  }),
+  http.get(`${carenageApiBaseUrl}/runs/invalid-id`, () => {
+    return new HttpResponse(null, {
+      status: 404,
+      statusText: "Not found"
+    });
+  }),
+  http.get(`${carenageApiBaseUrl}/pipelines/invalid-id`, () => {
     return new HttpResponse(null, {
       status: 404,
       statusText: "Not found"
