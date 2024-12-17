@@ -38,11 +38,12 @@
   }
   nav {
     display: flex;
-    width: 50%;
+    width: 70%;
     justify-content: space-around;
   }
   nav a {
     text-decoration: none;
+    border: 2px solid black;
     padding: 12px;
     display: flex;
     align-items: center;
