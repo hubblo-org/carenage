@@ -28,6 +28,7 @@ COPY --from=cacher /carenage/target target
 COPY --from=cacher $CARGO_HOME $CARGO_HOME
 RUN cargo build --manifest-path /carenage/carenage-cli/Cargo.toml --release --target x86_64-unknown-linux-musl
 RUN cargo build --manifest-path /carenage/carenaged/Cargo.toml --release --target x86_64-unknown-linux-musl
+RUN cargo build --manifest-path /carenage/api/Cargo.toml --release --target x86_64-unknown-linux-musl
 
 FROM alpine:3.19 AS runtime
 
@@ -35,5 +36,6 @@ WORKDIR carenage
 
 COPY --from=builder /carenage/target/x86_64-unknown-linux-musl/release/carenage-cli /usr/local/bin
 COPY --from=builder /carenage/target/x86_64-unknown-linux-musl/release/carenaged /usr/local/bin
+COPY --from=builder /carenage/target/x86_64-unknown-linux-musl/release/api /usr/local/bin
 
-ENTRYPOINT ["/usr/local/bin/carenage-cli", "start"]
+CMD ["/usr/local/bin/carenage-cli", "start"]
