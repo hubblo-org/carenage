@@ -26,8 +26,7 @@ export function formatDate(date: string) {
 
 export function formatTime(date: string) {
   const str_to_date = new Date(date);
-  const formattedTime = str_to_date.toTimeString();
-  return formattedTime;
+  return str_to_date;
 }
 
 export function isUUID(uuid: string): uuid is UUID {
