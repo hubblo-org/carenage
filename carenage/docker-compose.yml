@@ -20,7 +20,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-    profiles: [test, prod] 
+    profiles: [test, dev, prod] 
     networks:
       - carenage
 
@@ -66,7 +66,7 @@ services:
     networks:
       - carenage 
 
-  carenage:
+  daemon:
     build:
       context: .
     environment:
@@ -84,12 +84,33 @@ services:
     networks:
       - carenage
 
+  api:
+    build: 
+      context: .
+    environment:
+      DATABASE_URL: "postgres://carenage:password@database:5432/carenage"
+      PROJECT_NAME: "hubblo/carenage"
+      BOAGENT_URL: "http://boagent:8000"
+      LOCATION: "FRA"
+      LIFETIME: 5
+    depends_on:
+      - database
+      - boagent
+      - scaphandre
+      - boaviztapi
+    ports:
+      - "3000:3000"
+    profiles: [dev, prod]
+    command: ["/usr/local/bin/api"] 
+    networks:
+      - carenage
+
   dashboard:
     build:
      context: ../dashboard
     ports:
       - "5173:5173"
-    profiles: [prod]
+    profiles: [dev, prod]
     networks:
       - carenage
 
