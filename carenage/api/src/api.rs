@@ -1,6 +1,6 @@
 use axum::extract::Request;
 use axum::Extension;
-use axum::{debug_handler, extract::Path, http::Uri, response::Json, routing::get, Router};
+use axum::{debug_handler, extract::Path, response::Json, routing::get, Router};
 use chrono::{DateTime, Local};
 use database::database::{
     select_metrics_from_dimension, select_project_name_from_dimension, Record,
@@ -129,7 +129,7 @@ pub async fn get_dimension(
 
 pub fn app() -> Router {
     Router::new()
-        .route("/", get(|| async { "Welcome to the Carenage API!" }))
+        .route("/", get(|| async { "Welcome to the Carenage API!\n" }))
         .route("/runs/:run_id", get(get_dimension))
         .route("/projects/:project_id", get(get_dimension))
         .route("/workflows/:workflow_id", get(get_dimension))
