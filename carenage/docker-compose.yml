@@ -20,7 +20,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-    profiles: [test, dev, prod] 
+    profiles: [dev, prod] 
     networks:
       - carenage
 
@@ -108,7 +108,7 @@ services:
     image: hubblo/carenage-dashboard:dev
     ports:
       - "5173:5173"
-    profiles: [dev, prod]
+    profiles: [prod]
     networks:
       - carenage
 
