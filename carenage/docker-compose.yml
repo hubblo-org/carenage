@@ -67,8 +67,7 @@ services:
       - carenage 
 
   daemon:
-    build:
-      context: .
+    image: hubblo/carenage:dev
     environment:
       DATABASE_URL: "postgres://carenage:password@database:5432/carenage"
       PROJECT_NAME: "hubblo/carenage"
@@ -81,6 +80,7 @@ services:
       - scaphandre
       - boaviztapi
     profiles: [prod]
+    command: ["/usr/local/bin/carenage-cli", "start"]
     networks:
       - carenage
 
@@ -100,7 +100,6 @@ services:
     ports:
       - "3000:3000"
     profiles: [dev, prod]
-    command: ["/usr/local/bin/api"] 
     networks:
       - carenage
 
