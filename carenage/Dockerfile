@@ -38,4 +38,4 @@ COPY --from=builder /carenage/target/x86_64-unknown-linux-musl/release/carenage-
 COPY --from=builder /carenage/target/x86_64-unknown-linux-musl/release/carenaged /usr/local/bin
 COPY --from=builder /carenage/target/x86_64-unknown-linux-musl/release/api /usr/local/bin
 
-CMD ["/usr/local/bin/carenage-cli", "start"]
+CMD ["/usr/local/bin/api"]
