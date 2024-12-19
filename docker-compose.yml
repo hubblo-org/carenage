@@ -10,7 +10,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ../db:/docker-entrypoint-initdb.d
+      - ./db:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: carenage
@@ -113,7 +113,7 @@ services:
 
   dashboard-dev:
     build:
-      context: ../dashboard
+      context: ./dashboard
       target: builder
     ports: 
       - "5173:5173"
