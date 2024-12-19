@@ -10,7 +10,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ../db:/docker-entrypoint-initdb.d
+      - ./db:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: carenage
@@ -20,7 +20,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-    profiles: [test, prod] 
+    profiles: [dev, prod] 
     networks:
       - carenage
 
@@ -66,9 +66,8 @@ services:
     networks:
       - carenage 
 
-  carenage:
-    build:
-      context: .
+  daemon:
+    image: hubblo/carenage:dev
     environment:
       DATABASE_URL: "postgres://carenage:password@database:5432/carenage"
       PROJECT_NAME: "hubblo/carenage"
@@ -81,6 +80,48 @@ services:
       - scaphandre
       - boaviztapi
     profiles: [prod]
+    command: ["/usr/local/bin/carenage-cli", "start"]
+    networks:
+      - carenage
+
+  api:
+    image: hubblo/carenage:dev
+    environment:
+      DATABASE_URL: "postgres://carenage:password@database:5432/carenage"
+      PROJECT_NAME: "hubblo/carenage"
+      BOAGENT_URL: "http://boagent:8000"
+      LOCATION: "FRA"
+      LIFETIME: 5
+    depends_on:
+      - database
+      - boagent
+      - scaphandre
+      - boaviztapi
+    ports:
+      - "3000:3000"
+    profiles: [dev, prod]
+    networks:
+      - carenage
+
+  dashboard:
+    image: hubblo/carenage-dashboard:dev
+    ports:
+      - "5173:5173"
+    profiles: [prod]
+    networks:
+      - carenage
+
+  dashboard-dev:
+    build:
+      context: ./dashboard
+      target: builder
+    ports: 
+      - "5173:5173"
+    profiles: [dev]
+    volumes: 
+      - ../dashboard:/dashboard
+      - /dashboard/node_modules
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
     networks:
       - carenage
 
