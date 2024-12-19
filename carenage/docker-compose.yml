@@ -111,6 +111,20 @@ services:
     networks:
       - carenage
 
+  dashboard-dev:
+    build:
+      context: ../dashboard
+      target: builder
+    ports: 
+      - "5173:5173"
+    profiles: [dev]
+    volumes: 
+      - ../dashboard:/dashboard
+      - /dashboard/node_modules
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    networks:
+      - carenage
+
 
 volumes:
   powerdata: {}
