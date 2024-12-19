@@ -20,8 +20,114 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+    profiles: [dev, prod] 
     networks:
       - carenage
+
+  boagent:
+    image: ghcr.io/boavizta/boagent:0.1.1 
+    environment:
+      BOAVIZTAPI_ENDPOINT: "http://boaviztapi:5000"
+      DEFAULT_LIFETIME: 5.0
+      HARDWARE_FILE_PATH: "/home/boagent/hardware_data.json"
+      POWER_FILE_PATH: "/app/data/power_data.json"
+    privileged: true
+    depends_on:
+      - boaviztapi
+      - scaphandre
+    ports:
+      - "8000:8000"
+    networks:
+      - carenage 
+    volumes:
+      - "/proc:/proc"
+      - "/sys:/sys:ro"
+      - "powerdata:/app/data:ro"
+
+  scaphandre:
+    image: hubblo/scaphandre:dev
+    privileged: true
+    volumes:
+      - type: bind
+        source: /proc
+        target: /proc
+      - type: bind
+        source: /sys/class/powercap
+        target: /sys/class/powercap
+      - "powerdata:/app/data:rw"
+    command: [ "--no-header", "json", "-s", "10", "--resources", "-f", "/app/data/power_data.json" ]
+    networks:
+      - carenage
+
+  boaviztapi:
+    image: ghcr.io/boavizta/boaviztapi:1.2.2
+    ports:
+      - "5000:5000"
+    networks:
+      - carenage 
+
+  daemon:
+    image: hubblo/carenage:dev
+    environment:
+      DATABASE_URL: "postgres://carenage:password@database:5432/carenage"
+      PROJECT_NAME: "hubblo/carenage"
+      BOAGENT_URL: "http://boagent:8000"
+      LOCATION: "FRA"
+      LIFETIME: 5
+    depends_on:
+      - database
+      - boagent
+      - scaphandre
+      - boaviztapi
+    profiles: [prod]
+    command: ["/usr/local/bin/carenage-cli", "start"]
+    networks:
+      - carenage
+
+  api:
+    image: hubblo/carenage:dev
+    environment:
+      DATABASE_URL: "postgres://carenage:password@database:5432/carenage"
+      PROJECT_NAME: "hubblo/carenage"
+      BOAGENT_URL: "http://boagent:8000"
+      LOCATION: "FRA"
+      LIFETIME: 5
+    depends_on:
+      - database
+      - boagent
+      - scaphandre
+      - boaviztapi
+    ports:
+      - "3000:3000"
+    profiles: [dev, prod]
+    networks:
+      - carenage
+
+  dashboard:
+    image: hubblo/carenage-dashboard:dev
+    ports:
+      - "5173:5173"
+    profiles: [prod]
+    networks:
+      - carenage
+
+  dashboard-dev:
+    build:
+      context: ./dashboard
+      target: builder
+    ports: 
+      - "5173:5173"
+    profiles: [dev]
+    volumes: 
+      - ../dashboard:/dashboard
+      - /dashboard/node_modules
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    networks:
+      - carenage
+
+
+volumes:
+  powerdata: {}
 
 networks:
   carenage:

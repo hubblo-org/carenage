@@ -1,0 +1,91 @@
+stages:
+  - test
+  - build-and-test
+  - test-e2e
+
+include:
+- template: Jobs/SAST.gitlab-ci.yml
+
+semgrep-sast:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      exists:
+        - '**/*.rs'
+
+test-for-merge-request:
+  stage: build-and-test
+  services: 
+    - postgres
+  variables:
+    POSTGRES_DB: carenage 
+    POSTGRES_USER: carenage 
+    POSTGRES_HOST_AUTH_METHOD: trust
+  image: rust:latest
+  script: 
+    - export DATABASE_URL="postgresql://carenage@postgres:5432/carenage" 
+    - cd carenage
+    - printf "BOAGENT_URL='http://127.0.0.1/8000/'\nPROJECT_NAME=carenage_webapp\nLOCATION=FRA\nLIFETIME=5" >> .env
+    - cd database
+    - cargo test --verbose
+    - cd ../carenaged
+    - cargo test --verbose -- --test-threads=1
+    - cd ../api
+    - cargo test --verbose
+
+  rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+dashboard-test-for-merge-request:
+  stage: build-and-test
+  image: node:lts-slim
+  script:
+    - cd dashboard
+    - npm ci
+    - npm run test
+  rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+test-carenage-e2e:
+  stage: test-e2e
+  allow_failure: true
+  image: docker:24.0.7
+  allow_failure: true
+  variables:
+    MANIFEST_PATH: "/builds/hubblo/carenage/carenage/Cargo.toml"
+  before_script:
+    - docker info
+  script: 
+    - apk update 
+    - apk add curl gcc libressl-dev musl-dev pkgconf 
+    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    - . "$HOME/.cargo/env"
+    - cargo build --manifest-path $MANIFEST_PATH
+    - cargo build --manifest-path $MANIFEST_PATH -p carenaged
+    - cargo build --manifest-path $MANIFEST_PATH -p carenage-cli
+    - docker compose -f docker-compose.yml --profile test up -d
+    - export POSTGRES_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' carenage-database-1)
+    - cd carenage
+    - printf "DATABASE_URL='postgresql://carenage:password@$POSTGRES_IP:5432'\nBOAGENT_URL='http://127.0.0.1/8000/'\nPROJECT_NAME=carenage_webapp\nLOCATION=FRA\nLIFETIME=5\n" >> .env
+    - RUST_LOG="info" ./target/debug/carenage-cli start &
+    - sleep 10
+    - ./target/debug/carenage-cli stop
+  rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+test-dashboard-e2e:
+  stage: test-e2e
+  image: mcr.microsoft.com/playwright:v1.49.1-noble
+  script:
+    - cd dashboard
+    - npm ci
+    - npx playwright test --retries=2
+  rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
