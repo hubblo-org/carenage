@@ -1,10 +1,13 @@
-component_tests:
+component_test:
 	@echo "Running components' tests with Vitest"
 	npm test
 
-e2e_tests:
+e2e_test:
 	@echo "Running end-to-end tests with Playwright"
 	npx playwright test
+
+install: 
+	npm install
 
 build_prod:
 	@echo "Building production executable"
