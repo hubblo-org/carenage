@@ -7,19 +7,20 @@ LABEL org.opencontainers.image.description="Docker image for the dashboard for m
 LABEL org.opencontainers.image.licenses=Apache-2.0
 LABEL org.opencontainers.image.title="carenage-dashboard"
 
+EXPOSE $PORT
 WORKDIR /dashboard
 COPY package.json package-lock.json .
 RUN npm ci 
 COPY . .
 RUN npm run build
-RUN npm prune --production
 
 FROM node:22-alpine AS runtime
 
 WORKDIR /dashboard
+
+RUN npm prune --production
 COPY --from=builder /dashboard/build build/ 
 COPY --from=builder /dashboard/node_modules node_modules/
 COPY package.json .
-EXPOSE $PORT
 ENV NODE_ENV=production
 CMD ["node", "build"]
