@@ -26,18 +26,22 @@ build_release:
 
 compose_dev:
 	@echo "Launching Docker development environment orchestration"
+	@cd ..
 	@docker compose --profile dev up -d
 
 compose_prod:
 	@echo "Launching Docker production environment orchestration"
+	@cd ..
 	@docker compose --profile prod up -d
 
 compose_dev_stop:
 	@echo "Stopping Docker development environment orchestration"
+	@cd ..
 	@docker compose --profile dev down
 
 compose_prod_stop:
 	@echo "Stopping Docker production environment orchestration"
+	@cd ..
 	@docker compose --profile prod down
 
 install_debug:
