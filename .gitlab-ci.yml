@@ -30,6 +30,8 @@ test-for-merge-request:
     - cargo test --verbose
     - cd ../carenaged
     - cargo test --verbose -- --test-threads=1
+    - cd ../api
+    - cargo test --verbose
 
   rules:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
