@@ -24,6 +24,22 @@ build_release:
 	@echo "Building binary for Carenage CLI"
 	@cargo build --manifest-path $(CARENAGE_CLI_CARGO) --release
 
+compose_dev:
+	@echo "Launching Docker development environment orchestration"
+	@docker compose --profile dev up -d
+
+compose_prod:
+	@echo "Launching Docker production environment orchestration"
+	@docker compose --profile prod up -d
+
+compose_dev_stop:
+	@echo "Stopping Docker development environment orchestration"
+	@docker compose --profile dev down
+
+compose_prod_stop:
+	@echo "Stopping Docker production environment orchestration"
+	@docker compose --profile prod down
+
 install_debug:
 	@echo "Installing debug binaries"
 	@cp target/debug/api $(PREFIX)/
