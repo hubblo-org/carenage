@@ -6,7 +6,7 @@
 
 ## Development
 
-### Backend
+### Back-end
 
 The `carenage` project is divided into several packages, with three binaries (`api`, `carenaged`, `carenage-cli`) and one library (`database`).
 
@@ -25,7 +25,7 @@ With `rust` and `cargo` installed:
 
 ```
 cd carenage
-make build
+make build_debug
 ```
 
 #### Testing
@@ -36,3 +36,35 @@ Unit and integrations tests are implemented for the different packages of the pr
 cd carenage
 make test
 ``` 
+
+Some tests need a Postgres database set up to apply migrations and fixtures. If you have Docker installed, `make compose_dev` will set up the development / testing environment.
+
+### Front-end
+
+#### Setup
+
+With `npm` installed, you can do 
+
+```
+cd dashboard
+make install
+```
+
+to setup needed dependencies for the project. Then, with `make run_dev`, this will launch the server for the dashboard.
+
+#### Testing
+
+Unit and integration tests are executed with 
+```
+cd dashboard
+make component_test
+```
+
+end-to-end tests with 
+```
+cd dashboard
+make e2e_test
+```
+
+For integration testing and mocking responses from external services like `Boagent`, [msw](https://mswjs.io/) is used. You can add handlers for specific
+URLs in `src/mocks/handlers.ts`. In a development environment, those will be able to handle fetching valid URLs by the server code, and render data on the adequate pages. Handlers work either in the browser and in a Node environment.
