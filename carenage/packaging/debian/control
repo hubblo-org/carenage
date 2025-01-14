@@ -1,0 +1,7 @@
+Package: carenage
+Version: 0.1.0
+Section: utils
+Maintainer: Hubblo <contact@hubblo.org>
+Description: Continuous integration tool to assess the environmental
+ impacts and energy consumption of an application in development.
+Architecture: amd64
