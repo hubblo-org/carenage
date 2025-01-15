@@ -95,7 +95,7 @@ debian-amd64-package:
   image: rust:slim-bullseye
   artifacts:
     paths:
-      - carenage/packaging/*.deb
+      - carenage/*.deb
   script:
     - apt update && apt install -y pkg-config libssl-dev debhelper
     - cd carenage/packaging
