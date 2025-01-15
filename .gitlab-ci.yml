@@ -93,6 +93,9 @@ test-dashboard-e2e:
 debian-amd64-package:
   stage: packaging
   image: rust:slim-bullseye
+  artifacts:
+    paths:
+      - carenage/packaging/debian/*.deb
   variables: 
     CLI_MANIFEST_PATH: "carenage/carenage-cli/Cargo.toml"
     DAEMON_MANIFEST_PATH: "carenage/carenaged/Cargo.toml"
