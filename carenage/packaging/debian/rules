@@ -14,7 +14,7 @@ binary:
 	mkdir -p debian/carenage
 	mkdir -p debian/carenage/usr/bin
 	mkdir -p debian/carenage/usr/share/doc/carenage
-	gzip -9 debian/changelog > changelog.Debian.gz
+	gzip -c -9 debian/changelog > changelog.Debian.gz
 	mv ../target/release/carenage-cli ../target/release/carenage
 	cp ../target/release/carenage ../target/release/carenaged debian/carenage/usr/bin
 	cp debian/copyright debian/carenage/usr/share/doc/carenage
