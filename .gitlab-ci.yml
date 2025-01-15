@@ -95,10 +95,10 @@ debian-amd64-package:
   image: rust:slim-bullseye
   artifacts:
     paths:
-      - carenage/packaging/debian/*.deb
+      - carenage/packaging/*.deb
   script:
     - apt update && apt install -y pkg-config libssl-dev debhelper
-    - cd packaging
+    - cd carenage/packaging
     - dpkg-buildpackage -b 
   rules:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
