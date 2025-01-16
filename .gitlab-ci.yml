@@ -53,7 +53,6 @@ dashboard-test-for-merge-request:
 
 test-carenage-e2e:
   stage: test-e2e
-  allow_failure: true
   image: docker:24.0.7
   variables:
     MANIFEST_PATH: "/builds/hubblo/carenage/carenage/Cargo.toml"
@@ -79,7 +78,6 @@ test-carenage-e2e:
   rules:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
       - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      - if: $CI_PIPELINE_SOURCE == "push"
 
 test-dashboard-e2e:
   stage: test-e2e
@@ -105,4 +103,3 @@ debian-amd64-package:
     - dpkg-buildpackage -b 
   rules:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
-      - if: $CI_PIPELINE_SOURCE == "push"
