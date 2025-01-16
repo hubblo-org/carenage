@@ -1,4 +1,5 @@
 target/
 debug/
 
-
+*.deb
+*.gz

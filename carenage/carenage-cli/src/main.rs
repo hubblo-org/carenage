@@ -35,7 +35,7 @@ fn main() {
                 start_timestamp.to_string()
             );
 
-            let carenaged = Command::new("/usr/local/bin/carenaged")
+            let carenaged = Command::new("/usr/bin/carenaged")
                 .arg(args.step.to_string())
                 .arg(start_timestamp.to_string())
                 .arg(cli.unix.to_string())

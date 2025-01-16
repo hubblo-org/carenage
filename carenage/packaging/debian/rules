@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+
+CARENAGED_CARGO=../carenaged/Cargo.toml
+CARENAGE_CLI_CARGO=../carenage-cli/Cargo.toml
+
+clean:
+	cargo clean
+
+build:
+	cargo build --manifest-path $(CARENAGED_CARGO) --release
+	cargo build --manifest-path $(CARENAGE_CLI_CARGO) --release
+
+binary:
+	mkdir -p debian/carenage
+	mkdir -p debian/carenage/usr/bin
+	mkdir -p debian/carenage/usr/share/doc/carenage
+	gzip -c -9 debian/changelog > changelog.Debian.gz
+	mv ../target/release/carenage-cli ../target/release/carenage
+	cp ../target/release/carenage ../target/release/carenaged debian/carenage/usr/bin
+	cp debian/copyright debian/carenage/usr/share/doc/carenage
+	mv changelog.Debian.gz debian/carenage/usr/share/doc/carenage
+	objcopy --strip-debug --strip-unneeded debian/carenage/usr/bin/carenage
+	objcopy --strip-debug --strip-unneeded debian/carenage/usr/bin/carenaged
+	dh_gencontrol
+	dh_builddeb
