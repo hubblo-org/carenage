@@ -1,0 +1,13 @@
+Source: carenage
+Section: utils 
+Priority: optional
+Maintainer: Hubblo <contact@hubblo.org>
+Build-Depends: debhelper (>= 13), libssl-dev, pkg-config
+
+Package: carenage
+Version: 0.1.0
+Architecture: amd64 
+Description:  Continuous integration tool to assess the environmental
+ impacts and energy consumption of an application in 
+ development.
+Homepage: https://gitlab.com/hubblo/carenage 
