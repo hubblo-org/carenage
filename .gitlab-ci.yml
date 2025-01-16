@@ -67,8 +67,8 @@ test-carenage-e2e:
     - cargo build --manifest-path $MANIFEST_PATH
     - cargo build --manifest-path $MANIFEST_PATH -p carenaged
     - cargo build --manifest-path $MANIFEST_PATH -p carenage-cli
-    - mv target/debug/carenage-cli target/debug/carenage
-    - mv target/debug/carenage target/debug/carenaged /usr/bin 
+    - mv carenage/target/debug/carenage-cli carenage/target/debug/carenage
+    - mv carenage/target/debug/carenage carenage/target/debug/carenaged /usr/bin 
     - docker compose -f docker-compose.yml --profile test up -d
     - export POSTGRES_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' carenage-database-1)
     - cd carenage
