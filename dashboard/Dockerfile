@@ -9,7 +9,7 @@ LABEL org.opencontainers.image.title="carenage-dashboard"
 
 EXPOSE $PORT
 WORKDIR /dashboard
-COPY package.json package-lock.json .
+COPY package.json package-lock.json /dashboard/
 RUN npm ci 
 COPY . .
 RUN npm run build
