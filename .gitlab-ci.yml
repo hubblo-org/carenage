@@ -69,7 +69,7 @@ test-carenage-e2e:
     - cargo build --manifest-path $MANIFEST_PATH -p carenage-cli
     - mv carenage/target/debug/carenage-cli carenage/target/debug/carenage
     - mv carenage/target/debug/carenage carenage/target/debug/carenaged /usr/bin 
-    - docker compose -f docker-compose.yml --profile test up -d
+    - docker compose -f docker-compose.yml --profile dev up -d
     - export POSTGRES_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' carenage-database-1)
     - cd carenage
     - printf "DATABASE_URL='postgresql://carenage:password@$POSTGRES_IP:5432'\nBOAGENT_URL='http://127.0.0.1/8000/'\nPROJECT_NAME=carenage_webapp\nLOCATION=FRA\nLIFETIME=5\n" >> .env
