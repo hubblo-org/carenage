@@ -2,6 +2,7 @@ stages:
   - test
   - build-and-test
   - test-e2e
+  - packaging  
 
 include:
 - template: Jobs/SAST.gitlab-ci.yml
@@ -52,9 +53,7 @@ dashboard-test-for-merge-request:
 
 test-carenage-e2e:
   stage: test-e2e
-  allow_failure: true
   image: docker:24.0.7
-  allow_failure: true
   variables:
     MANIFEST_PATH: "/builds/hubblo/carenage/carenage/Cargo.toml"
   before_script:
@@ -67,13 +66,15 @@ test-carenage-e2e:
     - cargo build --manifest-path $MANIFEST_PATH
     - cargo build --manifest-path $MANIFEST_PATH -p carenaged
     - cargo build --manifest-path $MANIFEST_PATH -p carenage-cli
-    - docker compose -f docker-compose.yml --profile test up -d
+    - mv carenage/target/debug/carenage-cli carenage/target/debug/carenage
+    - mv carenage/target/debug/carenage carenage/target/debug/carenaged /usr/bin 
+    - docker compose -f docker-compose.yml --profile dev up -d
     - export POSTGRES_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' carenage-database-1)
     - cd carenage
     - printf "DATABASE_URL='postgresql://carenage:password@$POSTGRES_IP:5432'\nBOAGENT_URL='http://127.0.0.1/8000/'\nPROJECT_NAME=carenage_webapp\nLOCATION=FRA\nLIFETIME=5\n" >> .env
-    - RUST_LOG="info" ./target/debug/carenage-cli start &
+    - RUST_LOG="info" carenage start &
     - sleep 10
-    - ./target/debug/carenage-cli stop
+    - carenage stop
   rules:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
       - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -89,3 +90,16 @@ test-dashboard-e2e:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
       - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+debian-amd64-package:
+  stage: packaging
+  image: rust:slim-bullseye
+  artifacts:
+    paths:
+      - carenage/*.deb
+  script:
+    - apt update && apt install -y pkg-config libssl-dev debhelper
+    - cd carenage/packaging
+    - dpkg-buildpackage -b 
+  rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
