@@ -108,7 +108,7 @@ debian-amd64-package:
 
 test-ci-template:
   stage: ci-test
-  image: debian:slim-bullseye
+  image: debian:bullseye-slim
   script:
     - carenage start
     - sleep 10
