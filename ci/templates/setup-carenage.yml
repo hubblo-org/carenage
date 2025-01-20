@@ -40,7 +40,7 @@ default:
     - ghcr.io/boavizta/boagent:0.1.1 # ditto
 
   before_script:
-    - apt update && install curl unzip -y
+    - apt update && apt install curl unzip -y
     - >- 
       curl 
       --location
