@@ -109,6 +109,8 @@ debian-amd64-package:
 test-ci-template:
   stage: ci-test
   image: debian:bullseye-slim
+  variables:
+    CI_DEBUG_SERVICES: "true"
   script:
     - RUST_LOG="info" carenage start &
     - sleep 10
