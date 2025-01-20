@@ -12,13 +12,11 @@ spec:
     database:
       default: postgresql://carenage@postgres:5432/carenage
       description: "Defines the URL for the database connection"
-    scaphandre_pkg:
-      default: https://github.com/hubblo-org/scaphandre/releases/download/v1.0.0/scaphandre_v1.0.0-deb11_amd64.deb
-      description: "Defines the URL for downloading a Scaphandre binary package"
 ---
 
 variables:
   FF_NETWORK_PER_BUILD: true
+  POSTGRES_INIT_SCRIPT: "db/1_init_carenage.sql"
   POSTGRES_DB: carenage
   POSTGRES_USER: carenage
   POSTGRES_HOST_AUTH_METHOD: trust
@@ -36,11 +34,12 @@ default:
   services:
     - postgres
     - hubblo/scaphandre:latest
-    - ghcr.io/boavizta/boaviztapi:1.2.2 # might not work => not Docker Hub
-    - ghcr.io/boavizta/boagent:0.1.1 # ditto
+    - ghcr.io/boavizta/boaviztapi:1.2.2
+    - ghcr.io/boavizta/boagent:0.1.1
 
   before_script:
-    - apt update && apt install curl unzip -y
+    - apt update && apt install curl unzip postgresql -y
+    - psql -h "postgres" -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -f ${POSTGRES_INIT_SCRIPT}
     - >- 
       curl 
       --location
