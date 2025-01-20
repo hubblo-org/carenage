@@ -1,0 +1,50 @@
+spec:
+  inputs:
+    lifetime:
+      default: "5"
+      description: "Defines the lifetime for the evaluated device, in years"
+    location:
+      default: EEE
+      description: "Defines the location for the evaluation, to determinate the energy mix used"
+    project_name:
+      default: $CI_PROJECT_NAME
+      description: "Defines the name of the evaluated project"
+    database:
+      default: postgresql://carenage@postgres:5432/carenage
+      description: "Defines the URL for the database connection"
+    scaphandre_pkg:
+      default: https://github.com/hubblo-org/scaphandre/releases/download/v1.0.0/scaphandre_v1.0.0-deb11_amd64.deb
+      description: "Defines the URL for downloading a Scaphandre binary package"
+---
+
+variables:
+  FF_NETWORK_PER_BUILD: true
+  POSTGRES_DB: carenage
+  POSTGRES_USER: carenage
+  POSTGRES_HOST_AUTH_METHOD: trust
+  BOAVIZTAPI_ENDPOINT: http://boaviztapi:5000
+  CARENAGE_PROJECT_ID: 58830056
+  BOAGENT_URL: http://boagent:8000
+  HARDWARE_FILE_PATH: "/home/boagent/hardware_data.json"
+  POWER_FILE_PATH: "/app/data/power_data.json"
+  LOCATION: $[[ inputs.location ]]
+  LIFETIME: $[[ inputs.lifetime ]]
+  PROJECT_NAME: $[[ inputs.project_name ]]
+  DATABASE_URL: $[[ inputs.database ]]
+
+default:
+  services:
+    - postgres
+    - hubblo/scaphandre:latest
+    - ghcr.io/boavizta/boaviztapi # might not work => not Docker Hub
+    - ghcr.io/boavizta/boagent # ditto
+
+  before_script:
+    - apt install curl unzip
+    - >- 
+      curl 
+      --location
+      --output carenage.zip 
+      "https://gitlab.com/api/v4/projects/${CARENAGE_PROJECT_ID}/jobs/artifacts/ci-add-build-carenage-job/download?job=debian-amd64-package"
+    - unzip carenage.zip
+    - dpkg -i carenage/*.deb
