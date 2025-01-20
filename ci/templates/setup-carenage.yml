@@ -34,8 +34,10 @@ default:
   services:
     - postgres
     - hubblo/scaphandre:latest
-    - ghcr.io/boavizta/boaviztapi:1.2.2
-    - ghcr.io/boavizta/boagent:0.1.1
+    - name: ghcr.io/boavizta/boaviztapi:1.2.2
+      alias: boaviztapi
+    - name: ghcr.io/boavizta/boagent:0.1.1
+      alias: boagent
 
   before_script:
     - apt update && apt install curl unzip postgresql -y
