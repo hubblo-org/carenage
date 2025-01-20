@@ -36,8 +36,8 @@ default:
   services:
     - postgres
     - hubblo/scaphandre:latest
-    - ghcr.io/boavizta/boaviztapi # might not work => not Docker Hub
-    - ghcr.io/boavizta/boagent # ditto
+    - ghcr.io/boavizta/boaviztapi:1.2.2 # might not work => not Docker Hub
+    - ghcr.io/boavizta/boagent:0.1.1 # ditto
 
   before_script:
     - apt install curl unzip
