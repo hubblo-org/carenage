@@ -1,11 +1,13 @@
 stages:
+  - ci-test
   - test
   - build-and-test
   - test-e2e
   - packaging  
 
 include:
-- template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/SAST.gitlab-ci.yml
+  - local: "/ci/templates/setup-carenage.yml"
 
 semgrep-sast:
   stage: test
@@ -103,3 +105,13 @@ debian-amd64-package:
     - dpkg-buildpackage -b 
   rules:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+
+test-ci-template:
+  stage: ci-test
+  image: debian:slim-bullseye
+  script:
+    - carenage start
+    - sleep 10
+    - carenage stop
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
