@@ -107,7 +107,7 @@ debian-amd64-package:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
 
 test-ci-template:
-  stage: ci-test
+  stage: test
   image: debian:bullseye-slim
   variables:
     CI_DEBUG_SERVICES: "true"
@@ -116,4 +116,4 @@ test-ci-template:
     - sleep 10
     - carenage stop
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
