@@ -10,7 +10,7 @@ spec:
       default: $CI_PROJECT_NAME
       description: "Defines the name of the evaluated project"
     database:
-      default: postgresql://carenage@postgres:5432/carenage
+      default: postgresql://carenage:password@postgres:5432/carenage
       description: "Defines the URL for the database connection"
 ---
 
@@ -23,9 +23,6 @@ variables:
   DATABASE_URL: $[[ inputs.database ]]
 
 default:
-  services:
-    - postgres
-
   before_script:
     - apt update && apt install curl unzip -y
     - >- 
