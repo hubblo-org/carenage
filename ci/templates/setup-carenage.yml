@@ -15,16 +15,12 @@ spec:
 ---
 
 variables:
-  FF_NETWORK_PER_BUILD: true
   POSTGRES_INIT_SCRIPT: "db/1_init_carenage.sql"
   POSTGRES_DB: carenage
   POSTGRES_USER: carenage
   POSTGRES_HOST_AUTH_METHOD: trust
-  BOAVIZTAPI_ENDPOINT: http://boaviztapi:5000
   CARENAGE_PROJECT_ID: 58830056
   BOAGENT_URL: http://boagent:8000
-  HARDWARE_FILE_PATH: "/home/boagent/hardware_data.json"
-  POWER_FILE_PATH: "/app/data/power_data.json"
   LOCATION: $[[ inputs.location ]]
   LIFETIME: $[[ inputs.lifetime ]]
   PROJECT_NAME: $[[ inputs.project_name ]]
@@ -33,11 +29,6 @@ variables:
 default:
   services:
     - postgres
-    - hubblo/scaphandre:latest
-    - name: ghcr.io/boavizta/boaviztapi:1.2.2
-      alias: boaviztapi
-    - name: ghcr.io/boavizta/boagent:0.1.1
-      alias: boagent
 
   before_script:
     - apt update && apt install curl unzip postgresql -y
