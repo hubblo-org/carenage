@@ -1,0 +1,7 @@
+target/
+debug/
+
+*.deb
+*.gz
+*.toml
+*.env
