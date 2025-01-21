@@ -15,10 +15,6 @@ spec:
 ---
 
 variables:
-  POSTGRES_INIT_SCRIPT: "db/1_init_carenage.sql"
-  POSTGRES_DB: carenage
-  POSTGRES_USER: carenage
-  POSTGRES_HOST_AUTH_METHOD: trust
   CARENAGE_PROJECT_ID: 58830056
   BOAGENT_URL: http://boagent:8000
   LOCATION: $[[ inputs.location ]]
@@ -31,8 +27,7 @@ default:
     - postgres
 
   before_script:
-    - apt update && apt install curl unzip postgresql -y
-    - psql -h "postgres" -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -f ${POSTGRES_INIT_SCRIPT}
+    - apt update && apt install curl unzip -y
     - >- 
       curl 
       --location
