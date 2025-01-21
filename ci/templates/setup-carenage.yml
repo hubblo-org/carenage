@@ -20,7 +20,7 @@ variables:
   POSTGRES_USER: carenage
   POSTGRES_HOST_AUTH_METHOD: trust
   CARENAGE_PROJECT_ID: 58830056
-  BOAGENT_URL: http://192.168.33.6:8000
+  BOAGENT_URL: http://boagent:8000
   LOCATION: $[[ inputs.location ]]
   LIFETIME: $[[ inputs.lifetime ]]
   PROJECT_NAME: $[[ inputs.project_name ]]
