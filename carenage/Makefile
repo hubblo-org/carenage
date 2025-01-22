@@ -50,13 +50,15 @@ install_debug:
 	@echo "Installing debug binaries"
 	@cp target/debug/api $(PREFIX)/
 	@cp target/debug/carenaged $(PREFIX)/
-	@cp target/debug/carenage-cli $(PREFIX)/
+	@mv target/release/carenage-cli target/release/carenage
+	@cp target/debug/carenage $(PREFIX)/
 
 install_release:
-	@echo "Installing debug binaries"
+	@echo "Installing release binaries"
 	@cp target/release/api $(PREFIX)/
 	@cp target/release/carenaged $(PREFIX)/
-	@cp target/release/carenage-cli $(PREFIX)/
+	@mv target/release/carenage-cli target/release/carenage
+	@cp target/release/carenage $(PREFIX)/
 
 test:
 	@echo "Running tests. A test database Docker container must be running, otherwise some tests will never run!"
