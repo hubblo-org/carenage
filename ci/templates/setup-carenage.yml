@@ -15,7 +15,6 @@ spec:
 ---
 
 variables:
-  CARENAGE_PROJECT_ID: 58830056
   BOAGENT_URL: http://boagent:8000
   LOCATION: $[[ inputs.location ]]
   LIFETIME: $[[ inputs.lifetime ]]
@@ -24,11 +23,10 @@ variables:
 
 default:
   before_script:
-    - apt update && apt install curl unzip -y
-    - >- 
-      curl 
+    - apt update && apt install curl -y
+    - >-
+      curl
       --location
-      --output carenage.zip 
-      "https://gitlab.com/api/v4/projects/${CARENAGE_PROJECT_ID}/jobs/artifacts/ci-add-build-carenage-job/download?job=debian-amd64-package"
-    - unzip carenage.zip
-    - dpkg -i carenage/*.deb
+      --output carenage.deb
+      "https://gitlab.com/hubblo/carenage/-/releases/permalink/latest/packages/deb-amd64"
+    - dpkg -i carenage.deb
