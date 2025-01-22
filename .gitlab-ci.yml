@@ -63,7 +63,7 @@ build-carenage-and-test:
   image: rust:1.79.0-slim-bullseye
   variables:
     DATABASE_URL: postgresql://carenage:password@postgres:5432/carenage
-    BOAGENT_URL: http://127.0.0.1/8000
+    BOAGENT_URL: http://boagent:8000
     PROJECT_NAME: carenage_webapp
     LOCATION: FRA
     LIFETIME: 5
