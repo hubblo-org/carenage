@@ -3,7 +3,7 @@ CARENAGED_CARGO=./carenaged/Cargo.toml
 CARENAGE_CLI_CARGO=./carenage-cli/Cargo.toml
 DATABASE_CARGO=./database/Cargo.toml
 POSTGRES_CONTAINER=carenage-database-1
-PREFIX=/usr/local/bin
+PREFIX=/usr/bin
 CHECK_DATABASE_RUNNING=$(shell docker inspect -f '{{.State.Status}}' $(POSTGRES_CONTAINER))
 
 build_debug:
