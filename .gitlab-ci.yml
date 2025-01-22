@@ -24,12 +24,12 @@ test-for-merge-request:
     PROJECT_NAME: carenage_webapp
     LOCATION: FRA
     LIFETIME: 5
-  image: rust:latest
+  image: rust:1.79.0-slim-bullseye
   script:
     - cd carenage
     - cargo test --verbose --manifest-path $DATABASE_CARGO_FILEPATH
-    - cargo test --verbose --manifest-path $API_CARGO_FILEPATH -- --test-threads=1
-    - cargo test --verbose --manifest-path $DAEMON_CARGO_FILEPATH
+    - cargo test --verbose --manifest-path $DAEMON_CARGO_FILEPATH -- --test-threads=1
+    - cargo test --verbose --manifest-path $API_CARGO_FILEPATH
 
   rules:
       - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev")
@@ -59,7 +59,7 @@ test-dashboard-e2e:
 
 build-carenage-and-test:
   stage: build-and-test
-  image: rust:slim-bullseye
+  image: rust:1.79.0-slim-bullseye
   script:
     - apt update && apt install make
     - cd carenage
@@ -73,7 +73,7 @@ build-carenage-and-test:
 
 debian-amd64-package:
   stage: release 
-  image: rust:slim-bullseye
+  image: rust:1.79.0-slim-bullseye
   script:
     - apt update && apt install -y pkg-config libssl-dev debhelper python3-pip
     - pip3 install s3cmd
