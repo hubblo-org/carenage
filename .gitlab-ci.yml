@@ -26,6 +26,7 @@ test-for-merge-request:
     LIFETIME: 5
   image: rust:1.79.0-slim-bullseye
   script:
+    - apt update && apt install -y pkg-config libssl-dev
     - cd carenage
     - cargo test --verbose --manifest-path $DATABASE_CARGO_FILEPATH
     - cargo test --verbose --manifest-path $DAEMON_CARGO_FILEPATH -- --test-threads=1
