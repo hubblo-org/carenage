@@ -100,6 +100,7 @@ release:
   release:
     tag_name: $CI_COMMIT_TAG
     name: 'Release v$CI_COMMIT_TAG'
+    description: 'Latest release for Carenage.'
     assets:
       links:
         - name: 'deb-amd64'
