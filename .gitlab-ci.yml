@@ -68,7 +68,7 @@ build-carenage-and-test:
     - make install_release
     - RUST_LOG="info" carenage start &
     - sleep 10
-    - carenage_stop
+    - carenage stop
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev")
 
