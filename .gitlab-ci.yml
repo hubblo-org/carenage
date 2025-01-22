@@ -15,16 +15,11 @@ semgrep-sast:
 
 test-for-merge-request:
   stage: test
-  services:
-    - postgres
   variables:
-    POSTGRES_DB: carenage
-    POSTGRES_USER: carenage
-    POSTGRES_HOST_AUTH_METHOD: trust
     DATABASE_CARGO_FILEPATH: database/Cargo.toml
     API_CARGO_FILEPATH: api/Cargo.toml
     DAEMON_CARGO_FILEPATH: carenaged/Cargo.toml
-    DATABASE_URL: postgresql://carenage@postgres:5432/carenage
+    DATABASE_URL: postgresql://carenage:password@postgres:5432/carenage
     BOAGENT_URL: http://127.0.0.1/8000
     PROJECT_NAME: carenage_webapp
     LOCATION: FRA
