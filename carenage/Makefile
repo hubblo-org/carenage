@@ -8,6 +8,7 @@ CHECK_DATABASE_RUNNING=$(shell docker inspect -f '{{.State.Status}}' $(POSTGRES_
 
 build_debug:
 	@echo "Building debug"
+	apt install -y libssl-dev pkg-config
 	@echo "Building binary for API web server"
 	@cargo build --manifest-path $(API_CARGO)
 	@echo "Building binary for Carenage daemon"
@@ -17,6 +18,7 @@ build_debug:
 
 build_release:
 	@echo "Building release"
+	apt install -y libssl-dev pkg-config
 	@echo "Building binary for API web server"
 	@cargo build --manifest-path $(API_CARGO) --release
 	@echo "Building binary for Carenage daemon"
