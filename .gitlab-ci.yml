@@ -82,7 +82,7 @@ build-carenage-and-test:
   before_script:
     - apt update && apt install -y make postgresql
     - export PGPASSWORD=$POSTGRES_PASSWORD
-    - psql -h 'dbtest' -U '$POSTGRES_USER' -d '$POSTGRES_DB' -f db/1_init_carenage.sql
+    - psql -h "dbtest" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f db/1_init_carenage.sql
   script:
     - cd carenage
     - make build_release 
