@@ -3,5 +3,5 @@ debug/
 
 *.deb
 *.gz
-*.toml
+config.toml
 *.env
