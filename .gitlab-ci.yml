@@ -17,7 +17,8 @@ test-for-merge-request:
   stage: test
   image: rust:1.79.0-slim-bullseye
   services:
-    - postgres
+    - name: postgres
+      alias: dbtest
   variables:
     DATABASE_CARGO_FILEPATH: database/Cargo.toml
     API_CARGO_FILEPATH: api/Cargo.toml
@@ -25,7 +26,7 @@ test-for-merge-request:
     POSTGRES_DB: test_carenage
     POSTGRES_USER: test_user
     POSTGRES_PASSWORD: test_password
-    DATABASE_URL: postgresql://test_user:test_password@postgres:5432/test_carenage
+    DATABASE_URL: postgresql://test_user:test_password@dbtest:5432/test_carenage
     BOAGENT_URL: http://boagent:8000
     PROJECT_NAME: carenage_webapp
     LOCATION: FRA
@@ -67,12 +68,13 @@ build-carenage-and-test:
   stage: build-and-test
   image: rust:1.79.0-slim-bullseye
   services: 
-    - postgres
+    - name: postgres
+      alias: dbtest
   variables:
     POSTGRES_DB: test_carenage
     POSTGRES_USER: test_user
     POSTGRES_PASSWORD: test_password
-    DATABASE_URL: postgresql://test_user:test_password@postgres:5432/test_carenage
+    DATABASE_URL: postgresql://test_user:test_password@dbtest:5432/test_carenage
     BOAGENT_URL: http://boagent:8000
     PROJECT_NAME: carenage_webapp
     LOCATION: FRA
