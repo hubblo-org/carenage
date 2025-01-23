@@ -3,11 +3,12 @@ CARENAGED_CARGO=./carenaged/Cargo.toml
 CARENAGE_CLI_CARGO=./carenage-cli/Cargo.toml
 DATABASE_CARGO=./database/Cargo.toml
 POSTGRES_CONTAINER=carenage-database-1
-PREFIX=/usr/local/bin
+PREFIX=/usr/bin
 CHECK_DATABASE_RUNNING=$(shell docker inspect -f '{{.State.Status}}' $(POSTGRES_CONTAINER))
 
 build_debug:
 	@echo "Building debug"
+	apt update && apt install -y libssl-dev pkg-config
 	@echo "Building binary for API web server"
 	@cargo build --manifest-path $(API_CARGO)
 	@echo "Building binary for Carenage daemon"
@@ -17,6 +18,7 @@ build_debug:
 
 build_release:
 	@echo "Building release"
+	apt update && apt install -y libssl-dev pkg-config
 	@echo "Building binary for API web server"
 	@cargo build --manifest-path $(API_CARGO) --release
 	@echo "Building binary for Carenage daemon"
@@ -48,13 +50,15 @@ install_debug:
 	@echo "Installing debug binaries"
 	@cp target/debug/api $(PREFIX)/
 	@cp target/debug/carenaged $(PREFIX)/
-	@cp target/debug/carenage-cli $(PREFIX)/
+	@mv target/release/carenage-cli target/release/carenage
+	@cp target/debug/carenage $(PREFIX)/
 
 install_release:
-	@echo "Installing debug binaries"
+	@echo "Installing release binaries"
 	@cp target/release/api $(PREFIX)/
 	@cp target/release/carenaged $(PREFIX)/
-	@cp target/release/carenage-cli $(PREFIX)/
+	@mv target/release/carenage-cli target/release/carenage
+	@cp target/release/carenage $(PREFIX)/
 
 test:
 	@echo "Running tests. A test database Docker container must be running, otherwise some tests will never run!"
