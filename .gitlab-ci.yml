@@ -6,6 +6,11 @@ stages:
 include:
   - template: Jobs/SAST.gitlab-ci.yml
 
+variables:
+  RUST_DEFAULT_IMAGE:
+    value: "1.79.0-slim-bullseye"
+    description: "Default Rust image used in jobs."
+
 semgrep-sast:
   stage: test
   rules:
@@ -15,7 +20,7 @@ semgrep-sast:
 
 test-for-merge-request:
   stage: test
-  image: rust:1.79.0-slim-bullseye
+  image: rust:$RUST_DEFAULT_IMAGE
   services:
     - name: postgres
       alias: dbtest
@@ -68,7 +73,7 @@ test-dashboard-e2e:
 
 build-carenage-and-test:
   stage: build-and-test
-  image: rust:1.79.0-slim-bullseye
+  image: rust:$RUST_DEFAULT_IMAGE
   services: 
     - name: postgres
       alias: dbtest
@@ -97,7 +102,7 @@ build-carenage-and-test:
 
 debian-amd64-package:
   stage: release 
-  image: rust:1.79.0-slim-bullseye
+  image: rust:$RUST_DEFAULT_IMAGE
   script:
     - apt update && apt install -y pkg-config libssl-dev debhelper python3-pip
     - pip3 install s3cmd
