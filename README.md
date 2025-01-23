@@ -4,6 +4,30 @@
 
 *Carenage* (*careening* in English) is a series of operations made on the hull of a ship in order to inspect, clean or repair it. Environmental evaluation can be difficult to put into place for software development teams. With data recovered during tests or benchmarks, *Carenage* aims to simplify this and allow for better evaluation and better application of eco-design practices.
 
+## Using Carenage
+
+You can use Carenage in your continuous integration scripts, if the CI environment you will be using has the needed services already set up. The section [Setting up Carenage](#setting-up-carenage) gives a bit more information on that.
+If that is the case, you can include the template available in `ci/templates` that downloads and sets up `carenage` for a Debian environment. This can be done with the following command in the `.gitlab-ci.yml` of your project:
+ 
+```
+include:
+  - remote: "https://gitlab.com/hubblo/carenage/-/raw/main/ci/templates/setup-carenage.yml"
+    inputs:
+     lifetime: 6 
+```
+
+With `inputs`, some parameters used by `carenage` can be modified in place of the default ones, as documented in the template.
+
+## Setting up Carenage 
+
+`carenage` is meant to be executed in a continuous integration environment, such as a Gitlab runner. As it is dependent on several other services, namely [boaviztapi](https://github.com/boavizta/boaviztapi) and [scaphandre](https://github.com/hubblo-org/scaphandre) through [boagent](https://github.com/boavizta/boagent) and a PostgreSQL database, there is a bit of configuration to take care of if you want to self-host `carenage`.
+
+### Gitlab runner
+
+If you have set up your own [Gitlab runner](https://docs.gitlab.com/runner/install/index.html), you can add all needed services so that any CI pipelines can be executed without having to repeat their setup process for each job.
+In the folder `ci/docker`, you can find examples of a minimal `config.toml` for a Gitlab runner, and of a `docker-compose.yml` to see how to orchestrate all needed containers, with the associated network and volumes.
+You may have to tweak the configuration for your own specific needs, but with this minimal configuration and orchestration set into place, a CI script similar to `ci/templates/setup-carenage.yml` should be able to use `carenage`.
+
 ## Development
 
 ### Back-end
