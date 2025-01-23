@@ -1,0 +1,32 @@
+spec:
+  inputs:
+    lifetime:
+      default: "5"
+      description: "Defines the lifetime for the evaluated device, in years"
+    location:
+      default: EEE
+      description: "Defines the location for the evaluation, to determinate the energy mix used"
+    project_name:
+      default: $CI_PROJECT_NAME
+      description: "Defines the name of the evaluated project"
+    database:
+      default: postgresql://carenage:password@postgres:5432/carenage
+      description: "Defines the URL for the database connection"
+---
+
+variables:
+  BOAGENT_URL: http://boagent:8000
+  LOCATION: $[[ inputs.location ]]
+  LIFETIME: $[[ inputs.lifetime ]]
+  PROJECT_NAME: $[[ inputs.project_name ]]
+  DATABASE_URL: $[[ inputs.database ]]
+
+default:
+  before_script:
+    - apt update && apt install curl -y
+    - >-
+      curl
+      --location
+      --output carenage.deb
+      "https://gitlab.com/hubblo/carenage/-/releases/permalink/latest/packages/deb-amd64"
+    - dpkg -i carenage.deb

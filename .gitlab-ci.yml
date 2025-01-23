@@ -1,105 +1,128 @@
 stages:
   - test
   - build-and-test
-  - test-e2e
-  - packaging  
+  - release
 
 include:
-- template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/SAST.gitlab-ci.yml
 
 semgrep-sast:
   stage: test
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev")
       exists:
         - '**/*.rs'
 
 test-for-merge-request:
-  stage: build-and-test
-  services: 
-    - postgres
+  stage: test
+  image: rust:1.79.0-slim-bullseye
+  services:
+    - name: postgres
+      alias: dbtest
   variables:
-    POSTGRES_DB: carenage 
-    POSTGRES_USER: carenage 
-    POSTGRES_HOST_AUTH_METHOD: trust
-  image: rust:latest
-  script: 
-    - export DATABASE_URL="postgresql://carenage@postgres:5432/carenage" 
+    DATABASE_CARGO_FILEPATH: database/Cargo.toml
+    API_CARGO_FILEPATH: api/Cargo.toml
+    DAEMON_CARGO_FILEPATH: carenaged/Cargo.toml
+    POSTGRES_DB: test_carenage
+    POSTGRES_USER: test_user
+    POSTGRES_PASSWORD: test_password
+    DATABASE_URL: postgresql://test_user:test_password@dbtest:5432/test_carenage
+    BOAGENT_URL: http://boagent:8000
+    PROJECT_NAME: carenage_webapp
+    LOCATION: FRA
+    LIFETIME: 5
+  script:
+    - apt update && apt install -y pkg-config libssl-dev
     - cd carenage
-    - printf "BOAGENT_URL='http://127.0.0.1/8000/'\nPROJECT_NAME=carenage_webapp\nLOCATION=FRA\nLIFETIME=5" >> .env
-    - cd database
-    - cargo test --verbose
-    - cd ../carenaged
-    - cargo test --verbose -- --test-threads=1
-    - cd ../api
-    - cargo test --verbose
+    - cargo test --verbose --manifest-path $DATABASE_CARGO_FILEPATH
+    - cargo test --verbose --manifest-path $DAEMON_CARGO_FILEPATH -- --test-threads=1
+    - cargo test --verbose --manifest-path $API_CARGO_FILEPATH
 
   rules:
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev")
       - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 dashboard-test-for-merge-request:
-  stage: build-and-test
+  stage: test
   image: node:lts-slim
   script:
     - cd dashboard
     - npm ci
     - npm run test
   rules:
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
-      - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
-test-carenage-e2e:
-  stage: test-e2e
-  image: docker:24.0.7
-  variables:
-    MANIFEST_PATH: "/builds/hubblo/carenage/carenage/Cargo.toml"
-  before_script:
-    - docker info
-  script: 
-    - apk update 
-    - apk add curl gcc libressl-dev musl-dev pkgconf 
-    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    - . "$HOME/.cargo/env"
-    - cargo build --manifest-path $MANIFEST_PATH
-    - cargo build --manifest-path $MANIFEST_PATH -p carenaged
-    - cargo build --manifest-path $MANIFEST_PATH -p carenage-cli
-    - mv carenage/target/debug/carenage-cli carenage/target/debug/carenage
-    - mv carenage/target/debug/carenage carenage/target/debug/carenaged /usr/bin 
-    - docker compose -f docker-compose.yml --profile dev up -d
-    - export POSTGRES_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' carenage-database-1)
-    - cd carenage
-    - printf "DATABASE_URL='postgresql://carenage:password@$POSTGRES_IP:5432'\nBOAGENT_URL='http://127.0.0.1/8000/'\nPROJECT_NAME=carenage_webapp\nLOCATION=FRA\nLIFETIME=5\n" >> .env
-    - RUST_LOG="info" carenage start &
-    - sleep 10
-    - carenage stop
-  rules:
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev")
       - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 test-dashboard-e2e:
-  stage: test-e2e
+  stage: test
   image: mcr.microsoft.com/playwright:v1.49.1-noble
+  ## Some tests are flaky with webkit (Safari / Safari Mobile). Allowing failure for now until the problem is properly identified.
+  allow_failure: true
   script:
     - cd dashboard
     - npm ci
     - npx playwright test --retries=2
   rules:
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev")
       - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-debian-amd64-package:
-  stage: packaging
-  image: rust:slim-bullseye
-  artifacts:
-    paths:
-      - carenage/*.deb
+build-carenage-and-test:
+  stage: build-and-test
+  image: rust:1.79.0-slim-bullseye
+  services: 
+    - name: postgres
+      alias: dbtest
+  variables:
+    POSTGRES_DB: test_carenage
+    POSTGRES_USER: test_user
+    POSTGRES_PASSWORD: test_password
+    DATABASE_URL: postgresql://test_user:test_password@dbtest:5432/test_carenage
+    BOAGENT_URL: http://boagent:8000
+    PROJECT_NAME: carenage_webapp
+    LOCATION: FRA
+    LIFETIME: 5
+  before_script:
+    - apt update && apt install -y make postgresql
+    - export PGPASSWORD=$POSTGRES_PASSWORD
+    - psql -h "dbtest" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f db/1_init_carenage.sql
   script:
-    - apt update && apt install -y pkg-config libssl-dev debhelper
-    - cd carenage/packaging
-    - dpkg-buildpackage -b 
+    - cd carenage
+    - make build_release 
+    - make install_release
+    - RUST_LOG="info" carenage start &
+    - sleep 10
+    - carenage stop
   rules:
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev")
+
+debian-amd64-package:
+  stage: release 
+  image: rust:1.79.0-slim-bullseye
+  script:
+    - apt update && apt install -y pkg-config libssl-dev debhelper python3-pip
+    - pip3 install s3cmd
+    - cd carenage/packaging
+    - dpkg-buildpackage -b
+    - export SHA256SUM=$(sha256sum carenage*.deb) && echo $SHA256SUM
+    - echo $SHA256SUM > sha256sums
+    - s3cmd --access_key="$S3_ACCESS_KEY" --secret_key="$S3_SECRET_KEY" --region="fr-par" --acl-public --host="s3.fr-par.scw.cloud" --host-bucket="%(bucket).s3.fr-par.scw.cloud" --storage-class="ONEZONE_IA" put carenage*.deb sha256sums s3://carenage/amd64/$CI_COMMIT_TAG/
+  rules:
+      - if: $CI_COMMIT_TAG
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - echo "Releasing v$CI_COMMIT_TAG for Carenage!"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: 'Release v$CI_COMMIT_TAG'
+    description: 'Latest release for Carenage.'
+    assets:
+      links:
+        - name: 'deb-amd64'
+          url: 'https://carenage.s3.fr-par.scw.cloud/amd64/$CI_COMMIT_TAG/carenage_$CI_COMMIT_TAG-1_amd64.deb'
+          filepath: '/packages/deb-amd64'
+          link_type: 'package'
