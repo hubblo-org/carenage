@@ -1,14 +1,22 @@
-version: "3.9"
+name: carenage
 
 services:
 
-  database:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    restart: always
+    volumes:
+      - gitlab-runner-config:/etc/gitlab-runner
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    profiles: [prod]
+    networks:
+      - carenage
+
+  postgres:
     image: postgres:16-bookworm
     restart: always
     ports: 
-      - "5432:5432"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "5433:5433"
     volumes:
       - ./db:/docker-entrypoint-initdb.d
     environment:
@@ -20,7 +28,6 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-    profiles: [dev, prod] 
     networks:
       - carenage
 
@@ -66,40 +73,21 @@ services:
     networks:
       - carenage 
 
-  daemon:
-    image: hubblo/carenage:dev
-    environment:
-      DATABASE_URL: "postgres://carenage:password@database:5432/carenage"
-      PROJECT_NAME: "hubblo/carenage"
-      BOAGENT_URL: "http://boagent:8000"
-      LOCATION: "FRA"
-      LIFETIME: 5
-    depends_on:
-      - database
-      - boagent
-      - scaphandre
-      - boaviztapi
-    profiles: [prod]
-    command: ["/usr/local/bin/carenage-cli", "start"]
-    networks:
-      - carenage
-
   api:
     image: hubblo/carenage:dev
     environment:
-      DATABASE_URL: "postgres://carenage:password@database:5432/carenage"
+      DATABASE_URL: "postgres://carenage:password@postgres:5433/carenage"
       PROJECT_NAME: "hubblo/carenage"
       BOAGENT_URL: "http://boagent:8000"
       LOCATION: "FRA"
       LIFETIME: 5
     depends_on:
-      - database
+      - postgres
       - boagent
       - scaphandre
       - boaviztapi
     ports:
       - "3000:3000"
-    profiles: [dev, prod]
     networks:
       - carenage
 
@@ -128,7 +116,10 @@ services:
 
 volumes:
   powerdata: {}
+  gitlab-runner-config:
+    name: gitlab-runner-config
 
 networks:
   carenage:
+    name: carenage
     driver: bridge
