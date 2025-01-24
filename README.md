@@ -18,7 +18,7 @@ include:
 
 With `inputs`, some parameters used by `carenage` can be modified in place of the default ones, as documented in the template.
 
-## Setting up Carenage 
+## Self-hosting Carenage 
 
 `carenage` is meant to be executed in a continuous integration environment, such as a Gitlab runner. As it is dependent on several other services, namely [boaviztapi](https://github.com/boavizta/boaviztapi) and [scaphandre](https://github.com/hubblo-org/scaphandre) through [boagent](https://github.com/boavizta/boagent) and a PostgreSQL database, there is a bit of configuration to take care of if you want to self-host `carenage`.
 
