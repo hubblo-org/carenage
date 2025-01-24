@@ -9,9 +9,6 @@ spec:
     project_name:
       default: $CI_PROJECT_NAME
       description: "Defines the name of the evaluated project"
-    database:
-      default: postgresql://carenage:password@postgres:5432/carenage
-      description: "Defines the URL for the database connection"
 ---
 
 variables:
@@ -19,7 +16,6 @@ variables:
   LOCATION: $[[ inputs.location ]]
   LIFETIME: $[[ inputs.lifetime ]]
   PROJECT_NAME: $[[ inputs.project_name ]]
-  DATABASE_URL: $[[ inputs.database ]]
 
 default:
   before_script:
