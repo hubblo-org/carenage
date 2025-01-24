@@ -109,7 +109,7 @@ build-carenage-and-test:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev")
 
-debian-amd64-package:
+build-debian-amd64-package:
   stage: release 
   image: rust:$RUST_DEFAULT_IMAGE
   script:
@@ -122,6 +122,36 @@ debian-amd64-package:
     - s3cmd --access_key="$S3_ACCESS_KEY" --secret_key="$S3_SECRET_KEY" --region="fr-par" --acl-public --host="s3.fr-par.scw.cloud" --host-bucket="%(bucket).s3.fr-par.scw.cloud" --storage-class="ONEZONE_IA" put carenage*.deb sha256sums s3://carenage/amd64/$CI_COMMIT_TAG/
   rules:
     - !reference [.release_rules, rules]
+
+update-carenage-docker-image:
+  stage: release
+  image: docker 24.0.5
+  services:
+    - docker:24.0.5-dind
+  script:
+    - cd carenage
+    - docker build -t hubblo/carenage:latest .
+    - cat $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+    - docker push hubblo/carenage:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+      changes:
+        - carenage/**/*
+
+update-dashboard-docker-image:
+  stage: release
+  image: docker 24.0.5
+  services:
+    - docker:24.0.5-dind
+  script:
+    - cd dashboard
+    - docker build -t hubblo/carenage-dashboard:latest .
+    - cat $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+    - docker push hubblo/carenage-dashboard:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+      changes:
+      - dashboard/**/*
 
 release:
   stage: release
