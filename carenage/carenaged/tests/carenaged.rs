@@ -126,16 +126,18 @@ async fn it_inserts_start_event_to_events_table() {
 #[tokio::test]
 async fn it_inserts_all_events_and_metrics_for_processes() {
     common::setup();
+
+    let mut boagent_server = Server::new_async().await;
+    let url = boagent_server.url();
+    env::set_var("BOAGENT_URL", url);
+
     let now = Timestamp::new(UnixFlag::Unset);
     let gitlab_vars = GitlabVariables::parse_env_variables().unwrap();
     let project_root_path = std::env::current_dir().unwrap().join("..");
     let config = Config::check_configuration(&project_root_path)
         .expect("Configuration fields should be parsable.");
 
-    let mut boagent_server = Server::new_async().await;
-    let url = boagent_server.url();
     let mock_boagent_path = canonicalize("../mocks/query_boagent_response_before_process_embedded_impacts.json").unwrap();
-    env::set_var("BOAGENT_URL", url);
 
     let _mock_boagent_query_with_hardware = boagent_server
         .mock("GET", "/query")
@@ -151,6 +153,7 @@ async fn it_inserts_all_events_and_metrics_for_processes() {
         .with_body_from_file(&mock_boagent_path)
         .create_async()
         .await;
+
     let _mock_boagent_query_without_hardware = boagent_server
         .mock("GET", "/query")
         .match_query(Matcher::AllOf(vec![
