@@ -1,9 +1,15 @@
-use std::env;
 use chrono::Local;
 use database::timestamp::Timestamp;
+use std::env;
 
-pub fn setup(){
+pub fn setup() {
     let now = Timestamp::ISO8601(Some(Local::now()));
+    env::set_var(
+        "CI_PROJECT_URL",
+        "https://gitlab.com/carenage/mywebapplication",
+    );
+    env::set_var("CI_PROJECT_ID", "54212104651");
+    env::set_var("CI_PROJECT_CREATED_AT", now.to_string());
     env::set_var("CI_PROJECT_PATH", "hubblo/carenage");
     env::set_var("CI_PIPELINE_ID", "1234");
     env::set_var("CI_PIPELINE_CREATED_AT", now.to_string());

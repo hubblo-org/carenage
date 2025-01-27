@@ -4,6 +4,9 @@ use log::info;
 use crate::timestamp::{Timestamp, UnixFlag};
 
 pub struct GitlabVariables {
+    pub project_repo_url: String,
+    pub project_repo_id: i64,
+    pub project_created_at: Timestamp,
     pub project_path: String,
     pub pipeline_id: u64,
     pub pipeline_created_at: Timestamp,
@@ -15,6 +18,9 @@ pub struct GitlabVariables {
 
 impl GitlabVariables {
     pub fn parse_env_variables() -> Result<GitlabVariables, Box<dyn std::error::Error>> {
+        let project_repo_url = env::var("CI_PROJECT_URL")?.to_string();
+        let project_repo_id = env::var("CI_PROJECT_ID")?.to_string().parse::<i64>()?;
+        let project_created_at = Timestamp::parse_str(env::var("CI_PROJECT_CREATED_AT")?.to_string(), UnixFlag::Unset);
         let project_path = env::var("CI_PROJECT_PATH")?.to_string();
         let pipeline_id = env::var("CI_PIPELINE_ID")?.to_string().parse::<u64>()?;
         let pipeline_created_at = Timestamp::parse_str(env::var("CI_PIPELINE_CREATED_AT")?.to_string(), UnixFlag::Unset);
@@ -26,6 +32,9 @@ impl GitlabVariables {
         info!("All needed Gitlab variables are available!");
 
         Ok(GitlabVariables {
+            project_repo_url,
+            project_repo_id,
+            project_created_at,
             project_path,
             pipeline_id,
             pipeline_created_at,
