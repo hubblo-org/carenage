@@ -2,7 +2,7 @@ use crate::boagent::Config;
 use crate::ci::GitlabVariables;
 use crate::database::{
     format_hardware_data, get_db_connection_pool, get_project_id, insert_device_metadata,
-    insert_dimension_table_metadata
+    insert_dimension_table_metadata,
 };
 use crate::timestamp::Timestamp;
 use log::{error, info};
@@ -29,16 +29,14 @@ pub trait Metadata {
         start_timestamp: Timestamp,
         deserialized_boagent_response: Option<Value>,
         config: &Config,
-    ) -> Result<InsertAttempt, Box<dyn std::error::Error>>;
+    ) -> Result<PgRow, Box<dyn std::error::Error>>;
     async fn get_id(
         &self,
-        insert_attempt: InsertAttempt,
-        project_name: Option<&String>,
+        row: PgRow
     ) -> Result<uuid::Uuid, Box<dyn std::error::Error>>;
 }
 
 pub enum CarenageRow {
-    Project,
     Workflow,
     Pipeline,
     Job,
@@ -55,7 +53,6 @@ pub enum InsertAttempt {
 impl CarenageRow {
     pub fn table_name(&self) -> &str {
         match self {
-            CarenageRow::Project => "projects",
             CarenageRow::Workflow => "workflows",
             CarenageRow::Pipeline => "pipelines",
             CarenageRow::Job => "jobs",
@@ -71,7 +68,6 @@ impl Metadata for CarenageRow {
         let gitlab_vars = GitlabVariables::parse_env_variables()
             .expect("Gitlab variables should be available to parse");
         let row_name: String = match self {
-            CarenageRow::Project => gitlab_vars.project_path.to_string(),
             CarenageRow::Workflow => format!("workflow_{}", gitlab_vars.project_path),
             CarenageRow::Pipeline => gitlab_vars.pipeline_name,
             CarenageRow::Job => gitlab_vars.job_name,
@@ -86,7 +82,6 @@ impl Metadata for CarenageRow {
         let gitlab_vars = GitlabVariables::parse_env_variables()
             .expect("Gitlab variables should be available to parse");
         let start_date: Option<Timestamp> = match self {
-            CarenageRow::Project => Some(start_timestamp),
             CarenageRow::Workflow => Some(gitlab_vars.pipeline_created_at),
             CarenageRow::Pipeline => Some(start_timestamp),
             CarenageRow::Job => Some(gitlab_vars.job_started_at),

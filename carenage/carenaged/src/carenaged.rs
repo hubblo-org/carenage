@@ -56,27 +56,27 @@ pub async fn insert_metadata(
     let workflow_rows = CarenageRow::Workflow
         .insert(start_timestamp, None, config)
         .await?;
-    let workflow_id = CarenageRow::Workflow.get_id(workflow_rows, None).await?;
+    let workflow_id = CarenageRow::Workflow.get_id(workflow_rows).await?;
 
     let pipeline_rows = CarenageRow::Pipeline
         .insert(start_timestamp, None, config)
         .await?;
-    let pipeline_id = CarenageRow::Pipeline.get_id(pipeline_rows, None).await?;
+    let pipeline_id = CarenageRow::Pipeline.get_id(pipeline_rows).await?;
 
     let job_rows = CarenageRow::Job
         .insert(start_timestamp, None, config)
         .await?;
-    let job_id = CarenageRow::Job.get_id(job_rows, None).await?;
+    let job_id = CarenageRow::Job.get_id(job_rows).await?;
 
     let run_rows = CarenageRow::Run
         .insert(start_timestamp, None, config)
         .await?;
-    let run_id = CarenageRow::Run.get_id(run_rows, None).await?;
+    let run_id = CarenageRow::Run.get_id(run_rows).await?;
 
     let task_rows = CarenageRow::Task
         .insert(start_timestamp, None, config)
         .await?;
-    let task_id = CarenageRow::Task.get_id(task_rows, None).await?;
+    let task_id = CarenageRow::Task.get_id(task_rows).await?;
 
     let project_root_path = std::env::current_dir().unwrap().join("..");
     let config = Config::check_configuration(&project_root_path)?;
@@ -99,7 +99,7 @@ pub async fn insert_metadata(
             &config,
         )
         .await?;
-    let device_id = CarenageRow::Device.get_id(insert_device_data, None).await?;
+    let device_id = CarenageRow::Device.get_id(insert_device_data).await?;
 
     let start_process = ProcessBuilder::new(
         process::id() as i32,
