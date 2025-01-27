@@ -11,6 +11,7 @@ use database::tables::{CarenageRow, Metadata};
 use database::tables::{Process, ProcessBuilder};
 use database::timestamp::{Timestamp, UnixFlag};
 use log::{info, warn};
+use std::any::Any;
 use std::env;
 use std::process;
 
@@ -45,24 +46,36 @@ pub async fn insert_metadata(
     unix_flag: UnixFlag,
     config: &Config,
 ) -> Result<Ids, Box<dyn std::error::Error>> {
-    let project_rows = CarenageRow::Project.insert(start_timestamp, None, config).await?;
+    let project_rows = CarenageRow::Project
+        .insert(start_timestamp, None, config)
+        .await?;
     let project_id = CarenageRow::Project
         .get_id(project_rows, Some(&gitlab_vars.project_path))
         .await?;
 
-    let workflow_rows = CarenageRow::Workflow.insert(start_timestamp, None, config).await?;
+    let workflow_rows = CarenageRow::Workflow
+        .insert(start_timestamp, None, config)
+        .await?;
     let workflow_id = CarenageRow::Workflow.get_id(workflow_rows, None).await?;
 
-    let pipeline_rows = CarenageRow::Pipeline.insert(start_timestamp, None, config).await?;
+    let pipeline_rows = CarenageRow::Pipeline
+        .insert(start_timestamp, None, config)
+        .await?;
     let pipeline_id = CarenageRow::Pipeline.get_id(pipeline_rows, None).await?;
 
-    let job_rows = CarenageRow::Job.insert(start_timestamp, None, config).await?;
+    let job_rows = CarenageRow::Job
+        .insert(start_timestamp, None, config)
+        .await?;
     let job_id = CarenageRow::Job.get_id(job_rows, None).await?;
 
-    let run_rows = CarenageRow::Run.insert(start_timestamp, None, config).await?;
+    let run_rows = CarenageRow::Run
+        .insert(start_timestamp, None, config)
+        .await?;
     let run_id = CarenageRow::Run.get_id(run_rows, None).await?;
 
-    let task_rows = CarenageRow::Task.insert(start_timestamp, None, config).await?;
+    let task_rows = CarenageRow::Task
+        .insert(start_timestamp, None, config)
+        .await?;
     let task_id = CarenageRow::Task.get_id(task_rows, None).await?;
 
     let project_root_path = std::env::current_dir().unwrap().join("..");
@@ -80,7 +93,11 @@ pub async fn insert_metadata(
     .await?;
     let deserialized_boagent_response = deserialize_boagent_json(response).await?;
     let insert_device_data = CarenageRow::Device
-        .insert(start_timestamp, Some(deserialized_boagent_response), &config)
+        .insert(
+            start_timestamp,
+            Some(deserialized_boagent_response),
+            &config,
+        )
         .await?;
     let device_id = CarenageRow::Device.get_id(insert_device_data, None).await?;
 
@@ -113,13 +130,17 @@ pub async fn insert_metadata(
     Ok(ids)
 }
 
-pub async fn insert_event(event: &Event, config: &Config) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn insert_event(
+    event: &Event,
+    config: &Config,
+) -> Result<(), Box<dyn std::error::Error>> {
     let db_pool = get_db_connection_pool(&config.database_url)
         .await?
         .acquire();
 
     Event::insert(event, db_pool.await?).await?;
-    Ok(info!("Inserted event data into database."))
+    info!("Inserted event data into database.");
+    Ok(())
 }
 
 pub async fn query_and_insert_event(
@@ -205,6 +226,6 @@ pub async fn query_and_insert_event(
             "Some error occured while recovering data from Scaphandre, some data might be missing!"
         ),
     }
-
-    Ok(info!("Boagent query and metrics insertion attempt over."))
+    info!("Boagent query and metrics insertion attempt over.");
+    Ok(())
 }
