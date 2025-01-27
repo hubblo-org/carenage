@@ -11,7 +11,6 @@ use database::tables::{CarenageRow, Metadata, Project, ProjectBuilder};
 use database::tables::{Process, ProcessBuilder};
 use database::timestamp::{Timestamp, UnixFlag};
 use log::{info, warn};
-use std::any::Any;
 use std::env;
 use std::process;
 
@@ -47,8 +46,6 @@ pub async fn insert_metadata(
     config: &Config,
 ) -> Result<Ids, Box<dyn std::error::Error>> {
     let db_pool = get_db_connection_pool(&config.database_url)
-        .await?
-        .acquire()
         .await?;
 
     let project = ProjectBuilder::new(
@@ -58,7 +55,7 @@ pub async fn insert_metadata(
         &gitlab_vars.project_repo_url,
     )
     .build();
-    let insert_project_attempt = Project::insert(&project, db_pool).await?;
+    let insert_project_attempt = Project::insert(&project, db_pool.acquire().await?).await?;
     let project_id = Project::get_id(insert_project_attempt, Some(&project.name)).await?;
 
     let workflow_rows = CarenageRow::Workflow
@@ -86,9 +83,6 @@ pub async fn insert_metadata(
         .await?;
     let task_id = CarenageRow::Task.get_id(task_rows).await?;
 
-    let project_root_path = std::env::current_dir().unwrap().join("..");
-    let config = Config::check_configuration(&project_root_path)?;
-
     let end_time = Timestamp::new(unix_flag);
     let response = query_boagent(
         &config.boagent_url,
@@ -104,7 +98,7 @@ pub async fn insert_metadata(
         .insert(
             start_timestamp,
             Some(deserialized_boagent_response),
-            &config,
+            config,
         )
         .await?;
     let device_id = CarenageRow::Device.get_id(insert_device_data).await?;
@@ -117,12 +111,7 @@ pub async fn insert_metadata(
     )
     .build();
 
-    let db_pool = get_db_connection_pool(&config.database_url)
-        .await?
-        .acquire()
-        .await?;
-
-    let process_row = Process::insert(&start_process, db_pool).await?;
+    let process_row = Process::insert(&start_process, db_pool.acquire().await?).await?;
     let process_id = Process::get_id(process_row);
 
     let ids = Ids {
