@@ -31,7 +31,7 @@ CREATE TABLE devices (
 );
 CREATE TABLE events (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    "timestamp" timestamp with time zone,
+    timestamp timestamp with time zone,
     process_id uuid NOT NULL,
     task_id uuid NOT NULL,
     job_id uuid NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE pipelines (
     name character varying(255),
     start_date timestamp with time zone,
     stop_date timestamp with time zone,
-    repo_id integer,
+    repo_id bigint,
     repo_url character varying(255)
 );
 CREATE TABLE processes (
@@ -75,8 +75,9 @@ CREATE TABLE processes (
 CREATE TABLE projects (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
     name character varying(255) UNIQUE,
-    created_at timestamp with time zone,
-    repo_id integer,
+    start_date timestamp with time zone,
+    stop_date timestamp with time zone,
+    repo_id bigint,
     repo_url character varying(255)
 );
 CREATE TABLE runs (
@@ -84,9 +85,9 @@ CREATE TABLE runs (
     name character varying(255),
     start_date timestamp with time zone,
     stop_date timestamp with time zone,
-    repo_id integer,
+    repo_id bigint,
     repo_url character varying(255),
-    status character varying(255),
+    status character varying(255)
 );
 CREATE TABLE tasks (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -133,9 +134,9 @@ INSERT INTO component_characteristic VALUES
 	('59b594a3-270b-4022-939c-13302746f0c8', 'capacity', NULL),
 	('613fe2ee-781f-44cb-a668-2363ed81f274', 'capacity', NULL),
 	('5a20de51-38a6-4840-98b4-e0c4549c06aa', 'capacity', NULL),
-	('5a20de51-38a6-4840-98b4-e0c4549c06aa', 'type', '"ssd"'),
+	('5a20de51-38a6-4840-98b4-e0c4549c06aa', 'type', 'ssd'),
 	('03439571-5578-48b7-9737-9acdb1eb04a6', 'capacity', NULL),
-	('03439571-5578-48b7-9737-9acdb1eb04a6', 'type', '"hdd"');
+	('03439571-5578-48b7-9737-9acdb1eb04a6', 'type', 'hdd');
 
 
 --
@@ -160,10 +161,10 @@ INSERT INTO jobs VALUES
 --
 
 INSERT INTO pipelines VALUES
-	('80d53828-dcb8-4f45-aa4c-bc666e3ee54c', 'pipeline', '2024-11-05 11:14:52.079353+00', NULL, 1637850766, "https://gitlab.com/hubblo/carenage/-/pipelines/1637850766"),
-	('93a50da7-d390-43ed-92cf-192bc5e41eb2', 'pipeline', '2024-11-05 11:15:36.651423+00', NULL, 1637850767, "https://gitlab.com/hubblo/carenage/-/pipelines/1637850767"),
-	('648f8be8-0646-453e-8e48-110338b5e398', 'pipeline', '2024-11-05 11:18:40.346398+00', NULL, 1637850768, "https://gitlab.com/hubblo/carenage/-/pipelines/1637850768"),
-	('9d807f09-e006-4808-9fa2-70f67432d37b', 'pipeline', '2024-11-05 11:19:22.783871+00', NULL, 1637850769, "https://gitlab.com/hubblo/carenage/-/pipelines/1637850769");
+	('80d53828-dcb8-4f45-aa4c-bc666e3ee54c', 'pipeline', '2024-11-05 11:14:52.079353+00', NULL, 1637850766, 'https://gitlab.com/hubblo/carenage/-/pipelines/1637850766'),
+	('93a50da7-d390-43ed-92cf-192bc5e41eb2', 'pipeline', '2024-11-05 11:15:36.651423+00', NULL, 1637850767, 'https://gitlab.com/hubblo/carenage/-/pipelines/1637850767'),
+	('648f8be8-0646-453e-8e48-110338b5e398', 'pipeline', '2024-11-05 11:18:40.346398+00', NULL, 1637850768, 'https://gitlab.com/hubblo/carenage/-/pipelines/1637850768'),
+	('9d807f09-e006-4808-9fa2-70f67432d37b', 'pipeline', '2024-11-05 11:19:22.783871+00', NULL, 1637850769, 'https://gitlab.com/hubblo/carenage/-/pipelines/1637850769');
 
 
 --
@@ -194,7 +195,7 @@ INSERT INTO processes VALUES
 --
 
 INSERT INTO projects VALUES
-	('95dfae11-5cad-41d9-bcf9-fa6564c22dd6', 'hubblo/carenage', '2024-11-05 11:14:52.079353+00', 58830056, "https://gitlab.com/hubblo/carenage");
+	('95dfae11-5cad-41d9-bcf9-fa6564c22dd6', 'hubblo/carenage', '2024-11-05 11:14:52.079353+00', NULL, 58830056, 'https://gitlab.com/hubblo/carenage');
 
 
 --
@@ -202,10 +203,10 @@ INSERT INTO projects VALUES
 --
 
 INSERT INTO runs VALUES
-	('60f84f9d-1104-48d9-ab59-3f635811de3d', 'run_build_env', '2024-11-05 11:14:52.079353+00', NULL, 8931381068, "https://gitlab.com/hubblo/carenage/-/jobs/8931381068"),
-	('006db111-dbe7-4c01-888e-96f0231ac0ac', 'run_build_env', '2024-11-05 11:15:36.651423+00', NULL, 8931381069, "https://gitlab.com/hubblo/carenage/-/jobs/8931381069"),
-	('5643685e-6e92-4987-b0c6-c3708aa62c60', 'run_build_env', '2024-11-05 11:18:40.346398+00', NULL, 8931381070, "https://gitlab.com/hubblo/carenage/-/jobs/8931381070"),
-	('e51076c8-5c47-4a47-a146-04625e77a6ae', 'run_build_env', '2024-11-05 11:19:22.783871+00', NULL, 8931381071, "https://gitlab.com/hubblo/carenage/-/jobs/8931381071");
+	('60f84f9d-1104-48d9-ab59-3f635811de3d', 'run_build_env', '2024-11-05 11:14:52.079353+00', NULL, 8931381068, 'https://gitlab.com/hubblo/carenage/-/jobs/8931381068'),
+	('006db111-dbe7-4c01-888e-96f0231ac0ac', 'run_build_env', '2024-11-05 11:15:36.651423+00', NULL, 8931381069, 'https://gitlab.com/hubblo/carenage/-/jobs/8931381069'),
+	('5643685e-6e92-4987-b0c6-c3708aa62c60', 'run_build_env', '2024-11-05 11:18:40.346398+00', NULL, 8931381070, 'https://gitlab.com/hubblo/carenage/-/jobs/8931381070'),
+	('e51076c8-5c47-4a47-a146-04625e77a6ae', 'run_build_env', '2024-11-05 11:19:22.783871+00', NULL, 8931381071, 'https://gitlab.com/hubblo/carenage/-/jobs/8931381071');
 
 
 --

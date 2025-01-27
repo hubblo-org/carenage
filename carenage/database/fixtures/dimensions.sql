@@ -17,8 +17,9 @@ BEGIN
 	CREATE TABLE projects (
 	  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	  name VARCHAR(255) UNIQUE,
-	  created_at TIMESTAMPTZ,
-	  repo_id INTEGER,
+	  start_date TIMESTAMPTZ,
+	  stop_date TIMESTAMPTZ,
+	  repo_id BIGINT,
 	  repo_url VARCHAR(255)
 	);
 	CREATE TABLE workflows (
@@ -33,7 +34,7 @@ BEGIN
 	  name VARCHAR(255),
 	  start_date TIMESTAMPTZ,
 	  stop_date TIMESTAMPTZ,
-	  repo_id INTEGER,
+	  repo_id BIGINT,
 	  repo_url VARCHAR(255)
 	);
 
@@ -42,7 +43,7 @@ BEGIN
 	  name VARCHAR(255),
 	  start_date TIMESTAMPTZ,
 	  stop_date TIMESTAMPTZ,
-	  repo_id INTEGER,
+	  repo_id BIGINT,
 	  repo_url VARCHAR(255),
 	  status VARCHAR(255)
 	);
@@ -125,11 +126,11 @@ BEGIN
 	);
 
 	nowts := CURRENT_TIMESTAMP;
-	INSERT INTO PROJECTS (name, created_at, repo_id, repo_url) VALUES ('my_web_app', nowts, 58830056, "https://gitlab.com/hubblo/carenage") RETURNING id INTO p_id;
-	INSERT INTO WORKFLOWS (name, start_date)VALUES ('workflow_my_web_app', nowts) RETURNING id INTO w_id;
-	INSERT INTO PIPELINES (name, start_date, repo_id, repo_url) VALUES ('Run tests on merge request', nowts, 1637850766, "https://gitlab.com/hubblo/carenage/-/pipelines/1637850766") RETURNING id INTO pip_id;
+	INSERT INTO PROJECTS (name, start_date, repo_id, repo_url) VALUES ('my_web_app', nowts, 58830056, 'https://gitlab.com/hubblo/carenage') RETURNING id INTO p_id;
+	INSERT INTO WORKFLOWS (name, start_date) VALUES ('workflow_my_web_app', nowts) RETURNING id INTO w_id;
+	INSERT INTO PIPELINES (name, start_date, repo_id, repo_url) VALUES ('Run tests on merge request', nowts, 1637850766, 'https://gitlab.com/hubblo/carenage/-/pipelines/1637850766') RETURNING id INTO pip_id;
 	INSERT INTO JOBS (name, start_date) VALUES ('tests', nowts) RETURNING id INTO j_id;
-	INSERT INTO RUNS (name, start_date, repo_id, repo_url) VALUES ('run_tests_01', nowts, 8931381068, "https://gitlab.com/hubblo/carenage/-/jobs/8931381068") RETURNING id INTO r_id;
+	INSERT INTO RUNS (name, start_date, repo_id, repo_url) VALUES ('run_tests_01', nowts, 8931381068, 'https://gitlab.com/hubblo/carenage/-/jobs/8931381068') RETURNING id INTO r_id;
 	INSERT INTO TASKS (name, start_date) VALUES ('build_env_and_test', nowts) RETURNING id INTO t_id;
 	INSERT INTO DEVICES (name, lifetime, location) VALUES ('dell r740', 5, 'FRA') RETURNING id INTO d_id;
 	INSERT INTO COMPONENTS (device_id, name, model, manufacturer) VALUES (d_id, 'cpu',  'Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz', 'Intel Corp.') RETURNING id INTO c_id;
