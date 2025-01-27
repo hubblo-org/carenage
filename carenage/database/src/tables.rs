@@ -122,72 +122,117 @@ impl Metadata for CarenageRow {
         start_timestamp: Timestamp,
         deserialized_boagent_response: Option<Value>,
         config: &Config,
-    ) -> Result<InsertAttempt, Box<dyn std::error::Error>> {
+    ) -> Result<PgRow, Box<dyn std::error::Error>> {
         let db_pool = get_db_connection_pool(&config.database_url).await?;
-        let rows: InsertAttempt = match self {
-            CarenageRow::Project => InsertAttempt::Pending(
-                insert_dimension_table_metadata(
-                    db_pool.acquire().await?,
-                    self.table_name(),
-                    self.serialize(start_timestamp, None, config),
-                )
-                .await,
-            ),
+        let rows: PgRow = match self {
             CarenageRow::Workflow
             | CarenageRow::Pipeline
             | CarenageRow::Job
             | CarenageRow::Run
-            | CarenageRow::Task => InsertAttempt::Success(
+            | CarenageRow::Task => {
                 insert_dimension_table_metadata(
                     db_pool.acquire().await?,
                     self.table_name(),
                     self.serialize(start_timestamp, None, config),
                 )
-                .await?,
-            ),
-            CarenageRow::Device => InsertAttempt::Success(
+                .await?
+            }
+            CarenageRow::Device => {
                 insert_device_metadata(
                     db_pool.acquire().await?,
                     self.serialize(start_timestamp, deserialized_boagent_response, config),
                 )
-                .await?,
-            ),
+                .await?
+            }
         };
         Ok(rows)
     }
 
     async fn get_id(
         &self,
+        row: PgRow
+    ) -> Result<uuid::Uuid, Box<dyn std::error::Error>> {
+        let id = row.get("id");        
+        Ok(id)
+    }
+}
+
+pub struct Project {
+    pub id: Option<Uuid>,
+    pub name: String,
+    pub start_date: Timestamp,
+    pub stop_date: Option<Timestamp>,
+    pub repo_id: i64,
+    pub repo_url: String,
+}
+
+pub struct ProjectBuilder(Project);
+
+impl ProjectBuilder {
+    pub fn new(name: &str, start_date: Timestamp, repo_id: i64, repo_url: &str) -> Self {
+        ProjectBuilder(Project {
+            id: None,
+            name: name.to_owned(),
+            start_date,
+            stop_date: None,
+            repo_id,
+            repo_url: repo_url.to_owned(),
+        })
+    }
+    pub fn build(self) -> Project {
+        self.0
+    }
+}
+
+impl Project {
+    pub async fn insert(
+        &self,
+        db_connection: PoolConnection<Postgres>,
+    ) -> Result<InsertAttempt, Box<dyn std::error::Error>> {
+        let insert_query = "INSERT INTO projects (name, repo_id, repo_url) VALUES ($1, $2, $3)";
+
+        let project_row = sqlx::query(insert_query)
+            .bind(&self.name)
+            .bind(self.repo_id)
+            .bind(&self.repo_url)
+            .fetch_one(&mut db_connection.detach())
+            .await;
+        Ok(InsertAttempt::Pending(project_row))
+    }
+    pub async fn get_id(
         insert_attempt: InsertAttempt,
         row_name: Option<&String>,
     ) -> Result<uuid::Uuid, Box<dyn std::error::Error>> {
         let id: uuid::Uuid = match insert_attempt {
             InsertAttempt::Pending(Ok(row)) => {
-                info!("Inserted {} metadata into database.", self.table_name());
+                info!("Inserted project metadata into database.");
                 row.get("id")
             }
-            InsertAttempt::Pending(Err(err)) => match err
-                .as_database_error()
-                .expect("It should be a DatabaseError.")
-                .kind()
-            {
-                ErrorKind::UniqueViolation => {
-                    info!(
+            InsertAttempt::Pending(Err(err)) => {
+                println!("{:?}", err);
+                match err
+                    .as_database_error()
+                    .expect("It should be a DatabaseError.")
+                    .kind()
+                {
+                    ErrorKind::UniqueViolation => {
+                        info!(
                         "Metadata already present in database, not a project initialization: {}.",
                         err
                     );
-                    let project_root_path = std::env::current_dir().unwrap().join("..");
-                    let config = Config::check_configuration(&project_root_path)?;
-                    let db_pool = get_db_connection_pool(&config.database_url).await?;
-                    get_project_id(db_pool.acquire().await?, row_name.unwrap()).await?
+                        let project_root_path = std::env::current_dir().unwrap().join("..");
+                        let config = Config::check_configuration(&project_root_path)?;
+                        let db_pool = get_db_connection_pool(&config.database_url).await?;
+                        get_project_id(db_pool.acquire().await?, row_name.unwrap()).await?
+                    }
+                    _ => {
+                        error!("Error while processing metadata insertion: {}", err);
+                        process::exit(0x0100)
+                    }
                 }
-                _ => {
-                    error!("Error while processing metadata insertion: {}", err);
-                    process::exit(0x0100)
-                }
-            },
+            }
             InsertAttempt::Success(row) => {
-                info!("Inserted {} metadata into database.", self.table_name());
+                info!("Inserted project metadata into database.");
                 row.get("id")
             }
         };

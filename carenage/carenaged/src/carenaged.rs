@@ -7,7 +7,7 @@ use database::database::{
 };
 use database::event::{Event, EventBuilder, EventType};
 use database::metrics::Metrics;
-use database::tables::{CarenageRow, Metadata};
+use database::tables::{CarenageRow, Metadata, Project, ProjectBuilder};
 use database::tables::{Process, ProcessBuilder};
 use database::timestamp::{Timestamp, UnixFlag};
 use log::{info, warn};
@@ -46,12 +46,20 @@ pub async fn insert_metadata(
     unix_flag: UnixFlag,
     config: &Config,
 ) -> Result<Ids, Box<dyn std::error::Error>> {
-    let project_rows = CarenageRow::Project
-        .insert(start_timestamp, None, config)
+    let db_pool = get_db_connection_pool(&config.database_url)
+        .await?
+        .acquire()
         .await?;
-    let project_id = CarenageRow::Project
-        .get_id(project_rows, Some(&gitlab_vars.project_path))
-        .await?;
+
+    let project = ProjectBuilder::new(
+        &gitlab_vars.project_path,
+        gitlab_vars.project_created_at,
+        gitlab_vars.project_repo_id,
+        &gitlab_vars.project_repo_url,
+    )
+    .build();
+    let insert_project_attempt = Project::insert(&project, db_pool).await?;
+    let project_id = Project::get_id(insert_project_attempt, Some(&project.name)).await?;
 
     let workflow_rows = CarenageRow::Workflow
         .insert(start_timestamp, None, config)

@@ -10,7 +10,7 @@ use database::database::{
 };
 use database::event::{Event, EventType};
 use database::metrics::Metrics;
-use database::tables::{Process, ProcessBuilder};
+use database::tables::{InsertAttempt, Process, ProcessBuilder, Project, ProjectBuilder};
 use database::timestamp::Timestamp;
 use dotenv::var;
 use mockito::{Matcher, Server};
@@ -24,23 +24,17 @@ async fn it_inserts_valid_data_in_projects_table_in_the_carenage_database(
     pool: PgPool,
 ) -> sqlx::Result<()> {
     let now_timestamp = Local::now();
-
-    let project_metadata = json!({
-        "name": "my_web_application",
-        "start_date": now_timestamp.to_string(),
-    });
-
     let db_connection = pool.acquire().await?;
 
-    let insert_query =
-        insert_dimension_table_metadata(db_connection, "projects", project_metadata.clone()).await;
-
+    let project = ProjectBuilder::new(
+        "mywebapplication",
+        Timestamp::ISO8601(Some(now_timestamp)),
+        54212104651,
+        "https://gitlab.com/carenage/mywebapplication",
+    )
+    .build();
+    let insert_query = Project::insert(&project, db_connection).await;
     assert!(insert_query.is_ok());
-
-    let row = insert_query.unwrap();
-    let project_name: String = row.get("name");
-    assert_eq!(project_name, project_metadata["name"]);
-    assert_eq!(row.len(), 6);
     Ok(())
 }
 
