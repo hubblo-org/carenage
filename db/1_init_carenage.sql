@@ -1,8 +1,9 @@
 CREATE TABLE projects (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) UNIQUE,
-  created_at TIMESTAMPTZ,
-  repo_id INTEGER,
+  start_date TIMESTAMPTZ, 
+  stop_date TIMESTAMPTZ,
+  repo_id BIGINT,
   repo_url VARCHAR(255)
 );
 
@@ -18,7 +19,7 @@ CREATE TABLE pipelines (
   name VARCHAR(255),
   start_date TIMESTAMPTZ,
   stop_date TIMESTAMPTZ,
-  repo_id INTEGER,
+  repo_id BIGINT,
   repo_url VARCHAR(255)
 );
 
@@ -27,9 +28,9 @@ CREATE TABLE runs (
   name VARCHAR(255),
   start_date TIMESTAMPTZ,
   stop_date TIMESTAMPTZ,
-  repo_id INTEGER,
+  repo_id BIGINT,
   repo_url VARCHAR(255),
-  status VARCHAR(255),
+  status VARCHAR(255)
 );
 
 CREATE TABLE jobs (
